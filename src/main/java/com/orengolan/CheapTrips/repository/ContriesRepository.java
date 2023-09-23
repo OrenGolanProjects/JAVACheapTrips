@@ -1,4 +1,4 @@
-package com.orengolan.CheapTrips;
+package com.orengolan.CheapTrips.repository;
 
 
 
