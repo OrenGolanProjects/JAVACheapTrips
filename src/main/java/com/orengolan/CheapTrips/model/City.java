@@ -9,6 +9,38 @@ import org.springframework.data.mongodb.core.index.Indexed;
 public class City {
     @Id
     private  String _id;
+    @Indexed(unique = true)
+    private String cityName;
+    private String countryIATACode;
+    private String cityIATACode;
+    private String timeZone;
+    private Double latCoordinates;
+    private Double lonCoordinates;
+
+
+
+    public City(String cityName, String countryIATACode, String cityIATACode, String timeZone, Double latCoordinates,Double lonCoordinates) {
+        this.cityName = cityName;
+        this.countryIATACode = countryIATACode;
+        this.cityIATACode = cityIATACode;
+        this.timeZone = timeZone;
+        this.latCoordinates = latCoordinates;
+        this.lonCoordinates = lonCoordinates;
+    }
+
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id='" + _id + '\'' +
+                ", cityName='" + cityName + '\'' +
+                ", countryIATACode='" + countryIATACode + '\'' +
+                ", cityIATACode='" + cityIATACode + '\'' +
+                ", timeZone='" + timeZone + '\'' +
+                ", latCoordinates=" + latCoordinates +
+                ", lonCoordinates=" + lonCoordinates +
+                '}';
+    }
 
     public String getId() {
         return _id;
@@ -23,20 +55,20 @@ public class City {
         this.cityName = cityName;
     }
 
-    public String getCountryIATA() {
-        return countryIATA;
+    public String getCountryIATACode() {
+        return countryIATACode;
     }
 
-    public void setCountryIATA(String countryIATA) {
-        this.countryIATA = countryIATA;
+    public void setCountryIATACode(String countryIATA) {
+        this.countryIATACode = countryIATA;
     }
 
-    public String getCityIATA() {
-        return cityIATA;
+    public String getCityIATACode() {
+        return cityIATACode;
     }
 
-    public void setCityIATA(String cityIATA) {
-        this.cityIATA = cityIATA;
+    public void setCityIATACode(String cityIATA) {
+        this.cityIATACode = cityIATA;
     }
 
     public String getTimeZone() {
@@ -63,36 +95,4 @@ public class City {
         this.lonCoordinates = lonCoordinates;
     }
 
-    @Indexed(unique = true)
-    private String cityName;
-    private String countryIATA;
-    private String cityIATA;
-    private String timeZone;
-    private Double latCoordinates;
-    private Double lonCoordinates;
-
-
-
-    public City(String cityName, String countryIATA, String cityIATA, String timeZone, Double latCoordinates,Double lonCoordinates) {
-        this.cityName = cityName;
-        this.countryIATA = countryIATA;
-        this.cityIATA = cityIATA;
-        this.timeZone = timeZone;
-        this.latCoordinates = latCoordinates;
-        this.lonCoordinates = lonCoordinates;
-    }
-
-
-    @Override
-    public String toString() {
-        return "City{" +
-                "id='" + _id + '\'' +
-                ", city_name='" + cityName + '\'' +
-                ", country_IATA='" + countryIATA + '\'' +
-                ", city_IATA='" + cityIATA + '\'' +
-                ", time_zone='" + timeZone + '\'' +
-                ", lat_coordinates=" + latCoordinates +
-                ", lon_coordinates=" + lonCoordinates +
-                '}';
-    }
 }

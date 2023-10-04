@@ -2,11 +2,12 @@ package com.orengolan.CheapTrips.service;
 
 
 import com.orengolan.CheapTrips.model.City;
-import com.orengolan.CheapTrips.repository.CountriesRepository;
+import com.orengolan.CheapTrips.repository.CityRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,17 +15,22 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 @Service
-public class FlightDataAPI {
-    private static final Logger logger = Logger.getLogger(FlightDataAPI.class.getName());
+public class CityService {
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+    private static final Logger logger = Logger.getLogger(CityService.class.getName());
     private static final String API_URL = "https://api.travelpayouts.com/data/en/cities.json";
     private static final String SUCCESS_MESSAGE = "City list processed successfully.";
-    private final CountriesRepository countriesRepository;
+    private final CityRepository cityRepository;
     private final ObjectMapper objectMapper;
     private final OkHttpClient client = new OkHttpClient();
 
+
+
     @Autowired
-    public FlightDataAPI(CountriesRepository contriesRepository, ObjectMapper objectMapper) {
-        this.countriesRepository = contriesRepository;
+    public CityService(CityRepository cityRepository, ObjectMapper objectMapper) {
+        this.cityRepository = cityRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -53,7 +59,6 @@ public class FlightDataAPI {
 
             // Parse the JSON array
             JsonNode cityList = objectMapper.readTree(json);
-
             for (JsonNode cityNode : cityList) {
                 JsonNode nameNode = cityNode.path("name_translations").path("en");
                 if (nameNode.isMissingNode() || nameNode.isNull()) {
@@ -69,20 +74,18 @@ public class FlightDataAPI {
                 double lon = cityNode.path("coordinates").path("lon").asDouble();
 
                 // Check if a city with the same name already exists
-                City existingCity = countriesRepository.findByCityName(name);
+                City existingCity = cityRepository.findByCityIATACode(code);
                 if (existingCity != null) {
-                    // Handle the case where the city already exists (update or skip)
-                    // For example, you might update existingCity with the new data
-                    existingCity.setCountryIATA(countryCode);
-                    existingCity.setCityIATA(code);
+                    existingCity.setCountryIATACode(countryCode);
+                    existingCity.setCityIATACode(code);
                     existingCity.setTimeZone(timeZone);
                     existingCity.setLatCoordinates(lat);
                     existingCity.setLonCoordinates(lon);
-                    countriesRepository.save(existingCity);
+                    cityRepository.save(existingCity);
                 } else {
                     // Create a new City object and save it to the repository
                     City city = new City(name, countryCode, code, timeZone, lat, lon);
-                    countriesRepository.save(city);
+                    cityRepository.save(city);
                 }
             }
             logger.info("Finished synchronize cities data from API.");
@@ -91,13 +94,13 @@ public class FlightDataAPI {
             logger.severe("Error synchronize city data: " + e.getMessage());
             return "Error processing synchronize city data: " + e.getMessage();
         }
-
     }
 
     public Boolean deleteCities(){
         logger.info("Starting delete cities data from DB.");
         // Clear the existing collection of cities
-        countriesRepository.deleteAll();
+        cityRepository.deleteAll();
+        mongoTemplate.dropCollection(City.class);
         logger.info("Finished delete cities data from DB.");
         return Boolean.TRUE;
     }
