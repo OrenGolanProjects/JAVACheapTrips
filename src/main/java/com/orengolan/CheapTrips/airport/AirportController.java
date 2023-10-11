@@ -1,9 +1,7 @@
-package com.orengolan.CheapTrips.controller;
+package com.orengolan.CheapTrips.airport;
 
 
-import com.orengolan.CheapTrips.model.Airport;
-import com.orengolan.CheapTrips.repository.AirportRepository;
-import com.orengolan.CheapTrips.service.AirportService;
+import com.orengolan.CheapTrips.city.CityController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
@@ -20,8 +18,8 @@ import java.util.logging.Logger;
 @RequestMapping("/api/airports")
 public class AirportController {
 
-
-    private static final Logger logger = Logger.getLogger(CityController.class.getName());
+    //TODO Needs to developer a validation layer + User Identification.
+    private static final Logger logger = Logger.getLogger(AirportController.class.getName());
     private final AirportRepository airportRepository;
     private final AirportService airportService;
 
@@ -34,6 +32,7 @@ public class AirportController {
     @RequestMapping(value = "/airport/get-all-airports",method = RequestMethod.GET)
     public List<Airport> getAllAirports(){
         logger.info("*** Getting all airports");
+
         return this.airportRepository.findAll();
     }
 
@@ -62,10 +61,35 @@ public class AirportController {
             }
             return ResponseEntity.ok(airport);
         }
-
         catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving airports at IATA Code: "+ countryIATACode+ " information.");
         }
     }
 
+    @RequestMapping(value = "/airport/{countryIATACode}/{cityIATACode}", method = RequestMethod.GET)
+    public ResponseEntity<Airport> getAirportByCountryAndCity(@PathVariable String countryIATACode,@PathVariable String cityIATACode) {
+        try {
+            logger.info("Getting information for Country IATA code: " + countryIATACode + ", City IATA code: " + cityIATACode);
+
+            List<Airport> airports = this.airportRepository.findByCountryIATACodeAndCityIATACode(
+                    countryIATACode.toUpperCase(),
+                    cityIATACode.toUpperCase()
+            );
+
+            if (airports.isEmpty()) {
+                logger.warning("No airports found for Country IATA Code: " + countryIATACode+ " and City IATA Code: " + cityIATACode + ".");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+            if (airports.size()>1){
+                logger.warning("Multiple airports found for Country IATA code: " + countryIATACode + ", City IATA code: " + cityIATACode);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+
+            return ResponseEntity.ok(airports.get(0));
+
+        } catch (Exception e) {
+            logger.warning("Error retrieving airport information for Country IATA Code: " + countryIATACode+ " and City IATA Code: " + cityIATACode + ".");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

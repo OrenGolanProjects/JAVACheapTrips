@@ -1,7 +1,5 @@
-package com.orengolan.CheapTrips.service;
+package com.orengolan.CheapTrips.airport;
 
-import com.orengolan.CheapTrips.model.Airport;
-import com.orengolan.CheapTrips.repository.AirportRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +19,8 @@ public class AirportService {
     private MongoTemplate mongoTemplate;
 
     private static final Logger logger = Logger.getLogger(AirportService.class.getName());
+
+    //TODO Needs to move the variables to Secure storge: API_URL
     private static final String API_URL = "https://api.travelpayouts.com/data/en/airports.json";
     private static final String SUCCESS_MESSAGE = "Airport list processed successfully.";
     private final AirportRepository airportRepository;
@@ -37,6 +37,8 @@ public class AirportService {
         logger.info("Starting get airport list");
         Request request = new Request.Builder().url(API_URL).build();
 
+
+        // TODO before execute the request, need to activate LOCK_DOWN_MECHANISM - LOCK_DOWN_MECHANISM needs to developed.
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
             if (response.body() != null) {
@@ -83,6 +85,8 @@ public class AirportService {
                 Double lonCoordinates       =  airportNode.path("coordinates").path("lon").asDouble();
                 Double latCoordinates       =  airportNode.path("coordinates").path("lat").asDouble();
 
+
+
                 if (cityIATACode.isEmpty()) {
                     continue; // Skip processing this airport if cityIATACode is null or empty
                 }
@@ -96,6 +100,11 @@ public class AirportService {
 
                 // Create a new City object and save it to the repository
                 Airport airport = new Airport(airportIATACode,airportName,lonCoordinates,latCoordinates,timeZone,countryIATACode,cityIATACode);
+
+                if (!airportName.toLowerCase().contains("airport")) {
+                    logger.warning("Not valid Airport name: "+airport);
+                    continue;
+                }
                 airportRepository.save(airport);
             }
             logger.info("Finished synchronize airports data from API.");
@@ -108,8 +117,7 @@ public class AirportService {
 
     public boolean deleteAirports(){
         logger.info("Starting delete airports list");
-        this.airportRepository.deleteAll();
-        mongoTemplate.dropCollection(Airport.class);
+        mongoTemplate.dropCollection("airports");
         logger.info("Finished delete airports data from DB.");
         return Boolean.TRUE;
     }

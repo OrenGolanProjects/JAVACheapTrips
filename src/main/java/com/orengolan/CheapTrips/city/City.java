@@ -1,4 +1,4 @@
-package com.orengolan.CheapTrips.model;
+package com.orengolan.CheapTrips.city;
 
 
 import org.springframework.data.annotation.Id;
@@ -9,17 +9,18 @@ import org.springframework.data.mongodb.core.index.Indexed;
 public class City {
     @Id
     private  String _id;
-    @Indexed(unique = true)
     private String cityName;
     private String countryIATACode;
+    @Indexed(unique = true)
     private String cityIATACode;
     private String timeZone;
     private Double latCoordinates;
     private Double lonCoordinates;
 
-
-
     public City(String cityName, String countryIATACode, String cityIATACode, String timeZone, Double latCoordinates,Double lonCoordinates) {
+        if (cityName == null || countryIATACode == null || cityIATACode == null || timeZone == null || latCoordinates == null || lonCoordinates == null) {
+            throw new IllegalArgumentException("All constructor arguments must be non-null.");
+        }
         this.cityName = cityName;
         this.countryIATACode = countryIATACode;
         this.cityIATACode = cityIATACode;

@@ -1,4 +1,4 @@
-package com.orengolan.CheapTrips.model;
+package com.orengolan.CheapTrips.airport;
 
 
 import org.springframework.data.annotation.Id;
@@ -11,16 +11,11 @@ public class Airport {
     @Id
     private String _id;
     private String cityIATACode;
-
-
     private String airportName;
-
     private String timeZone;
     private String countryIATACode;
-
     @Indexed(unique = true)
     private String airportIATACode;
-
     private Double lonCoordinates;
     private Double latCoordinates;
 

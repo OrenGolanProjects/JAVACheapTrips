@@ -1,11 +1,9 @@
-package com.orengolan.CheapTrips.controller;
+package com.orengolan.CheapTrips.city;
 
 
-import com.orengolan.CheapTrips.repository.CityRepository;
-import com.orengolan.CheapTrips.model.City;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import com.orengolan.CheapTrips.service.CityService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import com.mongodb.client.result.UpdateResult;
@@ -20,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @RestController
 @RequestMapping("/api/locations")
 public class CityController {
+
+
+    //TODO Needs to developer a validation layer + User Identification.
     private static final Logger logger = Logger.getLogger(CityController.class.getName());
     private final CityRepository cityRepository;
     private final CityService cityService;
@@ -34,18 +35,37 @@ public class CityController {
 
     @RequestMapping(value = "/city/{cityName}", method = RequestMethod.GET)
     public ResponseEntity<?> getSpecificCity(@PathVariable String cityName) {
-        try{
-        logger.info("Getting information for city: " + cityName);
-        List<City> city = this.cityRepository.findBycityName(cityName.toLowerCase());
-        if (city == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("City "+cityName+" is not found.");
-        }
-        if (city.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("City: "+cityName+" is not found.");
-        }
-        return ResponseEntity.ok(city);}
-        catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving city information");
+        try {
+            logger.info("Getting information for city: " + cityName);
+            City city = null;
+            try {
+                // Start by searching for search the EXACT string.
+                city = this.cityRepository.findCityByPartialName(cityName.toLowerCase());
+            }catch(Exception e){
+                logger.warning(e.getMessage());
+            }
+            if (city == null) {
+
+                List<City> cities = this.cityRepository.findBycityName(cityName.toLowerCase());
+
+                if (!cities.isEmpty()){
+                logger.warning("Found "+cities.size()+" matching cities found for city name: " + cityName);
+                logger.warning("Returning the first one.");
+
+                return ResponseEntity.ok(cities.get(0));
+                }
+
+                // Try search again but with partial name.
+                logger.warning("City " + cityName + " is not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("City " + cityName + " is not found.");
+                }
+
+            // Success found a city
+            return ResponseEntity.ok(city);
+
+        }catch(Exception e) {
+            logger.warning("Error retrieving city information, "+e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving city information, "+e.getMessage());
         }
     }
 
@@ -68,14 +88,18 @@ public class CityController {
             throw new IllegalArgumentException("Invalid input parameters");
         }
 
+
+
         logger.info("Creating a new city: " + cityName);
         City newCity = new City(cityName, countryIATA, cityIATA, timeZone, latCoordinates, lonCoordinates);
-        newCity = this.cityRepository.insert(newCity);
+        if (this.cityRepository.findBycityName(cityName).isEmpty()){
+            newCity = this.cityRepository.insert(newCity);
+        }
         return newCity;
     }
 
     @RequestMapping(value="/synchronize-cities", method = RequestMethod.POST)
-    public String synchronizeCities() {
+    public String synchronizeCities() throws IOException {
         logger.info("Rebuilding cities data");
         return this.cityService.synchronizeCityDataWithAPI();
     }
