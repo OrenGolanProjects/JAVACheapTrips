@@ -1,16 +1,13 @@
 package com.orengolan.CheapTrips.airport;
 
 
-import com.orengolan.CheapTrips.city.CityController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -23,8 +20,9 @@ public class AirportController {
     private final AirportRepository airportRepository;
     private final AirportService airportService;
 
+
     @Autowired
-    public AirportController(AirportRepository airportRepository, AirportService airportService, MongoTemplate mongoTemplate ){
+    public AirportController(AirportRepository airportRepository, AirportService airportService){
         this.airportRepository = airportRepository;
         this.airportService = airportService;
     }
@@ -56,9 +54,6 @@ public class AirportController {
             if (airport == null){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Airports did not found at IATA Code: "+ countryIATACode+".");
             }
-            if (airport.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Airports did not found at IATA Code: "+ countryIATACode+".");
-            }
             return ResponseEntity.ok(airport);
         }
         catch(Exception e) {
@@ -67,7 +62,7 @@ public class AirportController {
     }
 
     @RequestMapping(value = "/airport/{countryIATACode}/{cityIATACode}", method = RequestMethod.GET)
-    public ResponseEntity<Airport> getAirportByCountryAndCity(@PathVariable String countryIATACode,@PathVariable String cityIATACode) {
+    public ResponseEntity<?> getAirportByCountryAndCity(@PathVariable String countryIATACode,@PathVariable String cityIATACode) {
         try {
             logger.info("Getting information for Country IATA code: " + countryIATACode + ", City IATA code: " + cityIATACode);
 
@@ -78,18 +73,18 @@ public class AirportController {
 
             if (airports.isEmpty()) {
                 logger.warning("No airports found for Country IATA Code: " + countryIATACode+ " and City IATA Code: " + cityIATACode + ".");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No airports found for Country IATA Code: " + countryIATACode+ " and City IATA Code: " + cityIATACode + ".");
             }
             if (airports.size()>1){
                 logger.warning("Multiple airports found for Country IATA code: " + countryIATACode + ", City IATA code: " + cityIATACode);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Multiple airports found for Country IATA code: " + countryIATACode + ", City IATA code: " + cityIATACode);
             }
 
             return ResponseEntity.ok(airports.get(0));
 
         } catch (Exception e) {
             logger.warning("Error retrieving airport information for Country IATA Code: " + countryIATACode+ " and City IATA Code: " + cityIATACode + ".");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving airport information for Country IATA Code: " + countryIATACode+ " and City IATA Code: " + cityIATACode + ".");
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.orengolan.CheapTrips.city;
 
-
+import com.orengolan.CheapTrips.controller.GlobalExceptionHandler;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -53,6 +53,9 @@ public class City {
     }
 
     public void setCityName(String cityName) {
+        if (cityName.isEmpty()){
+            throw new IllegalArgumentException("City name is null, cannot setCityName.");
+        }
         this.cityName = cityName;
     }
 
