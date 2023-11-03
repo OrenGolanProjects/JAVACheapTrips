@@ -3,10 +3,8 @@ package com.orengolan.CheapTrips.airport;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import okhttp3.Request;
-import okhttp3.Response;
+import com.orengolan.CheapTrips.util.API;
 import java.io.IOException;
-import okhttp3.OkHttpClient;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,48 +13,36 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AirportService {
-    @Autowired
-    private MongoTemplate mongoTemplate;
 
+    private final MongoTemplate mongoTemplate;
     private static final Logger logger = Logger.getLogger(AirportService.class.getName());
 
-    //TODO Needs to move the variables to Secure storge: API_URL
+    //TODO Needs to move the variables to Secure storage: API_URL
     private static final String API_URL = "https://api.travelpayouts.com/data/en/airports.json";
     private static final String SUCCESS_MESSAGE = "Airport list processed successfully.";
     private final AirportRepository airportRepository;
     private final ObjectMapper objectMapper;
-    private final OkHttpClient client = new OkHttpClient();
+    private final API api;
+
+
 
     @Autowired
-    public AirportService(AirportRepository airportRepository, ObjectMapper objectMapper) {
+    public AirportService(AirportRepository airportRepository, ObjectMapper objectMapper, MongoTemplate mongoTemplate,API api) {
         this.airportRepository = airportRepository;
         this.objectMapper = objectMapper;
+        this.mongoTemplate = mongoTemplate;
+        this.api = api;
     }
 
-    public String getAirportList() throws IOException {
+    private String getAirports() throws IOException {
         logger.info("Starting get airport list");
-        Request request = new Request.Builder().url(API_URL).build();
-
-
-        // TODO before execute the request, need to activate LOCK_DOWN_MECHANISM - LOCK_DOWN_MECHANISM needs to developed.
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-            if (response.body() != null) {
-                logger.info("Finished get airports list.");
-                return response.body().string();
-            } else {
-                throw new IOException("Body of response if empty. " + response);
-            }
-        } catch(IOException e) {
-            logger.severe("Error get airport list: " + e.getMessage());
-            return "Error get airport list: " + e.getMessage();
-        }
+        return this.api.buildAndExecuteRequest(API_URL,null);
     }
 
     public String synchronizeAirportDataWithAPI() {
         try {
             logger.info("Starting synchronize airports data from API.");
-            String json = getAirportList();
+            String json = getAirports();
 
             // Parse the JSON array
             JsonNode airportList = objectMapper.readTree(json);

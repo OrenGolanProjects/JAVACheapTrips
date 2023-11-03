@@ -2,6 +2,7 @@ package com.orengolan.CheapTrips.util;
 
 import org.joda.time.*;
 import org.springframework.lang.Nullable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.Calendar;
@@ -10,7 +11,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 public class Dates {
-    public static SimpleDateFormat shortDate = new SimpleDateFormat("YYYY-MM-dd");
+    public static SimpleDateFormat shortDate = new SimpleDateFormat("yyyy-MM-dd");
     public static TimeZone TIME_ZONE = TimeZone.getTimeZone("Asia/Jerusalem");
     public static SimpleDateFormat monthFormatter = new SimpleDateFormat("yyyy/MM");
 
@@ -19,7 +20,6 @@ public class Dates {
 
     public static String getCurMonth() {
         Date date = new Date();
-
         return monthFormatter.format(date);
     }
 
@@ -84,4 +84,16 @@ public class Dates {
             return Objects.equals(date1, date2);
         }
     }
+    public static LocalDateTime parseStringToLocalDateTime(String dateString) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        Date date = formatter.parse(dateString);
+        return atLocalTime(date);
+    }
+    public static LocalDateTime parseStringToLocalDate(String dateString) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = formatter.parse(dateString);
+        return atLocalTime(date);
+    }
+
+
 }
