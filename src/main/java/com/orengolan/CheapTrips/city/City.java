@@ -1,26 +1,43 @@
 package com.orengolan.CheapTrips.city;
 
-import com.orengolan.CheapTrips.controller.GlobalExceptionHandler;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Size;
+
 @Document(collection = "cities")
 public class City {
     @Id
-    private  String _id;
-    private String cityName;
-    private String countryIATACode;
-    @Indexed(unique = true)
-    private String cityIATACode;
-    private String timeZone;
-    private Double latCoordinates;
-    private Double lonCoordinates;
+    private String _id;
 
-    public City(String cityName, String countryIATACode, String cityIATACode, String timeZone, Double latCoordinates,Double lonCoordinates) {
-        if (cityName == null || countryIATACode == null || cityIATACode == null || timeZone == null || latCoordinates == null || lonCoordinates == null) {
-            throw new IllegalArgumentException("All constructor arguments must be non-null.");
-        }
+    @NotNull
+    @Size(min = 2, max = 10)
+    private String cityName;
+    @NotNull
+    @Size(max = 3)
+    private final String countryIATACode;
+    @NotNull
+    @Size(max = 3)
+    @Indexed(unique = true)
+    private final String cityIATACode;
+    private final String timeZone;
+    @NotNull
+    @DecimalMin(value = "-90.0", message = "Latitude must be at least -90")
+    @DecimalMax(value = "90.0", message = "Latitude must be at most 90")
+    private final Double latCoordinates;
+
+    @NotNull
+    @DecimalMin(value = "-180.0", message = "Longitude must be at least -180")
+    @DecimalMax(value = "180.0", message = "Longitude must be at most 180")
+    private final Double lonCoordinates;
+
+
+    public City(@NotNull String cityName, @NotNull String countryIATACode, @NotNull String cityIATACode,
+                @NotNull String timeZone, @NotNull Double latCoordinates, @NotNull Double lonCoordinates) {
         this.cityName = cityName;
         this.countryIATACode = countryIATACode;
         this.cityIATACode = cityIATACode;
@@ -33,23 +50,27 @@ public class City {
     @Override
     public String toString() {
         return "{" +
-                "id='" + _id + '\'' +
-                ", cityName='" + cityName + '\'' +
-                ", countryIATACode='" + countryIATACode + '\'' +
-                ", cityIATACode='" + cityIATACode + '\'' +
-                ", timeZone='" + timeZone + '\'' +
-                ", latCoordinates=" + latCoordinates +
-                ", lonCoordinates=" + lonCoordinates +
+                "id='" + this.getId() + '\'' +
+                ", cityName='" + this.getCityName() + '\'' +
+                ", countryIATACode='" + this.getCountryIATACode() + '\'' +
+                ", cityIATACode='" + this.getCityIATACode() + '\'' +
+                ", timeZone='" + this.getTimeZone() + '\'' +
+                ", latCoordinates=" + this.getLatCoordinates() +
+                ", lonCoordinates=" + this.getLonCoordinates() +
                 '}';
     }
 
-    public String getId() {
-        return _id;
+    public String getTimeZone() {
+        return timeZone;
     }
 
+    public String getId() {
+        return this._id;
+    }
 
+    @NotNull
     public String getCityName() {
-        return cityName;
+        return this.cityName;
     }
 
     public void setCityName(String cityName) {
@@ -59,44 +80,24 @@ public class City {
         this.cityName = cityName;
     }
 
+    @NotNull
     public String getCountryIATACode() {
         return countryIATACode;
     }
 
-    public void setCountryIATACode(String countryIATA) {
-        this.countryIATACode = countryIATA;
-    }
-
+    @NotNull
     public String getCityIATACode() {
         return cityIATACode;
     }
 
-    public void setCityIATACode(String cityIATA) {
-        this.cityIATACode = cityIATA;
-    }
-
-    public String getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
-    }
-
+    @NotNull
     public Double getLatCoordinates() {
         return latCoordinates;
     }
 
-    public void setLatCoordinates(Double latCoordinates) {
-        this.latCoordinates = latCoordinates;
-    }
-
+    @NotNull
     public Double getLonCoordinates() {
         return lonCoordinates;
-    }
-
-    public void setLonCoordinates(Double lonCoordinates) {
-        this.lonCoordinates = lonCoordinates;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.orengolan.CheapTrips.Service;
+package com.orengolan.CheapTrips.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

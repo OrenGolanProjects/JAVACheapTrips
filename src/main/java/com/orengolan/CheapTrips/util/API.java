@@ -1,10 +1,12 @@
 package com.orengolan.CheapTrips.util;
 
 import com.mongodb.lang.Nullable;
+import com.orengolan.CheapTrips.config.ConfigLoader;
 import com.orengolan.CheapTrips.news.NewsService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
@@ -14,7 +16,6 @@ import java.util.logging.Logger;
 public class API {
 
     private final Logger logger = Logger.getLogger(NewsService.class.getName());
-
     public String buildAndExecuteRequest(String url, @Nullable Map<String, String> headers)  {
         logger.info("API>>buildAndExecuteRequest: Start method.");
         OkHttpClient client = new OkHttpClient();

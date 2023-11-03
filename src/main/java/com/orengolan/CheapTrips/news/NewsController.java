@@ -2,11 +2,7 @@ package com.orengolan.CheapTrips.news;
 
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import javax.validation.constraints.Size;
+import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -20,21 +16,20 @@ public class NewsController {
         this.newsService = newsService;
     }
 
-    @RequestMapping(value = "get-specific-news",method = RequestMethod.GET)
-    public ResponseEntity<?> getSpecificNews(
-                                        @Size(max = 2) @RequestParam(defaultValue = "Israel") String cityName,
-                                       @Size(max = 3) @RequestParam(defaultValue = "10") Integer pageSize
-                                       ) throws IOException {
-        logger.info("NewsController>>fetchNews: Start method.");
-        return ResponseEntity.ok(this.newsService.getNews(cityName, pageSize));
+    @PostMapping("/get-specific-news")
+    public ResponseEntity<?> getSpecificNews(@RequestParam("cityName") String cityName) throws IOException {
+        logger.info("** NewsController>>  getSpecificNews: Start method.");
+        return ResponseEntity.ok(this.newsService.getNews(cityName, 10));
     }
 
     @RequestMapping(value = "get-all-news",method = RequestMethod.GET)
     public ResponseEntity<?> getAllNews(){
+        logger.info("** NewsController>>  getAllNews: Start method.");
         return ResponseEntity.ok(this.newsService.getAllNews());
     }
     @RequestMapping(value = "delete-all-news",method = RequestMethod.DELETE)
     public ResponseEntity<?> deleteAllNews(){
+        logger.info("** NewsController>>  deleteAllNews: Start method.");
         return ResponseEntity.ok(this.newsService.deleteAllNews());
     }
 }

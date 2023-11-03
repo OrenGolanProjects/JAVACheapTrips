@@ -4,18 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends Exception {
 
-    @ExceptionHandler({ChangeSetPersister.NotFoundException.class})
-    public ResponseEntity<String> handleResourceNotFoundException(Exception e) {
-        printTrack(e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
-    }
-    @ExceptionHandler({NumberFormatException.class, IllegalArgumentException.class})
+    @ExceptionHandler({NumberFormatException.class, IllegalArgumentException.class,IllegalStateException.class})
     public ResponseEntity<String> handleBadRequestException(Exception e) {
         printTrack(e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad request: " + e.getMessage());
@@ -31,6 +27,11 @@ public class GlobalExceptionHandler extends Exception {
     public ResponseEntity<String> handleJsonProcessingException(Exception e) {
         printTrack(e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON: " + e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return ResponseEntity.badRequest().body("Validation error: " + ex.getMessage());
     }
 
     private void printTrack(Exception e) {

@@ -1,4 +1,4 @@
-package com.orengolan.CheapTrips.Service;
+package com.orengolan.CheapTrips.service;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;

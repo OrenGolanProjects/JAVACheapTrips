@@ -18,7 +18,7 @@ public class AirportService {
     private static final Logger logger = Logger.getLogger(AirportService.class.getName());
 
     //TODO Needs to move the variables to Secure storage: API_URL
-    private static final String API_URL = "https://api.travelpayouts.com/data/en/airports.json";
+    private static final String API_URL = System.getenv("airport_API");
     private static final String SUCCESS_MESSAGE = "Airport list processed successfully.";
     private final AirportRepository airportRepository;
     private final ObjectMapper objectMapper;

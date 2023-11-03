@@ -2,8 +2,10 @@ package com.orengolan.CheapTrips.news;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orengolan.CheapTrips.Service.SentimentAnalyzer;
+import com.orengolan.CheapTrips.config.ConfigLoader;
+import com.orengolan.CheapTrips.service.SentimentAnalyzer;
 import com.orengolan.CheapTrips.util.API;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -17,7 +19,7 @@ import java.util.Date;
 public class NewsService {
 
     private final Logger logger = Logger.getLogger(NewsService.class.getName());
-
+    JSONObject config = ConfigLoader.loadConfig();
     private final SentimentAnalyzer sentimentAnalyzer;
     private final ObjectMapper objectMapper;
     private final NewsRepository newsRepository;
@@ -31,23 +33,23 @@ public class NewsService {
     }
 
     private String getNewsStream(String cityName, Integer pageSize,String lastDay)  {
-        String TOKEN = "8358e5edeb074b0784b6f128db5ff9c3";
 
-        logger.info("NewsService>>getNewsStream: Start method.");
-        logger.info("NewsService>>getNewsStream: Data: cityName:"+cityName+" , pageSize: "+pageSize+" ,lastDay:"+lastDay);
+        logger.info("NewsService>>  getNewsStream: Start method.");
+        String API_URL = (String) config.get("news_API");
+        String TOKEN = (String) config.get("news_TOKEN");
+        logger.info("NewsService>>  getNewsStream: Data: cityName:"+cityName+" , pageSize: "+pageSize+" ,lastDay:"+lastDay);
 
-        String API_URL = "https://newsapi.org/v2/everything?q="+cityName+"&from="+lastDay+"&sortBy=popularity&apiKey="+ TOKEN +"&pageSize="+pageSize+"&language=en";
-        return this.api.buildAndExecuteRequest(API_URL,null);
+        String URL = API_URL+cityName+"&from="+lastDay+"&sortBy=popularity&apiKey="+ TOKEN +"&pageSize="+pageSize+"&language=en";
+        return this.api.buildAndExecuteRequest(URL,null);
     }
 
-    private List<News.news> analyzeNewsStream(String cityName, Integer pageSize,String lastDay,List<News.news> newsList) throws IOException {
+    private List<News.news> fetchNewsStream(String cityName, Integer pageSize,String lastDay,List<News.news> newsList) throws IOException {
 
-        logger.info("NewsService>>analyzeNewsStream: Start method.");
-
+        logger.info("NewsService>>  fetchNewsStream: Start method.");
         String json = getNewsStream(cityName,pageSize,lastDay);
-        logger.info("NewsService>>analyzeNewsStream: Found "+json.length()+" news.");
-
         JsonNode rootNode = this.objectMapper.readTree(json);
+
+        logger.info("NewsService>>  fetchNewsStream: Found "+rootNode.size()+" news.");
         for (JsonNode article: rootNode.get("articles")){
 
             String sourceName = article.path("source").get("name").asText();
@@ -62,53 +64,57 @@ public class NewsService {
             if(title.isEmpty() || title.equals("[Removed]")){
                 continue;
             }
-
             Double score= this.sentimentAnalyzer.analyze(content);
-
             News.news newsItem = new News.news(sourceName,author,title,description,url,urlToImage,publishedAt,content,score);
             newsList.add(newsItem);
         }
-        logger.info("NewsService>>analyzeNewsStream: End method.");
+        logger.info("NewsService>>  fetchNewsStream: End method.");
         return newsList;
     }
 
     public void saveNews(News news){
+        logger.info("NewsService>>  saveNews: Start method.");
         news.setExpireAt(new Date(System.currentTimeMillis() + 604800000));
         news.setNewsListCount(news.getNewsList().size());
         this.newsRepository.insert(news);
+        logger.info("NewsService>>  saveNews: End method.");
     }
 
     public News getNews(String cityName, Integer pageSize) throws IOException {
-        logger.info("NewsService>>getNews: Data: cityName:"+cityName+" , pageSize: "+pageSize);
+        logger.info("NewsService>>  getNews: Start method.");
+        logger.info("NewsService>>  getNews: Data: cityName:"+cityName+" , pageSize: "+pageSize);
+        if(cityName.length()>10){
+            throw new IllegalArgumentException("Invalid city name, City name must be until 10 letters.");
+        }
 
         News existingNews = this.newsRepository.findByCityName(cityName);
         if(existingNews != null){
-            logger.info("NewsService>>saveNews: Found News object.");
+            logger.info("NewsService>>  getNews: Found News for city: "+cityName);
+            logger.info("NewsService>>  getNews: End method.");
             return existingNews;
         }
-        logger.info("NewsService>>getNews: Did not found News object, creating new document..");
-        // Get news and fill the list with news objects.
+
+        logger.info("NewsService>>  getNews: Did not found News object, creating news..");
         LocalDateTime currentDate = LocalDateTime.now();
         LocalDateTime lastDate = currentDate.minusDays(1); // Subtract one day to get the last date
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String lastDay = lastDate.format(formatter);
 
-        News obj_news = new News(lastDay,cityName);
-        logger.info("NewsController>>fetchNews: Start initialize news list.");
 
-        obj_news.setNewsList(this.analyzeNewsStream("Travel to "+cityName,pageSize,lastDay ,obj_news.getNewsList()));
-        logger.info("NewsController>>fetchNews: End initialize news list.");
+        News obj_news = new News(cityName);
+        obj_news.setNewsList(this.fetchNewsStream("Travel to "+cityName,pageSize,lastDay ,obj_news.getNewsList()));
         this.saveNews(obj_news);
-
+        logger.info("NewsService>>  getNews: End method.");
         return obj_news;
     }
 
     public List<News> getAllNews(){
+        logger.info("NewsService>>  getAllNews: Start method.");
         return this.newsRepository.findAll();
     }
 
     public boolean deleteAllNews(){
+        logger.info("NewsService>>  deleteAllNews: Start method.");
         this.newsRepository.deleteAll();
         return true;
     }

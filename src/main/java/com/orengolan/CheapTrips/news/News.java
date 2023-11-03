@@ -1,9 +1,11 @@
 package com.orengolan.CheapTrips.news;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,14 +16,13 @@ public class News {
     @Id
     private String _id;
 
-    private final String dateOfNews;
-
-    private Date expireAt;
-
+    private Date _expireAt;
+    @NotNull
     @Indexed(unique = true)
+    @Size(max = 10)
     private final String cityName;
     private List<news> newsList;
-    private Integer newsListCount;
+    private Integer _newsListCount;
 
     public static class news{
         private final String source_name;
@@ -84,23 +85,17 @@ public class News {
     }
 
 
-    public News(String dateOfNews, String cityName) {
-        this.dateOfNews = dateOfNews;
+    public News(String cityName) {
         this.cityName = cityName;
         this.newsList = new ArrayList<>();
-        this._id = new ObjectId().toString(); // Generate a unique _id
     }
 
     public String get_id() {
         return _id;
     }
 
-    public String getDateOfNews() {
-        return dateOfNews;
-    }
-
     public Date getExpireAt() {
-        return expireAt;
+        return this._expireAt;
     }
 
     public String getCityName() {
@@ -112,7 +107,7 @@ public class News {
     }
 
     public void setExpireAt(Date expireAt) {
-        this.expireAt = expireAt;
+        this._expireAt = expireAt;
     }
 
     public void setNewsList(List<news> newsList) {
@@ -120,21 +115,20 @@ public class News {
     }
 
     public Integer getNewsListCount() {
-        return newsListCount;
+        return this._newsListCount;
     }
 
     public void setNewsListCount(Integer newsListCount) {
-        this.newsListCount = newsListCount;
+        this._newsListCount = newsListCount;
     }
 
     @Override
     public String toString() {
         return "News{" +
-                "_id='" + _id + '\'' +
-                ", dateOfNews='" + dateOfNews + '\'' +
-                ", expireAt=" + expireAt +
-                ", cityName='" + cityName + '\'' +
-                ", newsList=" + newsList +
+                "_id='" + this.get_id() + '\'' +
+                ", expireAt=" + this.getExpireAt() +
+                ", cityName='" + this.getCityName() + '\'' +
+                ", newsList=" + this.getNewsList() +
                 '}';
     }
 }
