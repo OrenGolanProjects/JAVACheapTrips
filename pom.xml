@@ -62,6 +62,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.10.13</version> <!-- or the version you are using -->
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
+			<version>2.14.1</version> <!-- Use the latest version available -->
+		</dependency>
 
 		<!-- OKHTTP	-->
 		<dependency>
@@ -116,6 +121,25 @@
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
 			<version>1.7</version> <!-- or the version you prefer -->
+		</dependency>
+
+		<!-- JWT- jsonwebtoken -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+
+		<!-- JWT- security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!-- actuator -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
 
