@@ -12,6 +12,7 @@ public class CheapTripsApplication {
 			port = "8080"; // Use a default port for local development
 		}
 
+
 		// Set the port for the embedded web server
 		System.setProperty("server.port", port);
 
