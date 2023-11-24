@@ -1,7 +1,7 @@
 FROM openjdk:11
 
 # Copy the JAR file into the container
-COPY target/CheapTrips*.jar /usr/src/CheapTrips.jar
+COPY ./CheapTrips*.jar /usr/src/CheapTrips.jar
 
 # Copy the application.properties file
 COPY src/main/resources/application.properties /opt/conf/application.properties
