@@ -1,61 +1,80 @@
 package com.orengolan.cheaptrips.flight;
 
+import com.mongodb.lang.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 public class Flight {
-    private final Location origin;
-    private final Location destination;
+    private Location origin;
+    private Location destination;
     private List<FlightTicket> ticketKeys;
+    @NotNull
+    @Size(min = 3,max = 3)
+    private String currency;
+
+    @Nullable
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Date must be in the yyyy-MM-dd format")
+    private String departure_at;
+
+    @Nullable
+    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "Date must be in the yyyy-MM-dd format")
+    private String return_at;
+
+
 
     public Flight(Location origin, Location destination){
-        // Constructor flight.
         this.origin = origin;
         this.destination = destination;
+        this.currency = "USD";
         this.ticketKeys = null;
+        this.return_at = null;
+        this.departure_at=null;
     }
 
+    @Nullable
+    public String getReturn_at() {
+        return return_at;
+    }
 
-    public static class Location{
-        // Location subclass.
-        private final String cityName;
-        private final String cityIataCode;
-        private final String countryIataCode;
-        private final Double lonCoordinates;
-        private final Double latCoordinates;
+    public void setReturn_at(@Nullable String return_at) {
+        this.return_at = return_at;
+    }
 
-        public Location(String cityName, String cityIataCode, String countryIataCode,Double lonCoordinates,Double latCoordinates) {
-            // Constructor location.
-            this.cityName = cityName;
-            this.cityIataCode = cityIataCode;
-            this.countryIataCode = countryIataCode;
-            this.lonCoordinates = lonCoordinates;
-            this.latCoordinates = latCoordinates;
-        }
+    @Nullable
+    public String getDeparture_at() {
+        return departure_at;
+    }
 
-        public String getCityName() {return this.cityName;}
-        public String getCityIataCode() {return cityIataCode;}
-        public String getCountryIataCode() {return countryIataCode;}
-        public Double getLonCoordinates() {return lonCoordinates;}
-        public Double getLatCoordinates() {return latCoordinates;}
+    public void setDeparture_at(@Nullable String departure_at) {
+        this.departure_at = departure_at;
+    }
 
-        @Override
-        public String toString() {
-            return "Location:{" +
-                    "cityName='" + cityName +
-                    ", cityIataCode='" + cityIataCode +
-                    ", countryIataCode='" + countryIataCode +
-                    ", lonCoordinates=" + lonCoordinates +
-                    ", latCoordinates=" + latCoordinates +
-                    '}';
-        }
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public void setOrigin(Location origin) {
+        this.origin = origin;
+    }
+
+    public void setDestination(Location destination) {
+        this.destination = destination;
     }
 
     public Location getOrigin() {
-        return origin ;
+        return origin;
     }
+
     public Location getDestination() {
         return destination;
     }
+
+    public String getCurrency() {
+        return currency;
+    }
+
     public List<FlightTicket> getTicketKeys() {
         return ticketKeys;
     }

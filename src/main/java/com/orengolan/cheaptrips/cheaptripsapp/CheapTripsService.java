@@ -12,7 +12,6 @@ import com.orengolan.cheaptrips.usersearch.UserInfoService;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 @Service
@@ -30,28 +29,23 @@ public class CheapTripsService {
         this.openTripMapService = openTripMapService;
     }
 
-    public UserInfo generateTrip(CheapTripsRequest cheapTripsRequest, UserInfo userInfo ) throws ParseException, IOException {
+    public UserInfo generateTripMonthly(CheapTripsRequestMonthly cheapTripsRequestMonthly, UserInfo userInfo ) throws ParseException, IOException {
         logger.info("CheapTripsService>>  generateTrip: Start method.");
-
-        // if there's trip history by the origin and destination.
-        if (!(userInfo.getTripHistory() == null)) {
-            if (
-                    Objects.equals(cheapTripsRequest.getOrigin_cityName(), userInfo.getTripHistory().getFlight().getOrigin().getCityName()) &&
-                    Objects.equals(cheapTripsRequest.getDestination_cityName(), userInfo.getTripHistory().getFlight().getDestination().getCityName())
-            ) {
-                logger.warning("CheapTripsService>>  generateTrip: Found user info, Origin & Destination matched.");
-                logger.info("CheapTripsService>>  generateTrip: End method.");
-                return userInfo;
-            }
-        }
-
-
         logger.warning("CheapTripsService>>  generateTrip: Generating trip, Origin & Destination not matched.");
-        CheapTripsResponse cheapTripsResponse =  this.generateNewTrip(cheapTripsRequest);
+
+        CheapTripsResponse cheapTripsResponse =  this.generateNewMonthlyTrip(cheapTripsRequestMonthly);
 
         logger.info("CheapTripsService>>  generateTrip: End method.");
         return this.saveUserTrip(userInfo,cheapTripsResponse);
+    }
+    public UserInfo generateTripByDates(CheapTripsRequestByDates cheapTripsRequestByDates, UserInfo userInfo ) throws ParseException, IOException {
+        logger.info("CheapTripsService>>  generateTrip: Start method.");
+        logger.warning("CheapTripsService>>  generateTrip: Generating trip, Origin & Destination not matched.");
 
+        CheapTripsResponse cheapTripsResponse =  this.generateNewByDatesTrip(cheapTripsRequestByDates);
+
+        logger.info("CheapTripsService>>  generateTrip: End method.");
+        return this.saveUserTrip(userInfo,cheapTripsResponse);
     }
 
     public UserInfo newUser(UserInfoRequest userInfoRequest,String userNameToken){
@@ -68,34 +62,71 @@ public class CheapTripsService {
         return this.userInfoService.getSpecificUserByEmail(userName);
     }
 
-    private CheapTripsResponse generateNewTrip(CheapTripsRequest cheapTripsRequest) throws ParseException, IOException {
+    private CheapTripsResponse generateNewMonthlyTrip(CheapTripsRequestMonthly cheapTripsRequestMonthly) throws ParseException, IOException {
         logger.info("CheapTripsService>>  generateNewTrip: Start method.");
 
-        Flight flight = this.flightService.findFlight(cheapTripsRequest.getOrigin_cityName(),cheapTripsRequest.getDestination_cityName());
+
+        Flight flight = this.flightService.findFlight(
+                cheapTripsRequestMonthly.getOrigin_cityIATACode(),
+                cheapTripsRequestMonthly.getDestination_cityIATACode(),
+                null,null
+        );
         logger.info("CheapTripsService>>  generateNewTrip: Flight created successfully.");
 
-        News news = this.newsService.getNews(flight.getDestination().getCityName(),20);
+        News news = this.newsService.getNews(flight.getDestination().getCity().getCityName(),20);
         logger.info("CheapTripsService>>  generateNewTrip: News created successfully.");
 
         PlacesData placesData;
-        placesData = this.openTripMapService.getSpecificPlace(cheapTripsRequest.getDestination_cityName());
+        placesData = this.openTripMapService.getSpecificPlace(flight.getDestination().getCity().getCityName());
         if (placesData == null){
             placesData = new PlacesData(
-                    cheapTripsRequest.getRadius(),
-                    flight.getDestination().getLonCoordinates(),
-                    flight.getDestination().getLatCoordinates(),
-                    cheapTripsRequest.getLimitPlaces(),
-                    flight.getDestination().getCityName(),
-                    flight.getDestination().getCountryIataCode()
+                    cheapTripsRequestMonthly.getRadius(),
+                    flight.getDestination().getCity().getLonCoordinates(),
+                    flight.getDestination().getCity().getLatCoordinates(),
+                    cheapTripsRequestMonthly.getLimitPlaces(),
+                    flight.getDestination().getCity().getCityName(),
+                    flight.getDestination().getCity().getCountryIATACode()
             );
         }
-
-
 
         logger.info("CheapTripsService>>  generateNewTrip: News created successfully.");
 
         logger.info("CheapTripsService>>  generateNewTrip: End method.");
-        return new CheapTripsResponse(flight,news,this.openTripMapService.generatePlaces(placesData,cheapTripsRequest.getKinds()));
+        return new CheapTripsResponse(flight,news,this.openTripMapService.generatePlaces(placesData, cheapTripsRequestMonthly.getKinds()));
+    }
+
+    private CheapTripsResponse generateNewByDatesTrip(CheapTripsRequestByDates cheapTripsRequestByDates) throws ParseException, IOException {
+        logger.info("CheapTripsService>>  generateNewTrip: Start method.");
+
+        Flight flight = this.flightService.findFlight(
+                cheapTripsRequestByDates.getOrigin_cityIATACode(),
+                cheapTripsRequestByDates.getDestination_cityIATACode(),
+                cheapTripsRequestByDates.getDeparture_at(),
+                cheapTripsRequestByDates.getReturn_at()
+        );
+        logger.info("CheapTripsService>>  generateNewTrip: Flight created successfully.");
+
+        News news = this.newsService.getNews(flight.getDestination().getCity().getCityName(),20);
+        logger.info("CheapTripsService>>  generateNewTrip: News created successfully.");
+
+        PlacesData placesData;
+        placesData = this.openTripMapService.getSpecificPlace(flight.getDestination().getCity().getCityName());
+
+        if (placesData == null){
+            placesData = new PlacesData(
+                    cheapTripsRequestByDates.getRadius(),
+                    flight.getDestination().getCity().getLonCoordinates(),
+                    flight.getDestination().getCity().getLatCoordinates(),
+                    cheapTripsRequestByDates.getLimitPlaces(),
+                    flight.getDestination().getCity().getCityName(),
+                    flight.getDestination().getCity().getCountryIATACode()
+            );
+        }
+
+        logger.info("CheapTripsService>>  generateNewTrip: News created successfully.");
+
+        logger.info("CheapTripsService>>  generateNewTrip: End method.");
+        return new CheapTripsResponse(flight,news,this.openTripMapService.generatePlaces(placesData, cheapTripsRequestByDates.getKinds()));
     }
 
     private UserInfo saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) {

@@ -11,3 +11,10 @@ services:
     ports:
       - 27017:27017
     privileged: true
+
+  appserver:
+    container_name: server
+    hostname: localhost
+    build: .
+    ports:
+      - 8080:8080

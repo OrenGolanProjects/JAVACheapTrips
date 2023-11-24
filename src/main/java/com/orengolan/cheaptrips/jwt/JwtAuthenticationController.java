@@ -47,7 +47,7 @@ public class JwtAuthenticationController {
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequest userRequest) throws Exception {
+    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequest userRequest) {
         String encodedPass = passwordEncoder.encode(userRequest.getPassword());
         DBUser user = DBUser.UserBuilder.anUser().name(userRequest.getUsername())
                 .password(encodedPass).build();

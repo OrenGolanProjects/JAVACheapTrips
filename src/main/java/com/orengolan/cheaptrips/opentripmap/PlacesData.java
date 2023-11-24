@@ -20,7 +20,7 @@ public class PlacesData {
     private String databaseKey;
     private KindsCategory kindsCategory;
     @Indexed(expireAfterSeconds = 365 * 24 * 60 * 60) // One year expiration
-    private final Date expireAt;
+    private Date expireAt;
 
     public PlacesData(Integer radius, Double lon, Double lat, Integer limitPlaces, String city, String countryIATAcode) {
         this.radius = radius;
@@ -33,6 +33,10 @@ public class PlacesData {
         this.kindsCategory = new KindsCategory();
         this.expireAt = new Date(System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000)); // 1 year in milliseconds
 
+    }
+
+    public void setExpireAt(Date expireAt) {
+        this.expireAt = expireAt;
     }
 
     public Date getExpireAt() {

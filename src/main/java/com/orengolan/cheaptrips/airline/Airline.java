@@ -20,7 +20,7 @@ public class Airline implements Serializable {
     private Boolean isLowCost;
 
     @Indexed(expireAfterSeconds = 365 * 24 * 60 * 60) // One year expiration
-    private final Date expireAt;
+    private Date expireAt;
 
     public Airline(@NotNull String name, @NotNull String airlineIATACode, @NotNull Boolean isLowCost) {
         this.name = name;
@@ -31,6 +31,10 @@ public class Airline implements Serializable {
 
     public Date getExpireAt() {
         return expireAt;
+    }
+
+    public void setExpireAt(Date expireAt) {
+        this.expireAt = expireAt;
     }
 
     @NotNull

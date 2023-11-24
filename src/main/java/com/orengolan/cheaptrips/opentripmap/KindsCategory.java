@@ -37,7 +37,7 @@ public class KindsCategory {
                 this.name = name;
                 this.places = new ArrayList<>();
             }else {
-                throw new IllegalArgumentException("Invalid category name.");
+                throw new IllegalArgumentException("Invalid category name:" +name);
             }
         }
 

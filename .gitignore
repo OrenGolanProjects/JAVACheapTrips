@@ -35,3 +35,4 @@ build/
 # Exclude file
 config.json
 .mvn
+.env

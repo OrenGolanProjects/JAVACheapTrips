@@ -37,7 +37,7 @@ public class UserInfo {
     private CheapTripsResponse tripHistory;
 
     @Indexed(expireAfterSeconds = 7 * 60 * 60) // One year expiration
-    private final Date expireAt;
+    private Date expireAt;
 
     public UserInfo(String firstName, String surName, String email, String phone,String userName) {
         this.firstName = firstName;
@@ -51,6 +51,10 @@ public class UserInfo {
 
     public Date getExpireAt() {
         return expireAt;
+    }
+
+    public void setExpireAt(Date expireAt) {
+        this.expireAt = expireAt;
     }
 
     public String getUserName() {

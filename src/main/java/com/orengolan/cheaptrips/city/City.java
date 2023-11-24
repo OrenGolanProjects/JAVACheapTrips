@@ -1,11 +1,11 @@
 package com.orengolan.cheaptrips.city;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -15,11 +15,9 @@ public class City {
     private String _id;
 
     @NotNull
-    @Size(min = 2, max = 10)
+    @Size(min = 2, max = 50)
     private String cityName;
-    @NotNull
-    @Size(max = 3)
-    private final String countryIATACode;
+
     @NotNull
     @Size(max = 3)
     @Indexed(unique = true)
@@ -36,60 +34,54 @@ public class City {
     private final Double lonCoordinates;
 
     @Indexed(expireAfterSeconds = 365 * 24 * 60 * 60) // One year expiration
-    private final Date expireAt;
+    private Date expireAt;
 
-    public City(@NotNull String cityName, @NotNull String countryIATACode, @NotNull String cityIATACode,
-                @NotNull String timeZone, @NotNull Double latCoordinates, @NotNull Double lonCoordinates) {
+    @NotNull
+    @Size(max = 3)
+    private String countryIATACode;
+
+    public City(@NotNull String cityName, @NotNull String cityIATACode,
+                @NotNull String timeZone, @NotNull Double latCoordinates, @NotNull Double lonCoordinates,@NotNull String countryIATACode) {
         this.cityName = cityName;
-        this.countryIATACode = countryIATACode;
         this.cityIATACode = cityIATACode;
         this.timeZone = timeZone;
         this.latCoordinates = latCoordinates;
         this.lonCoordinates = lonCoordinates;
+        this.countryIATACode = countryIATACode;
         this.expireAt = new Date(System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000)); // 1 year in milliseconds
+    }
 
+
+    @NotNull
+    public String getCountryIATACode() {
+        return countryIATACode;
+    }
+
+    public void setCountryIATACode(@NotNull String countryIATACode) {
+        this.countryIATACode = countryIATACode;
     }
 
     public Date getExpireAt() {
         return expireAt;
     }
 
-    @Override
-    public String toString() {
-        return "{" +
-                "id='" + this.getId() + '\'' +
-                ", cityName='" + this.getCityName() + '\'' +
-                ", countryIATACode='" + this.getCountryIATACode() + '\'' +
-                ", cityIATACode='" + this.getCityIATACode() + '\'' +
-                ", timeZone='" + this.getTimeZone() + '\'' +
-                ", latCoordinates=" + this.getLatCoordinates() +
-                ", lonCoordinates=" + this.getLonCoordinates() +
-                '}';
+    public void setExpireAt(Date expireAt) {
+        this.expireAt = expireAt;
     }
 
     public String getTimeZone() {
         return timeZone;
     }
 
-    public String getId() {
-        return this._id;
-    }
-
     @NotNull
     public String getCityName() {
         return this.cityName;
     }
-
     public void setCityName(String cityName) {
         if (cityName.isEmpty()){
             throw new IllegalArgumentException("City name is null, cannot setCityName.");
         }
         this.cityName = cityName;
-    }
-
-    @NotNull
-    public String getCountryIATACode() {
-        return countryIATACode;
     }
 
     @NotNull
@@ -107,4 +99,16 @@ public class City {
         return lonCoordinates;
     }
 
+    @Override
+    public String toString() {
+        return "City{" +
+                "cityName='" + cityName +
+                ", cityIATACode='" + cityIATACode +
+                ", timeZone='" + timeZone +
+                ", latCoordinates=" + latCoordinates +
+                ", lonCoordinates=" + lonCoordinates +
+                ", expireAt=" + expireAt +
+                ", country=" + countryIATACode +
+                '}';
+    }
 }

@@ -3,7 +3,6 @@ package com.orengolan.cheaptrips.flight;
 import com.orengolan.cheaptrips.airline.Airline;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
-
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.logging.Logger;
@@ -11,18 +10,24 @@ import java.util.logging.Logger;
 public class FlightTicket implements Serializable {
 
     private static final Logger logger = Logger.getLogger(FlightTicket.class.getName());
+    @NotNull
     private  Double price;
+    @NotNull
+    private  Integer transfers;
+    private Airline airlineDetails;
+    @NotNull
     private  Integer flightNumber;
+    @NotNull
     private  LocalDateTime departureAt;
+    @NotNull
     private  LocalDateTime returnAt;
+    @NotNull
     private  LocalDateTime expiresAt;
     private  String ticketIndex;
-    private  String currency;
-    private Airline airlineDetails;
 
     public FlightTicket(@NotNull Double price,@NotNull  Airline airlineDetails,@NotNull  Integer flightNumber,
                         @NotNull LocalDateTime departureAt,@NotNull  LocalDateTime returnAt,
-                        @NotNull LocalDateTime expiresAt,@NotNull  String ticketIndex) {
+                        @NotNull LocalDateTime expiresAt,@NotNull  String ticketIndex,@NotNull Integer transfers) {
         this.price = price;
         this.flightNumber = flightNumber;
         this.airlineDetails = airlineDetails;
@@ -30,7 +35,8 @@ public class FlightTicket implements Serializable {
         this.returnAt = returnAt;
         this.expiresAt = expiresAt;
         this.ticketIndex = ticketIndex;
-        this.currency = "USD";
+        this.transfers = transfers;
+
     }
 
     public String generateTicketKey(String origin_cityIataCode,String destination_cityIataCode) {
@@ -52,6 +58,14 @@ public class FlightTicket implements Serializable {
             return 60;
         }
         return sec;
+    }
+
+    public Integer getTransfers() {
+        return transfers;
+    }
+
+    public void setTransfers(Integer transfers) {
+        this.transfers = transfers;
     }
 
     public Airline getAirlineDetails() {
@@ -111,13 +125,7 @@ public class FlightTicket implements Serializable {
         this.ticketIndex = ticketIndex;
     }
 
-    public String getCurrency() {
-        return currency;
-    }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
 
     @Override
     public String toString() {
@@ -129,7 +137,7 @@ public class FlightTicket implements Serializable {
                 ", returnAt=" + returnAt.toString() +
                 ", expiresAt=" + expiresAt.toString() +
                 ", ticketIndex='" + ticketIndex +
-                ", currency='" + currency +
+                ", transfers='" + transfers +
                 '}';
     }
 }

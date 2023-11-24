@@ -1,10 +1,9 @@
 package com.orengolan.cheaptrips.city;
 
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.result.UpdateResult;
-import com.orengolan.cheaptrips.config.ConfigLoader;
 import com.orengolan.cheaptrips.util.API;
-import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,65 +19,57 @@ import java.util.logging.Logger;
 @Service
 public class CityService {
     private static final Logger logger = Logger.getLogger(CityService.class.getName());
-    JSONObject config = ConfigLoader.loadConfig();
     private final MongoTemplate mongoTemplate;
     private final ObjectMapper objectMapper;
     private final CityRepository cityRepository;
     private final API api;
+    private final String cityEndpoint;
 
 
-
-    @Autowired
-    public CityService(CityRepository cityRepository, ObjectMapper objectMapper, MongoTemplate mongoTemplate,API api) {
-        this.cityRepository = cityRepository;
-        this.objectMapper = objectMapper;
+    public CityService(Dotenv dotenv, MongoTemplate mongoTemplate, ObjectMapper objectMapper, CityRepository cityRepository, API api) {
         this.mongoTemplate = mongoTemplate;
-        this.api =api;
+        this.objectMapper = objectMapper;
+        this.cityRepository = cityRepository;
+        this.api = api;
+        this.cityEndpoint = dotenv.get("city_ENDPOINT");
     }
 
     private String getCitiesData() throws IOException {
         logger.info("CityService>>  getCitiesList: Start method.");
-        String ENDPOINT_URL = (String) config.get("city_ENDPOINT");
-        logger.info("CityService>>  getCitiesList: ENDPOINT URL: "+ENDPOINT_URL);
-        return this.api.buildAndExecuteRequest(ENDPOINT_URL,null);
+        logger.info("CityService>>  getCitiesList: ENDPOINT URL: "+cityEndpoint);
+        return this.api.buildAndExecuteRequest(cityEndpoint,null);
     }
+
 
     public Boolean synchronizeCityDataWithAPI() throws IOException {
         logger.info("CityService>>  synchronizeCityDataWithAPI: Starting synchronize cities data from API.");
-        String json = getCitiesData();
+        String jsonCity = getCitiesData();
 
         // Parse the JSON array
-        JsonNode cityList = objectMapper.readTree(json);
-        for (JsonNode cityNode : cityList) {
-                JsonNode cityIataCodeNode = cityNode.path("code");
-                if (cityIataCodeNode.isMissingNode() || cityIataCodeNode.isNull()) {
-                    // Skip processing this city if name is null
-                    continue;
-                }
+        JsonNode cityJsonNode = objectMapper.readTree(jsonCity);
+        for (JsonNode cityNode : cityJsonNode) {
+            JsonNode cityIataCodeNode = cityNode.path("code");
+            if (cityIataCodeNode.isMissingNode() || cityIataCodeNode.isNull()) {
+                logger.info("CityService>>  synchronizeCityDataWithAPI: SKIPPED.");
+                logger.info("is missing: "+cityIataCodeNode.isMissingNode()+" is null: "+cityIataCodeNode.isNull());
+                continue;
+            }
 
-                String cityName = cityNode.path("name_translations").path("en").asText().toLowerCase();
-                String countryIataCode = cityNode.path("country_code").asText().toUpperCase();
-                String cityIataCode = cityIataCodeNode.asText().toUpperCase();
-                String timeZone = cityNode.path("time_zone").asText();
-                double lat = cityNode.path("coordinates").path("lat").asDouble();
-                double lon = cityNode.path("coordinates").path("lon").asDouble();
-
-                // Check if a city with the same name already exists
-                City existingCity = cityRepository.findByCityIATACode(cityIataCode);
-                if (existingCity != null) {
-                    logger.info("CityService>>  synchronizeCityDataWithAPI: Found existing city, City:" + cityName + " IATA Code: " + cityIataCode + " Skipped.");
-                }
-                else {
-                    // Create a new City object and save it to the repository
-                    List<City> listCitiesByIataCode = this.cityRepository.findCityByCityIATACode(cityIataCode);
-                    if (listCitiesByIataCode.size() > 1) {
-                        logger.warning("CityService>>  synchronizeCityDataWithAPI: Multiple cities: found more then one IATA Code. " + cityName + " " + cityIataCode);
-                        continue;
-                    }
-                    City city = new City(cityName, countryIataCode, cityIataCode, timeZone, lat, lon);
-                    cityRepository.save(city);
-                }
+            String cityName = cityNode.path("name_translations").path("en").asText().toLowerCase();
+            String countryIataCode = cityNode.path("country_code").asText().toUpperCase();
+            String cityIataCode = cityIataCodeNode.asText().toUpperCase();
+            String timeZone = cityNode.path("time_zone").asText();
+            double lat = cityNode.path("coordinates").path("lat").asDouble();
+            double lon = cityNode.path("coordinates").path("lon").asDouble();
+            City city = new City(cityName,cityIataCode,timeZone,lat,lon,countryIataCode);
+            try {
+                cityRepository.save(city);
+            }
+            catch(DuplicateKeyException error){
+                continue;
+            }
         }
+
         logger.info("CityService>>  synchronizeCityDataWithAPI: Finished synchronize cities data from API.");
         return Boolean.TRUE;
     }
@@ -94,29 +84,22 @@ public class CityService {
         return Boolean.TRUE;
     }
 
-    public City fetchSpecificCity(String cityName) {
-        logger.info("CityService>>  fetchSpecificCity: Start method fetch SpecificCity, city:"+ cityName);
-
+    public List<City> fetchSpecificCityByName(String cityName) {
+        logger.info("CityService>>  fetchSpecificCityByName: Start method fetch Specific City:"+ cityName);
         // Start by searching for search the EXACT string.
-        City city = this.cityRepository.findCityByPartialName(cityName.toLowerCase());
-        if (city == null) {
+        return this.cityRepository.findByCityName(cityName);
+    }
 
-            List<City> cities = this.cityRepository.findBycityName(cityName.toLowerCase());
-            if (!cities.isEmpty()){
-                logger.warning("CityService>>  fetchSpecificCity: Found "+cities.size()+" matching cities found for city name: " + cityName);
-                logger.warning("CityService>>  fetchSpecificCity: Returning the first one.");
-                return cities.get(0);
-            }
-            throw new IllegalArgumentException("CityService>>  fetchSpecificCity: City " + cityName + " is not found.");
-        }
-        // Success found a city
-        return city;
+    public City fetchSpecificCityByIATA(String cityIATACode) {
+        logger.info("CityService>>  fetchSpecificCityByIATA: Start method fetch Specific City:"+ cityIATACode);
+        // Start by searching for search the EXACT string.
+        return this.cityRepository.findByCityIATACode(cityIATACode);
     }
 
     public boolean createNewCity(City city){
         logger.info("CityService>>  createNewCity: Start method");
         logger.info("CityService>>  createNewCity: Creating a new city: " + city);
-        if (this.cityRepository.findBycityName(city.getCityName()).isEmpty()){
+        if (this.cityRepository.findByCityName(city.getCityName()) == null){
             this.cityRepository.insert(city);
             logger.info("CityService>>  createNewCity: End method");
             return true;
@@ -157,5 +140,7 @@ public class CityService {
             update.set(field, value);
         }
     }
+
+
 
 }

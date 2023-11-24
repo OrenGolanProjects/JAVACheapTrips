@@ -29,9 +29,9 @@ public class CityController {
     }
 
     @RequestMapping(value = "/city/{cityName}", method = RequestMethod.GET)
-    public ResponseEntity<City> getSpecificCity(@PathVariable String cityName)  {
+    public List<City> getSpecificCity(@PathVariable String cityName)  {
         logger.info("** CityController>>  getSpecificCity: Start method");
-        return ResponseEntity.ok( this.cityService.fetchSpecificCity(cityName));
+        return this.cityService.fetchSpecificCityByName(cityName);
     }
 
     @RequestMapping(value="/get-all-cities", method = RequestMethod.GET)

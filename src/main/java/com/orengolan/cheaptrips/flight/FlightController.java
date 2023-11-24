@@ -2,7 +2,6 @@ package com.orengolan.cheaptrips.flight;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,15 +24,18 @@ public class FlightController {
 
     @RequestMapping(value = "/search-flight",method = RequestMethod.GET)
     public Flight  searchFlight(
-            @Size(max = 10) @RequestParam(defaultValue ="TLV") String origin_cityName,
-            @Size(max = 10) @RequestParam(defaultValue ="AMS") String destination_cityName,
+            @Size(max = 20) @RequestParam(defaultValue ="TLV") String origin_cityIATACODE,
+            @Size(max = 20) @RequestParam(defaultValue ="AMS") String destination_cityIATACODE,
             @RequestParam(defaultValue ="2023-XX-XX",required = false) @JsonFormat(pattern = "yyyy-MM-dd") String depart_date,
             @RequestParam(defaultValue ="2023-XX-XX",required = false) @JsonFormat(pattern = "yyyy-MM-dd") String return_date,
             @Size(min=3,max = 3) @RequestParam(defaultValue = "USD") String currency
-    ) throws ChangeSetPersister.NotFoundException, ParseException, IOException {
+    ) throws  ParseException, IOException {
 
         logger.info("** FlightController>>  searchFlight: Start method.");
-        return this.flightService.findFlight(origin_cityName,destination_cityName);
+        return this.flightService.findFlight(
+                origin_cityIATACODE,
+                destination_cityIATACODE,null,null
+        );
     }
 
     @RequestMapping(value = "/get-specific-ticket",method = RequestMethod.GET)

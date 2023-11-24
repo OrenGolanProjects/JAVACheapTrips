@@ -2,9 +2,8 @@ package com.orengolan.cheaptrips.opentripmap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orengolan.cheaptrips.config.ConfigLoader;
 import com.orengolan.cheaptrips.util.API;
-import org.json.simple.JSONObject;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
@@ -13,17 +12,33 @@ import java.util.logging.Logger;
 @Service
 public class OpenTripMapService {
     private final Logger logger = Logger.getLogger(OpenTripMapService.class.getName());
-    JSONObject config = ConfigLoader.loadConfig();
     private final API api;
     private final ObjectMapper objectMapper;
     private final OpenTripMapRepository openTripMapRepository;
+    private final String opentripmapeEndpoint;
+    private final String opentripmapENDPOINTGeo;
+    private final String opentripmapeToken;
 
-    public OpenTripMapService(OpenTripMapRepository openTripMapRepository, API api, ObjectMapper objectMapper) {
+    public OpenTripMapService(Dotenv dotenv, OpenTripMapRepository openTripMapRepository, API api, ObjectMapper objectMapper) {
         this.openTripMapRepository = openTripMapRepository;
         this.api = api;
         this.objectMapper = objectMapper;
+        this.opentripmapENDPOINTGeo = dotenv.get("opentripmap_ENDPOINT_Geo");
+        this.opentripmapeEndpoint = dotenv.get("opentripmap_ENDPOINT_Places");
+        this.opentripmapeToken = dotenv.get("opentripmap_TOKEN");
     }
 
+
+    private JsonNode getPlaceDetails(String xid) throws IOException {
+        logger.info("OpenTripMapService  >>getPlaceDetails: Start method.");
+
+        String URL= opentripmapENDPOINTGeo+xid+"?apikey="+opentripmapeToken;
+        String json = this.api.buildAndExecuteRequest(URL,null);
+        logger.info("OpenTripMapService  >>getListTouristPlaces: response to get place details: "+json);
+
+        logger.info("OpenTripMapService  >>getPlaceDetails: End method.");
+        return this.objectMapper.readTree(json);
+    }
 
     public PlacesData generatePlaces(PlacesData placesData,List<String> kinds) throws IOException {
         logger.info("OpenTripMapService  >>generatePlaces: Start method.");
@@ -41,6 +56,7 @@ public class OpenTripMapService {
         logger.info("OpenTripMapService  >>generatePlaces: Did found a places, start validation & generate places.");
 
         for (String kind : kinds) {
+            kind = kind.replace(" ","");
             int countPlacesCurrent ;
             if (placesData.getKindsCategory().getCategories().isEmpty() || placesData.getKindsCategory().getCategory(kind).getPlaces().isEmpty()) {
                 countPlacesCurrent=0;
@@ -80,29 +96,15 @@ public class OpenTripMapService {
     private JsonNode getListPlaces(PlacesData placesData,String kind, Integer counterPlaces) throws IOException {
         logger.info("OpenTripMapService  >>generatePlaces: Start method.");
 
-        String ENDPOINT_URL = (String) config.get("opentripmap_ENDPOINT_Geo");
-        String TOKEN = (String) config.get("opentripmap_TOKEN");
 
-        ENDPOINT_URL +="radius?radius="+ placesData.getRadius()+"&lon="+ placesData.getLon()+"&lat="+ placesData.getLat()+"&kinds="+kind+"&limit="+counterPlaces+"&apikey="+TOKEN;
-        String json = this.api.buildAndExecuteRequest(ENDPOINT_URL,null);
+        String URL = opentripmapeEndpoint+"radius?radius="+ placesData.getRadius()+"&lon="+ placesData.getLon()+"&lat="+ placesData.getLat()+"&kinds="+kind+"&limit="+counterPlaces+"&apikey="+opentripmapeToken;
+        String json = this.api.buildAndExecuteRequest(URL,null);
         logger.info("OpenTripMapService  >>generatePlaces: response to get list of places: "+json);
 
         logger.info("OpenTripMapService  >>generatePlaces: End method.");
         return this.objectMapper.readTree(json);
     }
 
-    private JsonNode getPlaceDetails(String xid) throws IOException {
-        logger.info("OpenTripMapService  >>getPlaceDetails: Start method.");
-
-        String ENDPOINT_URL = (String) config.get("opentripmap_ENDPOINT_TourismPlaces");
-        String TOKEN = (String) config.get("opentripmap_TOKEN");
-        ENDPOINT_URL +=xid+"?apikey="+TOKEN;
-        String json = this.api.buildAndExecuteRequest(ENDPOINT_URL,null);
-        logger.info("OpenTripMapService  >>getListTouristPlaces: response to get place details: "+json);
-
-        logger.info("OpenTripMapService  >>getPlaceDetails: End method.");
-        return this.objectMapper.readTree(json);
-    }
 
     private PlaceDetails generatePlaceDetails(JsonNode mainPlaceDataNode) throws IOException {
 

@@ -23,16 +23,24 @@ public class CheapTripController {
     }
 
     @RequestMapping(value="/generate-monthly-trip", method = RequestMethod.POST)
-    public UserInfo generateMonthlyTrip(@Valid @RequestBody CheapTripsRequest cheapTripsRequest, HttpServletRequest request) throws ParseException, IOException {
+    public UserInfo generateMonthlyTrip(@Valid @RequestBody CheapTripsRequestMonthly cheapTripsRequestMonthly, HttpServletRequest request) throws ParseException, IOException {
 
         logger.info("** CheapTripController>>  generateTrip: Start method.");
         UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateTrip(cheapTripsRequest,user);
+        return this.cheapTripsService.generateTripMonthly(cheapTripsRequestMonthly,user);
+
+    }
+    @RequestMapping(value="/generate-trip-by-dates", method = RequestMethod.POST)
+    public UserInfo generateTripByDates(@Valid @RequestBody CheapTripsRequestByDates cheapTripsRequestByDates, HttpServletRequest request) throws ParseException, IOException {
+
+        logger.info("** CheapTripController>>  generateTrip: Start method.");
+        UserInfo user = this.retrieveUserInfoByToken(request);
+        return this.cheapTripsService.generateTripByDates(cheapTripsRequestByDates,user);
 
     }
 
     @RequestMapping(value="/create-user", method = RequestMethod.POST)
-    public UserInfo createUser(@Valid @RequestBody UserInfoRequest userInfoRequest,HttpServletRequest request){
+    public UserInfo createUser(@Valid @RequestBody UserInfoRequest userInfoRequest){
         logger.info("** CheapTripController>>  createUser: Start method.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -58,5 +66,7 @@ public class CheapTripController {
         return this.cheapTripsService.retrieveUserByIdentified(username);
 
     }
+
+
 
 }

@@ -1,16 +1,17 @@
 package com.orengolan.cheaptrips.flight;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.orengolan.cheaptrips.airline.Airline;
 import com.orengolan.cheaptrips.airline.AirlineService;
-import com.orengolan.cheaptrips.config.ConfigLoader;
+import com.orengolan.cheaptrips.countries.Country;
+import com.orengolan.cheaptrips.countries.CountryService;
 import com.orengolan.cheaptrips.service.Redis;
 import com.orengolan.cheaptrips.city.*;
 import com.orengolan.cheaptrips.util.API;
 import com.orengolan.cheaptrips.util.Dates;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
-import org.json.simple.JSONObject;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
@@ -24,43 +25,56 @@ import org.springframework.util.Assert;
 public class FlightService {
     private final Redis redis;
     private static final Logger logger = Logger.getLogger(CityService.class.getName());
-    private final CityController cityController;
     private final ObjectMapper objectMapper;
     private final API api;
-    JSONObject config = ConfigLoader.loadConfig();
     private final AirlineService airlineService;
+    private final CityService cityService;
+    private final CountryService countryService;
+    private final String flightmonthlyENDPOINT;
+    private final String flightcheapENDPOINT;
+    private final String flightToken;
 
-    public FlightService( Redis redis, CityController cityController, ObjectMapper objectMapper, API api,AirlineService airlineService){
-        this.cityController   = cityController;
+    public FlightService(Dotenv dotenv, Redis redis, ObjectMapper objectMapper, API api, AirlineService airlineService, CityService cityService, CountryService countryService){
         this.objectMapper = objectMapper;
         this.redis = redis;
         this.api = api;
         this.airlineService = airlineService;
+        this.cityService = cityService;
+        this.countryService = countryService;
+        this.flightmonthlyENDPOINT = dotenv.get("flight_monthlyENDPOINT");
+        this.flightcheapENDPOINT = dotenv.get("flight_cheapENDPOINT");
+        this.flightToken = dotenv.get("flight_TOKEN");
     }
 
-    public String getFlightTickets(String origin_cityIataCode, String destination_cityIataCode) throws IOException {
+    public String getFlightTickets(String origin_cityIataCode, String destination_cityIataCode,String departure_at, String return_at) throws IOException {
         logger.info("FlightService>>  getFlightTickets: Start method.");
         logger.info("FlightService>>  getFlightTickets: Send GET request to get flight ticket list.");
 
-        // Get secure values.
-        String ENDPOINT_URL = (String) config.get("flight_ENDPOINT");
-        String TOKEN = (String) config.get("flight_TOKEN");
-
-        // Build the Request for execute the Cheapest tickets API.
-        String newURL = ENDPOINT_URL+origin_cityIataCode+"&destination="+destination_cityIataCode+"&currency=USD";
-
+        String newURL;
+        if(departure_at !=null && return_at !=null){
+            newURL = flightcheapENDPOINT+origin_cityIataCode+"&destination="+destination_cityIataCode+"&currency=USD";
+        }
+        else {
+            // Build the Request for execute the Cheapest tickets API.
+            newURL = flightmonthlyENDPOINT+origin_cityIataCode+"&destination="+destination_cityIataCode+"&depart_date="+departure_at+"&return_date="+return_at+"&currency=USD";
+        }
         Map<String, String> headers = new HashMap<>();
-        headers.put("x-access-token", TOKEN);
+        headers.put("x-access-token", flightToken);
 
         logger.info("FlightService>>  getFlightTickets: URL: "+newURL);
         logger.info("FlightService>>  getFlightTickets: End method.");
         return this.api.buildAndExecuteRequest(newURL,headers);
     }
 
-    public Flight findFlight(String origin_cityName,String destination_cityName) throws ParseException, IOException {
+    public Flight findFlight(String origin_cityIATACode,String destination_cityIATACode,String departure_at, String return_at) throws ParseException, IOException {
+
 
         logger.info("FlightService>>  findFlight: Start method.");
-        Flight flight = this.generateFlight(origin_cityName,destination_cityName);
+        Flight flight = this.generateFlight(origin_cityIATACode,destination_cityIATACode);
+        if(departure_at !=null && return_at !=null){
+            flight.setDeparture_at(departure_at);
+            flight.setReturn_at(return_at);
+        }
 
         this.generateFlightTickets(flight);
 
@@ -71,7 +85,7 @@ public class FlightService {
 
     public void saveFlightTickets(@NotNull FlightTicket flightTicket, @NotNull Flight flight ) {
         logger.info("FlightService>>  saveFlightTickets: Start method.");
-        String generateTicketKey = flightTicket.generateTicketKey(flight.getOrigin().getCityIataCode(),flight.getDestination().getCityIataCode());
+        String generateTicketKey = flightTicket.generateTicketKey(flight.getOrigin().getCity().getCityIATACode(),flight.getDestination().getCity().getCityIATACode());
 
         FlightTicket existFlightTicket = (FlightTicket) this.redis.get(generateTicketKey);
 
@@ -95,7 +109,7 @@ public class FlightService {
     private List<FlightTicket> getTicketsByFlight(@NotNull Flight flight) {
         logger.info("FlightService>>  getTicketsByFlight: Start method.");
 
-        String partKey = flight.getOrigin().getCountryIataCode()+"_"+flight.getDestination().getCountryIataCode(); // Create the partial value to search tickets.
+        String partKey = flight.getOrigin().getCountry().getCountryIATACode()+"_"+flight.getDestination().getCountry().getCountryIATACode(); // Create the partial value to search tickets.
         Set<String> keys = this.redis.getKeys(partKey);  // Use your custom method to get keys
         List<FlightTicket> tickets = new ArrayList<>(); // initialize list of flight tickets
 
@@ -118,35 +132,14 @@ public class FlightService {
     }
 
     @NotNull
-    private Flight generateFlight(String origin_cityName, String destination_cityName) {
-
+    private Flight generateFlight(String origin_cityIATACode,String destination_cityIATACode) {
         logger.info("FlightService>>  generateFlight: Start method.");
-        ResponseEntity<?> origin_CityResponse = this.cityController.getSpecificCity(origin_cityName);
-        ResponseEntity<?> destination_CityResponse = this.cityController.getSpecificCity(destination_cityName);
 
-        logger.info("FlightService>>  generateFlight: Origin City Response Status Code: " + origin_CityResponse.getStatusCodeValue());
-        logger.info("FlightService>>  generateFlight: Destination City Response Status Code: " + destination_CityResponse.getStatusCodeValue());
+        Location origin_Location = this.generateLocation(origin_cityIATACode);
+        Location destination_Location = this.generateLocation(destination_cityIATACode);
 
-        City origin_City = (City) origin_CityResponse.getBody(); // Extract City instance.
-        City destination_City = (City) destination_CityResponse.getBody(); // Extract City instance.
-
-        Flight.Location origin = new Flight.Location(
-                Objects.requireNonNull(origin_City).getCityName(),  // CityName
-                origin_City.getCityIATACode(),      // CityIATACode
-                origin_City.getCountryIATACode(),   // CountryIATACode
-                origin_City.getLonCoordinates(),    // LonCoordinates
-                origin_City.getLatCoordinates()     // LatCoordinates
-        );
-        // Create a new instance of destination location.
-        Flight.Location destination = new Flight.Location(
-                Objects.requireNonNull(destination_City).getCityName(), // CityName
-                destination_City.getCityIATACode(), // CityIATACode
-                destination_City.getCountryIATACode(), // CountryIATACode
-                destination_City.getLonCoordinates(), // LonCoordinates
-                destination_City.getLatCoordinates() //LatCoordinates
-        );
         logger.info("FlightService>>  generateFlight: End method.");
-        return new Flight(origin,destination);
+        return new Flight(origin_Location,destination_Location);
     }
 
     private void generateFlightTickets(Flight flight) throws IOException, ParseException {
@@ -156,7 +149,7 @@ public class FlightService {
 
         if (flightTicketsList.isEmpty()){
 
-            String json = getFlightTickets(flight.getOrigin().getCityIataCode(),flight.getDestination().getCityIataCode());
+            String json = getFlightTickets(flight.getOrigin().getCity().getCityIATACode(),flight.getDestination().getCity().getCityIATACode(),flight.getDeparture_at(),flight.getReturn_at());
 
             JsonNode rootNode = this.objectMapper.readTree(json);
             JsonNode dataNode = rootNode.get("data");
@@ -165,20 +158,47 @@ public class FlightService {
             }
 
             String index = dataNode.fieldNames().next();
-            // Loop through airport IATA codes
+
             for (JsonNode ticketNode : dataNode) {
+                String value = ticketNode.fieldNames().next();
+                double price;
+                String airlineIataCode;
+                int flightNumber;
+                int transfers;
+                LocalDateTime departureAt;
+                LocalDateTime returnAt;
+                LocalDateTime expiresAt;
+                LocalDateTime newExpiresAt;
 
-                Double price = ticketNode.get("price").asDouble();
-                String airlineIataCode = ticketNode.get("airline").asText();
-                Integer flightNumber = ticketNode.get("flight_number").asInt();
+                if( value.matches("-?\\d+(\\.\\d+)?")){
+                    price = ticketNode.path(value).get("price").asDouble();
+                    airlineIataCode = ticketNode.path(value).get("airline").asText();
+                    flightNumber = ticketNode.path(value).get("flight_number").asInt();
+                    transfers = Integer.parseInt(value);
+                    departureAt = Dates.parseStringToLocalDateTime(ticketNode.path(value).get("departure_at").asText());
+                    returnAt = Dates.parseStringToLocalDateTime(ticketNode.path(value).get("return_at").asText());
+                    expiresAt = Dates.parseStringToLocalDateTime(ticketNode.path(value).get("expires_at").asText());
+                }else {
 
-                LocalDateTime departureAt = Dates.parseStringToLocalDateTime(ticketNode.get("departure_at").asText());
-                LocalDateTime returnAt = Dates.parseStringToLocalDateTime(ticketNode.get("return_at").asText());
-                LocalDateTime expiresAt = Dates.parseStringToLocalDateTime(ticketNode.get("expires_at").asText());
+                    price = ticketNode.get("price").asDouble();
+                    airlineIataCode = ticketNode.get("airline").asText();
+                    flightNumber = ticketNode.get("flight_number").asInt();
+                    transfers = ticketNode.get("transfers").asInt();
+                    departureAt = Dates.parseStringToLocalDateTime(ticketNode.get("departure_at").asText());
+                    returnAt = Dates.parseStringToLocalDateTime(ticketNode.get("return_at").asText());
+                    expiresAt = Dates.parseStringToLocalDateTime(ticketNode.get("expires_at").asText());
+                }
 
+
+                newExpiresAt = Dates.atLocalTime(Dates.atUtc(expiresAt));
                 // Create an instance of flight ticket.
-                FlightTicket outTicket = new FlightTicket(price,this.airlineService.getSpecificAirlines(airlineIataCode),flightNumber,departureAt,returnAt,expiresAt,index);
+                FlightTicket outTicket = new FlightTicket(price,this.airlineService.getSpecificAirlines(airlineIataCode),flightNumber,departureAt,returnAt,newExpiresAt,index,transfers);
+                Airline airline = this.airlineService.searchAirline(airlineIataCode);
+
+                outTicket.setAirlineDetails(airline);
                 flightTicketsList.add(outTicket);
+
+
                 this.saveFlightTickets(outTicket, flight);
             }
 
@@ -191,4 +211,19 @@ public class FlightService {
 
         logger.info("FlightService>>  generateFlightTickets: End method.");
     }
+
+    private Location generateLocation(String cityIATACode){
+        City city = this.cityService.fetchSpecificCityByIATA(cityIATACode);
+
+        if(city==null){
+            throw new IllegalArgumentException("Invalid city, did not found.");
+        }
+
+        Country country = this.countryService.fetchCountry(city.getCountryIATACode());
+        if(country==null){
+            throw new IllegalArgumentException("Invalid country, did not found.");
+        }
+        return new Location(city,country);
+    }
+
 }

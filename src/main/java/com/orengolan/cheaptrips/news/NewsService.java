@@ -2,10 +2,9 @@ package com.orengolan.cheaptrips.news;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orengolan.cheaptrips.config.ConfigLoader;
 import com.orengolan.cheaptrips.service.SentimentAnalyzer;
 import com.orengolan.cheaptrips.util.API;
-import org.json.simple.JSONObject;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,27 +18,29 @@ import java.util.Date;
 public class NewsService {
 
     private final Logger logger = Logger.getLogger(NewsService.class.getName());
-    JSONObject config = ConfigLoader.loadConfig();
     private final SentimentAnalyzer sentimentAnalyzer;
     private final ObjectMapper objectMapper;
     private final NewsRepository newsRepository;
     private final API api;
 
-    public NewsService(SentimentAnalyzer sentimentAnalyzer, ObjectMapper objectMapper,NewsRepository newsRepository,API api) {
+    private final String newsEndpoint;
+    private final String newsToken;
+
+    public NewsService(Dotenv dotenv, SentimentAnalyzer sentimentAnalyzer, ObjectMapper objectMapper, NewsRepository newsRepository, API api) {
         this.sentimentAnalyzer = sentimentAnalyzer;
         this.objectMapper = objectMapper;
         this.newsRepository = newsRepository;
         this.api = api;
+        this.newsEndpoint = dotenv.get("news_ENDPOINT");
+        this.newsToken = dotenv.get("news_TOKEN");
     }
 
     private String getNewsStream(String cityName, Integer pageSize,String lastDay) throws IOException {
 
         logger.info("NewsService>>  getNewsStream: Start method.");
-        String ENDPOINT_URL = (String) config.get("news_ENDPOINT");
-        String TOKEN = (String) config.get("news_TOKEN");
         logger.info("NewsService>>  getNewsStream: Data: cityName:"+cityName+" , pageSize: "+pageSize+" ,lastDay:"+lastDay);
 
-        String URL = ENDPOINT_URL+cityName+"&from="+lastDay+"&sortBy=popularity&apiKey="+ TOKEN +"&pageSize="+pageSize+"&language=en";
+        String URL = newsEndpoint+cityName+"&from="+lastDay+"&sortBy=popularity" +"&pageSize="+pageSize+"&language=en&apiKey="+ newsToken;
         return this.api.buildAndExecuteRequest(URL,null);
     }
 

@@ -19,7 +19,7 @@ public class News {
     private Date _expireAt;
     @NotNull
     @Indexed(unique = true,expireAfterSeconds = 24 * 60 * 60) // One day expiration
-    @Size(max = 10)
+    @Size(max = 50)
     private final String cityName;
     private List<news> newsList;
     private Integer _newsListCount;
