@@ -30,3 +30,4 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
         return MongoClients.create(settings);
     }
 }
+
