@@ -1,17 +1,14 @@
 package com.orengolan.cheaptrips.cheaptripsapp;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.orengolan.cheaptrips.usersearch.UserInfo;
-import com.orengolan.cheaptrips.usersearch.UserInfoRequest;
-import org.springframework.format.annotation.DateTimeFormat;
+import com.orengolan.cheaptrips.userinformation.UserInfo;
+import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
+import io.swagger.annotations.Api;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,6 +17,7 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/app/cheap-trip")
+@Api (tags = "CheapTripsApp", description = "User & Travel Services Management.")
 public class CheapTripController {
 
     private static final Logger logger = Logger.getLogger(CheapTripController.class.getName());
@@ -67,24 +65,6 @@ public class CheapTripController {
 
     }
 
-    private UserInfo retrieveUserInfoByToken(HttpServletRequest request) throws AuthenticationException {
-
-        String authorizationHeader = request.getHeader("Authorization");
-
-        String username;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            username = authentication.getName();
-
-        } else {
-            logger.warning("No valid JWT token found in the request.");
-            throw new AuthenticationException("Invalid JWT token") {
-            };
-        }
-        return this.cheapTripsService.retrieveUserByIdentified(username);
-
-    }
-
     private boolean isValidDateFormat(String date) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -95,4 +75,23 @@ public class CheapTripController {
             return false;
         }
     }
+
+    private UserInfo retrieveUserInfoByToken(HttpServletRequest request) throws AuthenticationException {
+
+        String authorizationHeader = request.getHeader("Authorization");
+
+        String email;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            email = authentication.getName();
+
+        } else {
+            logger.warning("No valid JWT token found in the request.");
+            throw new AuthenticationException("Invalid JWT token") {
+            };
+        }
+        return this.cheapTripsService.retrieveUserByIdentified(email);
+
+    }
+
 }

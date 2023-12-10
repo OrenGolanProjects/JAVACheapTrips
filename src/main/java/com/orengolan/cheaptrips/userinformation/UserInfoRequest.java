@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.usersearch;
+package com.orengolan.cheaptrips.userinformation;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.mongodb.core.index.Indexed;

@@ -38,10 +38,9 @@ public class JwtAuthenticationController {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequest authenticationRequest) throws Exception {
 
+        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
     }
@@ -49,10 +48,10 @@ public class JwtAuthenticationController {
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequest userRequest) {
         String encodedPass = passwordEncoder.encode(userRequest.getPassword());
-        DBUser user = DBUser.UserBuilder.anUser().name(userRequest.getUsername())
+        DBUser user = DBUser.UserBuilder.anUser().name(userRequest.getEmail())
                 .password(encodedPass).build();
         userServiceJWT.save(user);
-        UserDetails userDetails = new User(userRequest.getUsername(), encodedPass, new ArrayList<>());
+        UserDetails userDetails = new User(userRequest.getEmail(), encodedPass, new ArrayList<>());
         return ResponseEntity.ok(new JwtResponse(jwtTokenUtil.generateToken(userDetails)));
     }
 

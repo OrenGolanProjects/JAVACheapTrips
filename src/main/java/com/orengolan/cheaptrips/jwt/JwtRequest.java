@@ -1,30 +1,35 @@
 package com.orengolan.cheaptrips.jwt;
 
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.core.annotation.Order;
+
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 public class JwtRequest implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
-    private String username;
+    @ApiModelProperty(position = 1)
+    private String email;
 
+    @ApiModelProperty(position = 2)
     private String password;
 
     //need default constructor for JSON Parsing
     public JwtRequest() {
     }
 
-    public JwtRequest(String username, String password) {
-        this.setUsername(username);
+    public JwtRequest(String email, String password) {
+        this.setEmail(email);
         this.setPassword(password);
     }
 
-    public String getUsername() {
-        return this.username;
+    public String getEmail() {
+        return this.email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.usersearch;
+package com.orengolan.cheaptrips.userinformation;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

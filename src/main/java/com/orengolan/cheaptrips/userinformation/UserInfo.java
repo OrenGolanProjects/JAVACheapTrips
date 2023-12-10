@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.usersearch;
+package com.orengolan.cheaptrips.userinformation;
 
 import com.orengolan.cheaptrips.cheaptripsapp.CheapTripsResponse;
 import org.springframework.data.annotation.Id;

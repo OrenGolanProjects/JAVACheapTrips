@@ -6,9 +6,9 @@ import com.orengolan.cheaptrips.news.News;
 import com.orengolan.cheaptrips.news.NewsService;
 import com.orengolan.cheaptrips.opentripmap.OpenTripMapService;
 import com.orengolan.cheaptrips.opentripmap.PlacesData;
-import com.orengolan.cheaptrips.usersearch.UserInfo;
-import com.orengolan.cheaptrips.usersearch.UserInfoRequest;
-import com.orengolan.cheaptrips.usersearch.UserInfoService;
+import com.orengolan.cheaptrips.userinformation.UserInfo;
+import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
+import com.orengolan.cheaptrips.userinformation.UserInfoService;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
@@ -40,7 +40,7 @@ public class CheapTripsService {
     }
 
     public UserInfo retrieveUserByIdentified(String userName){
-        return this.userInfoService.getSpecificUserByEmail(userName);
+        return this.userInfoService.getUserByIdentifier(userName);
     }
 
     public CheapTripsResponse generateNewByTrip(CheapTripsRequest cheapTripsRequest,String departure_at,String return_at,UserInfo userInfo) throws ParseException, IOException {
@@ -87,6 +87,7 @@ public class CheapTripsService {
         logger.info("CheapTripsService>>  saveUserTrip: End method.");
         return this.userInfoService.createNewUser(userInfo);
     }
+
 
 
 }

@@ -55,8 +55,8 @@ public class SwaggerConfig {
                         + "     - Use the token that received insert format: <Bearer YOUR_TOKEN> and click Authorize.\n\n"
 
 
-                        + "2. **Register as a New User (CheapTripsApp):**\n"
-                        + "     - Use the /app/cheap-trip/create-user endpoint to register as a new user.\n"
+                        + "2. **Register as a New User (User Management):**\n"
+                        + "     - Use the /app/userinfo/create-specific-user-info endpoint to register as a new user.\n"
                         + "     - Insert the user information: username, first name, surname, phone.\n\n"
 
                         + "3. **Search for Trip at (CheapTripsApp):**\n"
