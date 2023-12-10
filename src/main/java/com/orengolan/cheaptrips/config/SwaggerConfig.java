@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
@@ -25,34 +27,54 @@ public class SwaggerConfig {
 
     @Bean
     public Docket swaggerSpringfoxDocket() {
-        Contact contact = new Contact(
-                "oren",
-                "https://cheap-trips.com",
-                "admin@cheap-trips.com");
-
-        List<VendorExtension> next = new ArrayList<>();
-
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .pathMapping("/")
-                .apiInfo(ApiInfo.DEFAULT)
-                .forCodeGeneration(true)
-                .genericModelSubstitutes(ResponseEntity.class)
-                .ignoredParameterTypes(Pageable.class)
-                .ignoredParameterTypes(java.sql.Date.class)
-                .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
-                .directModelSubstitute(java.time.ZonedDateTime.class, Date.class)
-                .directModelSubstitute(java.time.LocalDateTime.class, Date.class)
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.orengolan.cheaptrips"))
+                .paths(regex(DEFAULT_INCLUDE_PATTERN))
+                .build()
                 .securityContexts(Lists.newArrayList(securityContext()))
                 .securitySchemes(Lists.newArrayList(apiKey()))
                 .useDefaultResponseMessages(false);
-
-        docket = docket.select()
-                .paths(regex(DEFAULT_INCLUDE_PATTERN))
-                .build();
-        return docket;
     }
 
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("CheapTrips API Documentation")
+                .description(
+                        "###**About**\n\n"
+                        + "**CheapTrips is designed to simplify trip planning, offering:**\n"
+                        + "- **Flights:** Search for trips by month or specific dates.\n"
+                        + "- **Local News:** Retrieve destination-based news with sentiment scores (1-5).\n"
+                        + "- **Places to Travel:** Discover places based on coordinates, count, and category.\n\n"
 
+                        + "###**How to Use - New User**\n\n"
+                        + "1. **Generate Token and Authorize (JWT Authentication):**\n"
+                        + "     - Use the /user endpoint to sign in and obtain a JWT token.\n"
+                        + "     - Click on 'Authorize' in the top left corner of the screen.\n"
+                        + "     - Use the token that received insert format: <Bearer YOUR_TOKEN> and click Authorize.\n\n"
+
+
+                        + "2. **Register as a New User (CheapTripsApp):**\n"
+                        + "     - Use the /app/cheap-trip/create-user endpoint to register as a new user.\n"
+                        + "     - Insert the user information: username, first name, surname, phone.\n\n"
+
+                        + "3. **Search for Trip at (CheapTripsApp):**\n"
+                        + "     - Choose either the /app/cheap-trip/generate-monthly-trip or /app/cheap-trip/generate-trip-by-dates endpoints.\n"
+                        + "     - Provide the necessary details in the request body for generating trips.\n\n"
+
+                        + "###**Coming Soon:**\n\n"
+                        + "Enhancements to elevate your experience:\n"
+                        + "- Real-time Weather: Instant updates on destination weather.\n"
+                        + "- Holiday Insights: Details about upcoming holidays. Stay tuned for an enriched travel experience with CheapTrips!\n\n"
+
+                        + "###For code review,examples and README.md file, visit my GitHub repository:\n"
+                        + "\uD83D\uDD17 **GitHub Repository**: [https://github.com/OrenGolanProjects/JAVACheapTrips#readme/](https://github.com/OrenGolanProjects/JAVACheapTrips#readme/)\n"
+                        + "###Designed & Developed by: Oren Golan."
+                )
+                .version("1.0")
+                .build();
+    }
     private ApiKey apiKey() {
         return new ApiKey("Authorization", AUTHORIZATION_HEADER, "header");
     }
