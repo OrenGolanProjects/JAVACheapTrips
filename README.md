@@ -85,11 +85,9 @@ Before diving into the CheapTrips application, ensure you have the following pre
 Build and Run with Docker:
 
 ```bash
-   Copy code
-   docker-compose up --build
+  docker-compose up --build
 ```
 This command will build the Docker images and start the CheapTrips application.
-
 
 ## Usage
 
@@ -108,43 +106,27 @@ Use the following curl command to search for a city:
 ### Generate Monthly Trip Example
 Use the following curl command to generate a monthly trip:
 ```bash
-   curl -X POST 
-   --header 'Content-Type: application/json' 
-   --header 'Accept: application/json' 
-   --header 'Authorization: Bearer <your-token>' 
-   -d '{
-    "origin_cityIATACode": "TLV",
-    "destination_cityIATACode": "AMS",
-    "destination_cityName": "amsterdam",
-    "radius": 10000,
-    "limitPlaces": 2,
-    "kinds": [
-        "interesting_places",
-        "amusements",
-        "sport",
-        "tourist_facilities",
-        "accomodations",
-        "adult"
-    ]
-}' 'https://www.search-trips-api.com/cheap-trip/generate-monthly-trip'
+curl -X POST 
+  --header 'Content-Type: application/json' 
+  --header 'Accept: application/json' 
+  --header 'Authorization: Bearer <your-token>' 
+  -d '{
+        "origin_cityIATACode": "TLV",  
+        "destination_cityIATACode": "AMS",  
+        "destination_cityName": "amsterdam",  
+        "radius": 10000, 
+        "limitPlaces": 2  
+       }' 'https://www.search-trips-api.com/cheap-trip/generate-monthly-trip'
 ```
 
 Example JSON for generating a monthly trip:
 ```json
 {
-   "origin_cityIATACode": "TLV",
-   "destination_cityIATACode": "AMS",
-   "destination_cityName": "amsterdam",
-   "radius": 10000,
-   "limitPlaces": 2,
-   "kinds": [
-      "interesting_places",
-      "amusements",
-      "sport",
-      "tourist_facilities",
-      "accomodations",
-      "adult"
-   ]
+  "origin_cityIATACode": "TLV",
+  "destination_cityIATACode": "AMS",
+  "destination_cityName": "amsterdam",
+  "radius": 10000,
+  "limitPlaces": 2
 }
 ```
 
@@ -159,19 +141,17 @@ curl -X POST
   --header 'Accept: application/json' 
   --header 'Authorization: Bearer <your-token>' 
   -d '{
-    "origin_cityIATACode": "TLV",
-    "destination_cityIATACode": "AMS",
-    "destination_cityName": "amsterdam",
-    "radius": 10000,
-    "limitPlaces": 2
-  }' 'https://www.search-trips-api.com/cheap-trip/generate-trip-by-dates?departure_at=<your-departure_at>&return_at=<your-return_at>'
-
+        "origin_cityIATACode": "TLV",
+        "destination_cityIATACode": "AMS",
+        "destination_cityName": "amsterdam",
+        "radius": 10000,
+        "limitPlaces": 2
+       }' 'https://www.search-trips-api.com/cheap-trip/generate-trip-by-dates?departure_at=<your-departure_at>&return_at=<your-return_at>'
 ```
-Replace <your-token>, <your-departure_at>, and <your-return_at> with the actual authentication token, departure date, and return date. Adjust the formatting or wording as needed.
+Note: Replace <your-token>, <your-departure_at>, and <your-return_at> with the actual authentication token, departure date, and return date. Adjust the formatting or wording as needed.
 
 
 **Example JSON for generating a trip by dates:**
-
 ```json
 {
   "origin_cityIATACode": "TLV",
@@ -183,21 +163,91 @@ Replace <your-token>, <your-departure_at>, and <your-return_at> with the actual 
 ```
 Note: Make sure to replace the values (<departure_at>, <return_at>) when using the swagger-ui.
 
+### Create New User Example
+To create a new user and register with CheapTrips, use the following curl command:
+```bash
+curl -X POST 
+  --header 'Content-Type: application/json' 
+  --header 'Accept: application/json' 
+  --header 'Authorization: Bearer <your-token>' 
+  -d '{
+        "username": "your_username",
+        "firstName": "your_first_name",
+        "surname": "your_surname",
+        "phone": "your_phone_number"
+       }' 'https://www.search-trips-api.com/app/userinfo/create-specific-user-info'
+```
+Note: Replace the placeholder values (your_username, your_first_name, your_surname, your_phone_number, and your_email) with the actual user details. Adjust the formatting or wording as needed.
+
+**Example JSON for creating a new user:**
+```json
+{
+  "username": "your_username",
+  "firstName": "your_first_name",
+  "surname": "your_surname",
+  "phone": "your_phone_number"
+}
+```
+Note: Upon successful registration, a new user will be created, and you can use the generated JWT token for further authentication in other CheapTrips API endpoints
+
 ---
 
 ## API Documentation
 
 Explore the CheapTrips API and interact with the available services using the following documentation.
 
-### Authentication Token
+### Step 1: Obtain Authentication Token
 
-To access the CheapTrips API services, you need to include your authentication token in the headers of your HTTP requests.
+Before accessing CheapTrips services, you need to obtain an authentication token.
 
+#### Using Existing User:
+To get the authentication token for an existing user, make a request to the `/authentication` endpoint.
+
+```bash
+curl -X POST 
+  --header 'Content-Type: application/json' 
+  -d '{
+        "username": "your_existing_username",
+        "password": "your_password"
+       }' 'https://www.search-trips-api.com/authentication'
+```
+
+For New User:
+If you don't have a JWT token, create a new user and get the token by making a request to the /user endpoint.
+```bash
+curl -X POST 
+  --header 'Content-Type: application/json' 
+  -d '{
+        "username": "your_username",
+        "password": "your_password"
+       }' 'https://www.search-trips-api.com/user'
+```
+
+### Step 2: Authorize
+Once you have the authentication token, authorize your requests by including it in the headers.
 - **Header:** Authorization
 - **Value:** Bearer \<your-token\>
 
-### Swagger UI
 
-Visit the Swagger UI to interactively explore and test the available API endpoints.
+### Step 3: Create New User Information (If New User)
+If you are a new user, create your user information using the following curl command:
+```bash
+curl -X POST 
+  --header 'Content-Type: application/json' 
+  --header 'Authorization: Bearer <your-token>' 
+  -d '{
+        "username": "your_username",
+        "firstName": "your_first_name",
+        "surname": "your_surname",
+        "phone": "your_phone_number"
+       }' 'https://www.search-trips-api.com/app/userinfo/create-specific-user-info?email=your_email'
+```
+Replace the placeholder values with your actual details.
+
+### Step 4: Start Using the CheapTrips Services
+Now, you're ready to explore CheapTrips services. 
+Use the Swagger UI to interactively explore and test the available API endpoints.
 
 - **URL:** [Swagger UI](https://www.search-trips-api.com/swagger-ui.html)
+
+

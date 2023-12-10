@@ -63,9 +63,10 @@ public class UserInfoController {
             @ApiResponse(code = 201, message = "User successfully created"),
             @ApiResponse(code = 400, message = "Invalid request data"),
             @ApiResponse(code = 500, message = "Internal server error")
-    })    public ResponseEntity<UserInfo> createSpecificUser(@RequestBody UserInfoRequest userInfoRequest, @RequestParam @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format") String email) {
+    })    public ResponseEntity<UserInfo> createSpecificUser(@RequestBody UserInfoRequest userInfoRequest,HttpServletRequest request) {
         logger.info("** UserController>>  deleteAllUsers: Start method.");
-        return ResponseEntity.status(201).body(this.userService.createNewUser(userInfoRequest.toUserInto(email)));
+
+        return ResponseEntity.status(201).body(this.userService.createNewUser(userInfoRequest.toUserInto(this.retrieveUserIdentifier(request))));
     }
 
     @RequestMapping(value = "/update-specific-user-info", method = RequestMethod.PUT)
@@ -79,19 +80,8 @@ public class UserInfoController {
     })
     public ResponseEntity<UserInfo> updateSpecificUser(@RequestBody UserInfoRequest updatedUserInfoRequest,HttpServletRequest request) {
         logger.info("** UserController>>  updateSpecificUser: Start method.");
+        String email = this.retrieveUserIdentifier(request);
 
-        String authorizationHeader = request.getHeader("Authorization");
-
-        String email;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            email = authentication.getName();
-
-        } else {
-            logger.warning("No valid JWT token found in the request.");
-            throw new AuthenticationException("Invalid JWT token") {
-            };
-        }
         UserInfo updatedUser = this.userService.updateUserInfo(email, updatedUserInfoRequest.toUserInto(email));
         return ResponseEntity.ok(updatedUser);
     }
@@ -105,8 +95,14 @@ public class UserInfoController {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
+
     public UserInfo deleteSpecificUser(HttpServletRequest request){
         logger.info("** UserController>>  deleteSpecificUser: Start method.");
+        return this.userService.deleteSpecificUser(this.retrieveUserIdentifier(request));
+    }
+
+    private String retrieveUserIdentifier(HttpServletRequest request) throws AuthenticationException {
+
         String authorizationHeader = request.getHeader("Authorization");
 
         String email;
@@ -119,8 +115,8 @@ public class UserInfoController {
             throw new AuthenticationException("Invalid JWT token") {
             };
         }
-        return this.userService.deleteSpecificUser(email);
-    }
 
+        return email;
+    }
 
 }

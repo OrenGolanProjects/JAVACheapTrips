@@ -154,7 +154,6 @@ public class CheapTripController {
             };
         }
         return this.cheapTripsService.retrieveUserByIdentified(email);
-
     }
 
 }

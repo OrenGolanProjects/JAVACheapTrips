@@ -98,7 +98,7 @@ public class UserInfoService {
         logger.info("UserService>>  updateUserInfo: Start method.");
 
         // Check if the user exists
-        UserInfo existingUser = getUserByIdentifier(userIdentifier);
+        UserInfo existingUser = this.getUserByIdentifier(userIdentifier);
 
         if (existingUser != null) {
             // Perform the update with the new information
