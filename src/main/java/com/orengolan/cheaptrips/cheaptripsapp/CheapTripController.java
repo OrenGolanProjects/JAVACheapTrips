@@ -1,15 +1,21 @@
 package com.orengolan.cheaptrips.cheaptripsapp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.orengolan.cheaptrips.usersearch.UserInfo;
 import com.orengolan.cheaptrips.usersearch.UserInfoRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 @RestController
@@ -18,36 +24,48 @@ public class CheapTripController {
 
     private static final Logger logger = Logger.getLogger(CheapTripController.class.getName());
     private final CheapTripsService cheapTripsService;
+
     public CheapTripController(CheapTripsService cheapTripsService) {
         this.cheapTripsService = cheapTripsService;
     }
 
-    @RequestMapping(value="/generate-monthly-trip", method = RequestMethod.POST)
-    public UserInfo generateMonthlyTrip(@Valid @RequestBody CheapTripsRequestMonthly cheapTripsRequestMonthly, HttpServletRequest request) throws ParseException, IOException {
+    @RequestMapping(value = "/generate-monthly-trip", method = RequestMethod.POST)
+    public CheapTripsResponse generateMonthlyTrip(@Valid @RequestBody CheapTripsRequest cheapTripsRequest, HttpServletRequest request) throws ParseException, IOException {
 
         logger.info("** CheapTripController>>  generateTrip: Start method.");
         UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateTripMonthly(cheapTripsRequestMonthly,user);
-
+        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, null, null,user);
     }
-    @RequestMapping(value="/generate-trip-by-dates", method = RequestMethod.POST)
-    public UserInfo generateTripByDates(@Valid @RequestBody CheapTripsRequestByDates cheapTripsRequestByDates, HttpServletRequest request) throws ParseException, IOException {
+
+    @RequestMapping(value = "/generate-trip-by-dates", method = RequestMethod.POST)
+    public CheapTripsResponse generateTripByDates(
+            @Valid @RequestBody CheapTripsRequest cheapTripsRequest,
+            @RequestParam(defaultValue = "yyyy-MM-dd", required = true) String depart_date,
+            @RequestParam(defaultValue = "yyyy-MM-dd", required = true) String return_date,
+            HttpServletRequest request) throws ParseException, IOException {
 
         logger.info("** CheapTripController>>  generateTrip: Start method.");
-        UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateTripByDates(cheapTripsRequestByDates,user);
+        // Validate depart_date
+        if (depart_date == null || !isValidDateFormat(depart_date)) {
+            throw new IllegalArgumentException("Invalid depart_date format. Please use yyyy-MM-dd.");
+        }
+        // Validate return_date
+        if (return_date == null || !isValidDateFormat(return_date)) {
+            throw new IllegalArgumentException("Invalid return_date format. Please use yyyy-MM-dd.");
+        }
 
+        UserInfo user = this.retrieveUserInfoByToken(request);
+        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, depart_date, return_date,user);
     }
 
-    @RequestMapping(value="/create-user", method = RequestMethod.POST)
-    public UserInfo createUser(@Valid @RequestBody UserInfoRequest userInfoRequest){
+    @RequestMapping(value = "/create-user", method = RequestMethod.POST)
+    public UserInfo createUser(@Valid @RequestBody UserInfoRequest userInfoRequest) {
         logger.info("** CheapTripController>>  createUser: Start method.");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return this.cheapTripsService.newUser(userInfoRequest,username);
+        return this.cheapTripsService.newUser(userInfoRequest, username);
 
     }
-
 
     private UserInfo retrieveUserInfoByToken(HttpServletRequest request) throws AuthenticationException {
 
@@ -67,6 +85,14 @@ public class CheapTripController {
 
     }
 
-
-
+    private boolean isValidDateFormat(String date) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setLenient(false);
+            Date parsedDate = sdf.parse(date);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
 }
