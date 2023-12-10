@@ -2,6 +2,7 @@ package com.orengolan.cheaptrips.flight;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -39,9 +41,9 @@ public class FlightController {
     }
 
     @RequestMapping(value = "/get-specific-ticket",method = RequestMethod.GET)
-    public Set<String> getSpecificTicket(
+    public List<FlightTicket> getSpecificTicket(
             @Size(max =3) @RequestParam String Origin_CountryIataCode,
-            @Size(max =3) @RequestParam String Destination_CountryIataCode){
+            @Size(max =3) @RequestParam String Destination_CountryIataCode) throws JsonProcessingException {
         logger.info("** FlightController>>  getSpecificTicket: Start method.");
         return this.flightService.getTicketByParseKey(Origin_CountryIataCode+"_"+Destination_CountryIataCode);
     }

@@ -131,7 +131,7 @@ Use the following curl command to generate a monthly trip:
 
 Example JSON for generating a monthly trip:
 ```json
-   {
+{
    "origin_cityIATACode": "TLV",
    "destination_cityIATACode": "AMS",
    "destination_cityName": "amsterdam",
@@ -154,10 +154,10 @@ Example JSON for generating a monthly trip:
 Use the following curl command to generate a trip by dates:
 
 ```bash
-curl -X POST \
-  --header 'Content-Type: application/json' \
-  --header 'Accept: application/json' \
-  --header 'Authorization: Bearer <your-token>' \
+curl -X POST 
+  --header 'Content-Type: application/json' 
+  --header 'Accept: application/json' 
+  --header 'Authorization: Bearer <your-token>' 
   -d '{
     "origin_cityIATACode": "TLV",
     "destination_cityIATACode": "AMS",

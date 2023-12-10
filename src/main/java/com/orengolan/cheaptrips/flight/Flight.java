@@ -84,10 +84,13 @@ public class Flight {
 
     @Override
     public String toString() {
-        return "Flight:{" +
-                ", origin_" + getOrigin().toString() +
-                ", destination" + getDestination().toString() +
-                ", FlightTickets:" + ticketKeys +
+        return "Flight{" +
+                "origin=" + origin +
+                ", destination=" + destination +
+                ", ticketKeys=" + ticketKeys +
+                ", currency='" + currency + '\'' +
+                ", departure_at='" + departure_at + '\'' +
+                ", return_at='" + return_at + '\'' +
                 '}';
     }
 }

@@ -1,5 +1,12 @@
 package com.orengolan.cheaptrips.flight;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.joda.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.joda.ser.LocalDateTimeSerializer;
 import com.orengolan.cheaptrips.airline.Airline;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
@@ -17,13 +24,26 @@ public class FlightTicket implements Serializable {
     private Airline airlineDetails;
     @NotNull
     private  Integer flightNumber;
-    @NotNull
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private  LocalDateTime departureAt;
-    @NotNull
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private  LocalDateTime returnAt;
-    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private  LocalDateTime expiresAt;
+
     private  String ticketIndex;
+
+
+    public FlightTicket() {
+    }
 
     public FlightTicket(@NotNull Double price,@NotNull  Airline airlineDetails,@NotNull  Integer flightNumber,
                         @NotNull LocalDateTime departureAt,@NotNull  LocalDateTime returnAt,
@@ -125,19 +145,28 @@ public class FlightTicket implements Serializable {
         this.ticketIndex = ticketIndex;
     }
 
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(this);
+    }
+
+    public static FlightTicket fromJson(String json) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(json, FlightTicket.class);
+    }
 
 
     @Override
     public String toString() {
-        return "{" +
+        return "FlightTicket{" +
                 "price=" + price +
+                ", transfers=" + transfers +
+                ", airlineDetails=" + airlineDetails +
                 ", flightNumber=" + flightNumber +
-                ", airlineDetails='" + airlineDetails +
-                ", departureAt=" + departureAt.toString() +
-                ", returnAt=" + returnAt.toString() +
-                ", expiresAt=" + expiresAt.toString() +
-                ", ticketIndex='" + ticketIndex +
-                ", transfers='" + transfers +
+                ", departureAt=" + departureAt +
+                ", returnAt=" + returnAt +
+                ", expiresAt=" + expiresAt +
+                ", ticketIndex='" + ticketIndex + '\'' +
                 '}';
     }
 }

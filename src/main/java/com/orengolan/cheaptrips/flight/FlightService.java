@@ -1,5 +1,6 @@
 package com.orengolan.cheaptrips.flight;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.orengolan.cheaptrips.airline.Airline;
 import com.orengolan.cheaptrips.airline.AirlineService;
@@ -83,49 +84,42 @@ public class FlightService {
     }
 
 
-    public void saveFlightTickets(@NotNull FlightTicket flightTicket, @NotNull Flight flight ) {
+    public void saveFlightTickets(@NotNull FlightTicket flightTicket, @NotNull Flight flight ) throws JsonProcessingException {
         logger.info("FlightService>>  saveFlightTickets: Start method.");
         String generateTicketKey = flightTicket.generateTicketKey(flight.getOrigin().getCity().getCityIATACode(),flight.getDestination().getCity().getCityIATACode());
 
-        FlightTicket existFlightTicket = (FlightTicket) this.redis.get(generateTicketKey);
+        String existFlightTicket = (String) this.redis.get(generateTicketKey);
 
         if (existFlightTicket == null )
         {
-            this.redis.set(generateTicketKey,flightTicket, flightTicket.generateExpireTime());
+            this.redis.set(generateTicketKey,flightTicket.toJson(), flightTicket.generateExpireTime());
             logger.info("FlightService>>  saveFlightTickets: Successfully saved.");
         }
         logger.info("FlightService>>  saveFlightTickets: End method.");
     }
 
-    public Set<String> getTicketByParseKey(String partKey){
-        logger.info("FlightService>>  getTicketByParseKey: Start method.");
+    public List<FlightTicket> getTicketByParseKey(String partKey) throws JsonProcessingException {
+        logger.info("FlightService >> getTicketByParseKey: Start method.");
+        List<FlightTicket> ticketKeysList = new ArrayList<>();
+
         Set<String> result = this.redis.getKeys(partKey);
-        Assert.notNull(result, "Did not found ticket for parse key:" + partKey);
-        logger.info("FlightService>>  getTicketByParseKey: End method.");
-        return result;
+        for (String key : result) {
+            String value = (String) this.redis.get(key);
+
+            FlightTicket flightTicket = FlightTicket.fromJson(value);
+            ticketKeysList.add(flightTicket);
+        }
+        logger.info("FlightService >> getTicketByParseKey: End method.");
+        return ticketKeysList;
     }
 
     @NotNull
-    private List<FlightTicket> getTicketsByFlight(@NotNull Flight flight) {
+    private List<FlightTicket> getTicketsByFlight(@NotNull Flight flight) throws JsonProcessingException {
         logger.info("FlightService>>  getTicketsByFlight: Start method.");
 
-        String partKey = flight.getOrigin().getCountry().getCountryIATACode()+"_"+flight.getDestination().getCountry().getCountryIATACode(); // Create the partial value to search tickets.
-        Set<String> keys = this.redis.getKeys(partKey);  // Use your custom method to get keys
-        List<FlightTicket> tickets = new ArrayList<>(); // initialize list of flight tickets
+        String partKey = flight.getOrigin().getCity().getCityIATACode()+"_"+flight.getDestination().getCity().getCityIATACode(); // Create the partial value to search tickets.
+        List<FlightTicket> tickets = this.getTicketByParseKey(partKey);  // Use your custom method to get keys
 
-        if (keys != null && !keys.isEmpty()) {
-            for (String key : keys) {
-                Object value = redis.get(key);
-
-                FlightTicket flightTicket;
-                if (value instanceof FlightTicket) {
-                    flightTicket = (FlightTicket) value;
-                } else {
-                    continue;
-                }
-                tickets.add(flightTicket);
-            }
-        }
         logger.info("FlightService>>  getTicketsByFlight: Found: "+tickets.size()+" flight tickets.");
         logger.info("FlightService>>  getTicketsByFlight: End method.");
         return tickets;
@@ -197,7 +191,6 @@ public class FlightService {
 
                 outTicket.setAirlineDetails(airline);
                 flightTicketsList.add(outTicket);
-
 
                 this.saveFlightTickets(outTicket, flight);
             }

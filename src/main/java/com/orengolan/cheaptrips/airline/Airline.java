@@ -1,5 +1,7 @@
 package com.orengolan.cheaptrips.airline;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,17 +14,24 @@ public class Airline implements Serializable {
 
     @NotNull
     private String name;
+
     @NotNull
     @Size(max = 3)
     @Indexed(unique = true)
     private String airlineIATACode;
+
     @NotNull
     private Boolean isLowCost;
 
     @Indexed(expireAfterSeconds = 365 * 24 * 60 * 60) // One year expiration
     private Date expireAt;
 
-    public Airline(@NotNull String name, @NotNull String airlineIATACode, @NotNull Boolean isLowCost) {
+    @JsonCreator
+    public Airline(
+            @JsonProperty("name") @NotNull String name,
+            @JsonProperty("airlineIATACode") @NotNull String airlineIATACode,
+            @JsonProperty("isLowCost") Boolean isLowCost
+    ) {
         this.name = name;
         this.airlineIATACode = airlineIATACode;
         this.isLowCost = isLowCost;
@@ -66,9 +75,10 @@ public class Airline implements Serializable {
     @Override
     public String toString() {
         return "Airline{" +
-                "name='" + name +
-                ", airlineIATACode='" + airlineIATACode +
+                "name='" + name + '\'' +
+                ", airlineIATACode='" + airlineIATACode + '\'' +
                 ", isLowCost=" + isLowCost +
+                ", expireAt=" + expireAt +
                 '}';
     }
 }

@@ -1,11 +1,11 @@
 package com.orengolan.cheaptrips.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +15,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class Redis {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
+    public Redis(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
     //=============================common============================
@@ -73,7 +72,7 @@ public class Redis {
             if(key.length==1){
                 redisTemplate.delete(key[0]);
             }else{
-                redisTemplate.delete(CollectionUtils.arrayToList(key));
+                redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
             }
         }
     }
@@ -94,9 +93,9 @@ public class Redis {
      * @param value 值
      * @return true成功 false失败
      */
-    public boolean set(String key,Object value) {
+    public boolean set(String key,String value) {
         try {
-            return redisTemplate.opsForValue().setIfAbsent(key, value);
+            return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, value));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -526,8 +525,14 @@ public class Redis {
     }
 
     public Set<String> getKeys(String pattern) {
-        return redisTemplate.keys(pattern+"*");
+        pattern = "*" + pattern + "*";
+        return redisTemplate.keys(pattern);
     }
-
+    public void retrieveValues(Set<String> keys) {
+        for (String key : keys) {
+            String value = (String) redisTemplate.opsForValue().get(key);
+            System.out.println("Key: " + key + ", Value: " + value);
+        }
+    }
 
 }
