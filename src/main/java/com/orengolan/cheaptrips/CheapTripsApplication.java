@@ -6,7 +6,25 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.view.RedirectView;
+import springfox.documentation.annotations.ApiIgnore;
 
+
+/**
+ * The {@code CheapTripsApplication} class is the entry point for the CheapTrips Spring Boot application.
+ * It includes the main method for starting the application, and additional configuration for handling
+ * the embedded web server's port. The class also defines a SwaggerRedirectController for redirecting
+ * the root URL to the Swagger UI documentation.
+ *
+ * Key Features:
+ * - Configuration for setting the web server port, allowing flexibility for deployment.
+ * - Integration with Spring Boot to streamline the setup and deployment of the application.
+ * - Definition of a SwaggerRedirectController to redirect the root URL to the Swagger UI documentation.
+ *
+ * Example Usage:
+ * The main method is executed to start the Spring Boot application. The embedded web server's port
+ * is configured based on the environment, with a default port used for local development.
+ * The SwaggerRedirectController ensures that accessing the root URL redirects to the Swagger UI documentation.
+ */
 @SpringBootApplication
 public class CheapTripsApplication {
 	private static String baseUrl;  // Make it static
@@ -40,6 +58,7 @@ public class CheapTripsApplication {
 	}
 
 	@Controller
+	@ApiIgnore
 	static class RedirectController {
 		@GetMapping({"/"})
 		public RedirectView redirectToSwagger() {

@@ -6,6 +6,25 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The {@code PlacesDataRequest} class represents a request for information about places, including geographical coordinates,
+ * radius, limits on the number of places, and filters based on kinds of places. It is designed to capture user input and
+ * provide default values for unspecified parameters.
+ *
+ * Key Features:
+ * - Represents a request for information about places with parameters such as radius, longitude, latitude, limits on the number of places, and kinds.
+ * - Includes validation annotations like {@code @Max}, {@code @Min}, {@code @DecimalMax}, {@code @DecimalMin}, and {@code @Size} to ensure input constraints.
+ * - Provides default values for unspecified parameters, such as a default list of kinds if none is provided.
+ * - Implements setters and getters for each parameter, allowing flexibility in constructing and modifying requests.
+ *
+ * Example Usage:
+ * The class is used to construct requests for information about places, allowing users to specify parameters like location, radius,
+ * and preferred kinds of places. It ensures the validity of user input through validation annotations and provides default values
+ * when certain parameters are not explicitly set.
+ *
+ * Note: This class serves as a crucial part of the application's interaction with the OpenTripMap service, facilitating user input
+ * and customization of queries for retrieving information about places.
+ */
 public class PlacesDataRequest implements Serializable {
 
     @Max(50000)

@@ -9,6 +9,24 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The {@code OpenTripMapService} class provides services for interacting with the OpenTripMap API to fetch and manage place data.
+ * It includes methods for retrieving place details, generating and saving place data for specific cities, and deleting place data.
+ *
+ * Key Features:
+ * - Interacts with the OpenTripMap API to fetch place data.
+ * - Generates and saves place data for specific cities.
+ * - Includes methods for deleting all place data.
+ *
+ * Example Usage:
+ * The class is utilized to fetch and manage place data in the OpenTripMap service. It communicates with the OpenTripMap API to retrieve
+ * information about tourist places, including details such as names, rates, kinds, and geographical coordinates.
+ * The {@code generatePlaces} method is responsible for generating and saving place data for specific cities based on provided criteria.
+ * The {@code deletePlacesDataAll} method allows deleting all stored place data when necessary.
+ *
+ * Note: This service class is a key component of the application's data access layer, enabling the retrieval and management of place-related information
+ * from the OpenTripMap service.
+ */
 @Service
 public class OpenTripMapService {
     private final Logger logger = Logger.getLogger(OpenTripMapService.class.getName());

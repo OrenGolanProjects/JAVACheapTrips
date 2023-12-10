@@ -7,6 +7,26 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * The {@code GlobalExceptionHandler} class is a controller advice that handles global exception scenarios across the application.
+ * It provides methods to handle specific types of exceptions, ensuring consistent and meaningful responses to clients for various error situations.
+ *
+ * Key Features:
+ * - Utilizes Spring's {@code @ControllerAdvice} annotation to provide centralized exception handling for all controllers.
+ * - Defines methods to handle specific exception types, including bad requests, internal server errors, JSON processing errors,
+ *   and validation errors using {@code @ExceptionHandler} annotations.
+ * - Responds with appropriate HTTP status codes and error messages to ensure consistent and informative error handling.
+ * - Implements a custom method {@code printTrack} to print relevant information about the error, including the caller class,
+ *   caller method, and line number, enhancing debugging capabilities.
+ *
+ * Example Usage:
+ * The class is utilized to handle exceptions thrown during the execution of controller methods, providing consistent error responses
+ * to clients. It ensures that different types of exceptions, such as bad requests, internal server errors, JSON processing errors,
+ * and validation errors, are appropriately handled and result in clear error messages.
+ *
+ * Note: This class plays a crucial role in maintaining a standardized approach to exception handling, improving the overall reliability
+ * and user experience of the application.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler extends Exception {
 

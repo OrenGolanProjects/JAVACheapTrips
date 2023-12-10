@@ -1,14 +1,27 @@
 package com.orengolan.cheaptrips.cheaptripsapp;
 
 import io.swagger.annotations.ApiModelProperty;
-import springfox.documentation.annotations.ApiIgnore;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The {@code CheapTripRequest} class represents a request object for querying cheap trips information.
+ * It encapsulates the parameters required to search for travel destinations, including origin and destination
+ * city IATA codes, city names, radius, departure and return dates, and other optional parameters.
+ *
+ * Key Features:
+ * - Validation annotations ensure that the request parameters meet specific constraints.
+ * - Provides default values and validation for optional date parameters (departure_at and return_at).
+ * - Defines a list of kinds representing the types of places or activities to include in the search.
+ *
+ * Example Usage:
+ * CheapTripRequest tripRequest = new CheapTripRequest("TLV", "AMS", "2023-11-01", "2023-11-10", "amsterdam", 100, 5);
+ * tripRequest.setKinds(Arrays.asList("interesting_places", "amusements", "sport"));
+ * // Use the request object to query information about cheap trips.
+ */
 public class CheapTripsRequest {
 
 

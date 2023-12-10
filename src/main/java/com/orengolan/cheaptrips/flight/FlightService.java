@@ -19,9 +19,31 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.util.Assert;
 
 
+/**
+ * The {@code FlightService} class provides essential services related to flight management.
+ * It is responsible for handling flight data, including searching for flight tickets, generating
+ * flight information, and managing flight tickets in Redis. The service integrates with external
+ * APIs to obtain real-time flight data and ensures efficient caching of flight information for
+ * improved performance.
+ *
+ * Key Features:
+ * - {@code getFlightTickets}: Fetches flight tickets based on specified criteria, including
+ *   origin and destination city IATA codes, departure and return dates, and currency.
+ * - {@code findFlight}: Searches for available flights based on specified origin and destination
+ *   city IATA codes. It also supports optional parameters for departure and return dates.
+ * - {@code saveFlightTickets}: Stores flight ticket information in Redis for caching purposes.
+ * - {@code getTicketByParseKey}: Retrieves flight tickets based on a partial key in Redis.
+ *
+ * Example:
+ * The service can be used to search for available flights, generate flight information, and store
+ * flight ticket details for future retrieval. It integrates with Redis to efficiently cache flight
+ * information and external APIs to fetch real-time data.
+ *
+ * Note: This class plays a crucial role in the flight management module, providing services to
+ * controllers and ensuring seamless integration with external APIs and caching mechanisms.
+ */
 @Service
 public class FlightService {
     private final Redis redis;
@@ -35,6 +57,7 @@ public class FlightService {
     private final String flightcheapENDPOINT;
     private final String flightToken;
 
+
     public FlightService(Dotenv dotenv, Redis redis, ObjectMapper objectMapper, API api, AirlineService airlineService, CityService cityService, CountryService countryService){
         this.objectMapper = objectMapper;
         this.redis = redis;
@@ -47,6 +70,16 @@ public class FlightService {
         this.flightToken = dotenv.get("flight_TOKEN");
     }
 
+    /**
+     * Fetches flight tickets based on specified criteria.
+     *
+     * @param origin_cityIataCode The IATA code of the origin city.
+     * @param destination_cityIataCode The IATA code of the destination city.
+     * @param departure_at The departure date in the 'yyyy-MM-dd' format.
+     * @param return_at The return date in the 'yyyy-MM-dd' format.
+     * @return A JSON string containing flight ticket information.
+     * @throws IOException If an error occurs during the API request.
+     */
     public String getFlightTickets(String origin_cityIataCode, String destination_cityIataCode,String departure_at, String return_at) throws IOException {
         logger.info("FlightService>>  getFlightTickets: Start method.");
         logger.info("FlightService>>  getFlightTickets: Send GET request to get flight ticket list.");
@@ -67,6 +100,16 @@ public class FlightService {
         return this.api.buildAndExecuteRequest(newURL,headers);
     }
 
+    /**
+     * Searches for available flights based on specified origin and destination city IATA codes.
+     *
+     * @param origin_cityIATACode The IATA code of the origin city.
+     * @param destination_cityIATACode The IATA code of the destination city.
+     * @param departure_at The departure date in the 'yyyy-MM-dd' format (optional).
+     * @param return_at The return date in the 'yyyy-MM-dd' format (optional).
+     * @return A {@code Flight} object representing the search result.
+     * @throws Exception If an error occurs during the flight search process.
+     */
     public Flight findFlight(String origin_cityIATACode,String destination_cityIATACode,String departure_at, String return_at) throws ParseException, IOException {
 
 

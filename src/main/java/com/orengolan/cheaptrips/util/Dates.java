@@ -10,6 +10,24 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
 
+/**
+ * The {@code Dates} class provides utility methods for working with dates and times,
+ * including conversions between different date representations and formatting.
+ *
+ * Key Features:
+ * - Conversion between {@code LocalDate}, {@code LocalDateTime}, and {@code Date} objects.
+ * - Methods for obtaining the current date and time in various formats.
+ * - Parsing string representations of dates into {@code LocalDateTime}.
+ * - Handling time zones and formatting patterns for date representations.
+ *
+ * Example Usage:
+ * This class is used across the CheapTrips application to manage dates and times consistently.
+ * It includes methods for converting between different date types, parsing date strings,
+ * and obtaining the current date and time in UTC.
+ *
+ * Note: The class uses the Joda-Time library for enhanced date and time handling capabilities.
+ * It includes methods for converting between Joda-Time and standard Java date representations.
+ */
 public class Dates {
     public static SimpleDateFormat shortDate = new SimpleDateFormat("yyyy-MM-dd");
     public static TimeZone TIME_ZONE = TimeZone.getTimeZone("Asia/Jerusalem");

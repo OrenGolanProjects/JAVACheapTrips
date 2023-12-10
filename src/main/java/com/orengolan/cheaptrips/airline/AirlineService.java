@@ -10,6 +10,38 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The {@code AirlineService} class is a service component in the CheapTrips backend application,
+ * responsible for managing and synchronizing airline data with an external API. It serves as an intermediary
+ * between the data access layer (MongoDB repository) and the external airline data source.
+ *
+ * This service utilizes the {@code API}, a utility class for making HTTP requests, and the Spring Framework's
+ * {@code Dotenv} for handling environment variables. It retrieves airline information from the specified API endpoint,
+ * processes the data, and stores it in the MongoDB database through the injected {@code AirlineRepository}.
+ *
+ * The class includes the following major methods:
+ * - {@code synchronizeAirlineDataWithAPI}: Retrieves airline data from the external API, processes and saves it in the
+ *   database. Optionally, it can synchronize only the data for a specific airline IATA code if provided.
+ * - {@code getAllAirlines}: Retrieves a list of all airlines stored in the database.
+ * - {@code getSpecificAirlines}: Retrieves a specific airline by its IATA code from the database.
+ * - {@code searchAirline}: Searches for an airline by its IATA code. If not found, it synchronizes data from the API
+ *   and performs the search again.
+ *
+ * The class is annotated with {@code @Service} to indicate its role as a service component in the Spring application
+ * context. It uses a {@code Logger} for logging informative and warning messages during the execution of methods.
+ *
+ * Usage Example:
+ * <pre>
+ * {@code
+ * AirlineService airlineService = new AirlineService(dotenv, objectMapper, airlineRepository, api);
+ * airlineService.synchronizeAirlineDataWithAPI(null);
+ * List<Airline> allAirlines = airlineService.getAllAirlines();
+ * }
+ * </pre>
+ *
+ * This {@code AirlineService} class encapsulates the logic for interacting with airline data, ensuring its consistency
+ * and providing a convenient interface for other components to retrieve and search for airline information.
+ */
 @Service
 public class AirlineService {
 

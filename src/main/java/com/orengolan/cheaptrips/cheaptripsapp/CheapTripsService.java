@@ -1,5 +1,7 @@
 package com.orengolan.cheaptrips.cheaptripsapp;
 
+import com.orengolan.cheaptrips.city.City;
+import com.orengolan.cheaptrips.city.CityService;
 import com.orengolan.cheaptrips.flight.Flight;
 import com.orengolan.cheaptrips.flight.FlightService;
 import com.orengolan.cheaptrips.news.News;
@@ -12,8 +14,28 @@ import com.orengolan.cheaptrips.userinformation.UserInfoService;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The {@code CheapTripsService} class is the central service responsible for generating and managing cheap trip data.
+ * It coordinates interactions between various components such as user information, flight details, news updates,
+ * OpenTripMap data, and city information. This service handles the logic for generating monthly and date-specific
+ * cheap trip responses, retrieving user information, and saving user trip history.
+ *
+ * Key Features:
+ * - Generates comprehensive trip responses combining flight details, news updates, and OpenTripMap data.
+ * - Manages user information, including fetching, updating, and saving user trip history.
+ * - Coordinates interactions with external services like FlightService, NewsService, OpenTripMapService, and CityService.
+ * - Supports searching for city information based on the city name.
+ *
+ * Example Usage:
+ * CheapTripsService cheapTripsService = new CheapTripsService(userInfoService, flightService, newsService, openTripMapService, cityService);
+ * UserInfo userInfo = cheapTripsService.retrieveUserByIdentified("user@example.com");
+ * CheapTripRequest cheapTripRequest = new CheapTripRequest();
+        * CheapTripsResponse monthlyTripResponse = cheapTripsService.generateTripMonthly(cheapTripRequest, userInfo);
+        * // Access and utilize the generated trip response and user information as needed.
+        */
 @Service
 public class CheapTripsService {
     private static final Logger logger = Logger.getLogger(CheapTripsService.class.getName());
@@ -21,12 +43,15 @@ public class CheapTripsService {
     private final FlightService flightService;
     private final NewsService newsService;
     private final OpenTripMapService openTripMapService;
+    private final CityService cityService;
 
-    public CheapTripsService(UserInfoService userInfoService, FlightService flightService, NewsService newsService, OpenTripMapService openTripMapService) {
+
+    public CheapTripsService(UserInfoService userInfoService, FlightService flightService, NewsService newsService, OpenTripMapService openTripMapService,CityService cityService) {
         this.userInfoService = userInfoService;
         this.flightService = flightService;
         this.newsService = newsService;
         this.openTripMapService = openTripMapService;
+        this.cityService = cityService;
     }
 
     public UserInfo newUser(UserInfoRequest userInfoRequest,String userNameToken){
@@ -78,6 +103,11 @@ public class CheapTripsService {
         this.saveUserTrip(userInfo,cheapTripsResponse);
         return cheapTripsResponse;
     }
+
+    public List<City> searchCity(String cityName){
+        return this.cityService.fetchSpecificCityByName(cityName);
+    }
+
 
     private UserInfo saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) {
 

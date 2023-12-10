@@ -5,12 +5,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orengolan.cheaptrips.city.CityService;
 import com.orengolan.cheaptrips.util.API;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The {@code CountryService} class is responsible for handling business logic related to
+ * country data, including synchronization with an external API and interaction with the
+ * {@link CountryRepository} for database operations.
+ *
+ * Key Features:
+ * - {@code synchronizeCountryDataWithAPI}: Fetches country data from an external API,
+ *   processes the information, and stores new countries in the database.
+ * - {@code fetchCountry}: Retrieves a country entity by its unique IATA code from the database.
+ * - {@code getAllCountries}: Retrieves a list of all countries stored in the database.
+ *
+ * Example:
+ * The {@code synchronizeCountryDataWithAPI} method can be used to update the application's
+ * country data periodically by fetching the latest information from an external source.
+ * The {@code fetchCountry} and {@code getAllCountries} methods provide convenient access to
+ * country data for various use cases within the application.
+ *
+ * Note: This class demonstrates the service layer's role in coordinating data synchronization
+ * and interaction with the repository for country-related operations.
+ */
 @Service
 public class CountryService {
 
@@ -35,6 +54,12 @@ public class CountryService {
     }
 
 
+    /**
+     * Fetches country data from an external API, processes the information, and stores new
+     * countries in the database.
+     *
+     * @throws IOException If an error occurs while fetching or processing API data.
+     */
     public void synchronizeCountryDataWithAPI() throws IOException {
         logger.info("CountryService>>  synchronizeCountryDataWithAPI: Start method.");
         String jsonCountry = getCountriesData();
@@ -55,9 +80,21 @@ public class CountryService {
         }
     }
 
+    /**
+     * Retrieves a country entity by its unique IATA code from the database.
+     *
+     * @param countryIATACode The IATA code of the country to be retrieved.
+     * @return The country entity matching the provided IATA code, or null if not found.
+     */
     public Country fetchCountry(String countryIATACode){
         return this.countryRepository.findByCountryIATACode(countryIATACode);
     }
+
+    /**
+     * Retrieves a list of all countries stored in the database.
+     *
+     * @return A list of country entities.
+     */
     public List<Country> getAllCountries(){
         return this.countryRepository.findAll();
     }

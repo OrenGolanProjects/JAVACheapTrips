@@ -16,6 +16,46 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * The {@code CityService} class provides business logic and service operations related to City entities in the
+ * CheapTrips backend application. It acts as an intermediary between the CityController (presentation layer)
+ * and CityRepository (data access layer), encapsulating functionalities such as data synchronization with an external API,
+ * CRUD operations, and city data management.
+ *
+ * The service offers the following main functionalities:
+ * - Synchronize City data with an external API.
+ * - Delete all existing cities from the database.
+ * - Fetch specific cities by name or IATA code.
+ * - Create a new city with specified details.
+ * - Update details of an existing city.
+ *
+ * The class employs the CityRepository for database interactions, MongoDB for data storage, and the API class
+ * for making requests to external endpoints.
+ *
+ * Usage Example:
+ * <pre>
+ * {@code
+ * // Synchronize city data with an external API
+ * cityService.synchronizeCityDataWithAPI();
+ *
+ * // Delete all existing cities from the database
+ * cityService.deleteCities();
+ *
+ * // Fetch specific city by name
+ * List<City> specificCities = cityService.fetchSpecificCityByName("London");
+ *
+ * // Create a new city
+ * City newCity = new City("New City", "NEW", "UTC+0", 40.7128, -74.0060, "USA");
+ * cityService.createNewCity(newCity);
+ *
+ * // Update city details
+ * UpdateResult result = cityService.updateCityData("cityId123", "Updated City", "USA", "NYC", 40.7128, -74.0060, "UTC-5");
+ * }
+ * </pre>
+ *
+ * This {@code CityService} class serves as a central component for managing City entities, providing a clean separation
+ * of concerns within the CheapTrips application.
+ */
 @Service
 public class CityService {
     private static final Logger logger = Logger.getLogger(CityService.class.getName());

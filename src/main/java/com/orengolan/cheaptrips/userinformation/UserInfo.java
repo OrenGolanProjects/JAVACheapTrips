@@ -7,6 +7,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.*;
 import java.util.Date;
 
+/**
+ * The {@code UserInfo} class represents user information stored in a MongoDB collection for the CheapTrips application.
+ * It includes details such as the user's first name, surname, email, phone number, username, and trip history.
+ *
+ * Key Features:
+ * - Annotated with Spring Data MongoDB annotations for mapping to the "userinfo" collection.
+ * - Includes validation constraints for ensuring data integrity and uniqueness.
+ * - Utilizes a unique index for email and username fields to enforce uniqueness.
+ * - Manages the user's trip history as a {@link CheapTripsResponse} object.
+ * - Incorporates an expiration mechanism using MongoDB's "expireAfterSeconds" to automatically remove outdated user information.
+ *
+ * Example Usage:
+ * The class is used to persist and retrieve user information within the CheapTrips application.
+ * Developers can store and manage user profiles, including trip history, to offer personalized services and maintain user engagement.
+ *
+ * Note: MongoDB is employed to store user information, providing scalability and flexibility in handling user-related data.
+ */
 @Document(collection = "userinfo")
 public class UserInfo {
     @Id

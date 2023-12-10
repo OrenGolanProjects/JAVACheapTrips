@@ -11,6 +11,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The {@code Redis} class is a component providing simplified and efficient interactions with Redis, a key-value data store.
+ * It encapsulates common Redis operations, such as caching, data retrieval, and expiration handling, through a set of methods.
+ *
+ * Key Features:
+ * - Utilizes the Spring `RedisTemplate` for interfacing with Redis, allowing seamless integration with the Spring ecosystem.
+ * - Offers methods for checking and logging the connection status to Redis during the application initialization.
+ * - Provides common operations for managing cache expiration, key existence, and deletion.
+ * - Supports operations related to strings, hashes, sets, and lists in Redis.
+ * - Includes functionality for incrementing and decrementing numeric values within Redis hashes.
+ *
+ * Example Usage:
+ * The class is utilized within services and controllers to interact with Redis, facilitating efficient caching and data retrieval.
+ * It allows developers to store and retrieve data in various Redis data structures, ensuring seamless integration with the application.
+ *
+ * Note: This class plays a crucial role in optimizing application performance by leveraging Redis as a caching mechanism and data store.
+ */
 @Lazy
 @Component
 public class Redis {

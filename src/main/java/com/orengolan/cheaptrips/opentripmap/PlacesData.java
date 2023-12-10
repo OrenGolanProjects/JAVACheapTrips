@@ -5,7 +5,25 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
-
+/**
+ * The {@code PlacesData} class represents data about places, including geographical coordinates, radius, limits on the number
+ * of places, and a key for database identification. It encapsulates information retrieved from the OpenTripMap service and
+ * includes expiration settings for caching.
+ *
+ * Key Features:
+ * - Represents information about places, including radius, longitude, latitude, limits on the number of places, city, country IATA code, and more.
+ * - Utilizes MongoDB annotations such as {@code @Document} for mapping to the "opentripmap" collection and {@code @Indexed} for unique and expiration settings.
+ * - Incorporates a {@code KindsCategory} object to organize places into categories based on their kinds.
+ * - Provides methods for setting and retrieving expiration date, database key, and various attributes.
+ *
+ * Example Usage:
+ * The class is used to store information about places requested from the OpenTripMap service. It includes methods for managing
+ * expiration, retrieving geographical coordinates, getting the city and country IATA code, and displaying the data as a string
+ * for easy logging or debugging.
+ *
+ * Note: This class serves as a key data structure in the application, organizing and caching information about places retrieved
+ * from external services for efficient access and retrieval.
+ */
 @Document(collection = "opentripmap")
 public class PlacesData {
     @Id
