@@ -54,6 +54,9 @@ CheapTrips is built using the following technologies:
     - [Generate Monthly Trip Example](#generate-monthly-trip-example)
     - [Generate Trip by Dates Example](#generate-trip-by-dates-example)
 - [API Documentation](#api-documentation)
+    - [Obtain Authentication Token](#obtain-authentication-token)
+    - sd
+    - 
 
 ## Prerequisites
 
