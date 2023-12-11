@@ -3,6 +3,24 @@ package com.orengolan.cheaptrips.opentripmap;
 import com.mongodb.lang.Nullable;
 import javax.validation.constraints.NotNull;
 
+/**
+ * The {@code PlaceDetails} class represents detailed information about a place, including its unique identifier, name, rating,
+ * kinds, geographical coordinates, address, and additional metadata. It includes nested classes for {@code Address} and {@code Point}
+ * to encapsulate related information.
+ *
+ * Key Features:
+ * - Stores comprehensive details about a place, such as xid, name, rate, kinds, sources, and additional metadata.
+ * - Utilizes nested classes for {@code Address} and {@code Point} to encapsulate address-related and geographical coordinate details.
+ * - Facilitates the representation of a place's attributes, including OpenStreetMap (osm), Wikidata, image, and Wikipedia extracts.
+ *
+ * Example Usage:
+ * The class is employed to encapsulate detailed information about a place obtained from the OpenTripMap service. It includes methods
+ * to retrieve specific attributes such as xid, name, rate, kinds, sources, OpenStreetMap (osm) identifier, URL, and more.
+ * The {@code toString} method provides a formatted string representation of the place details for easy logging or debugging.
+ *
+ * Note: This class serves as a crucial data structure in the application, encapsulating detailed information about places
+ *   obtained from external services such as the OpenTripMap API.
+ */
 public class PlaceDetails {
 
     @NotNull

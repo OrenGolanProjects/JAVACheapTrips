@@ -14,6 +14,31 @@ import java.util.logging.Logger;
 import java.util.Date;
 
 
+/**
+ * The {@code NewsService} class is responsible for handling news-related operations, including fetching news from an external API,
+ * performing sentiment analysis, and interacting with the MongoDB database to store and retrieve news data.
+ *
+ * Key Features:
+ * - {@code sentimentAnalyzer}: Performs sentiment analysis on news content.
+ * - {@code objectMapper}: Handles JSON serialization and deserialization.
+ * - {@code newsRepository}: Serves as the data access layer for interacting with the MongoDB database for news entities.
+ * - {@code api}: Provides utility methods for making HTTP requests to external APIs.
+ * - {@code newsEndpoint} and {@code newsToken}: Configuration properties for the external news API endpoint and authentication token.
+ *
+ * Methods:
+ * - {@code getNewsStream}: Fetches news data from an external API based on the specified city name, page size, and last day.
+ * - {@code fetchNewsStream}: Parses the JSON response from the API, performs sentiment analysis, and constructs a list of news items.
+ * - {@code saveNews}: Persists the news data to the MongoDB database, including setting expiration time and updating news count.
+ * - {@code getNews}: Retrieves news data for a given city name, either from the database or by fetching and saving new data.
+ * - {@code getAllNews}: Retrieves all news entries stored in the database.
+ * - {@code deleteAllNews}: Deletes all news entries from the database.
+ *
+ * Example Usage:
+ * The class is used as a service in a Spring application to manage news-related functionalities, ensuring the retrieval
+ * and storage of news data in the MongoDB database for different cities.
+ *
+ * Note: Proper configuration of external API endpoints, authentication tokens, and MongoDB connection settings is required.
+ */
 @Service
 public class NewsService {
 

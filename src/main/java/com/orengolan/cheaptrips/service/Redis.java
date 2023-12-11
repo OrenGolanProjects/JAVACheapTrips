@@ -1,24 +1,40 @@
 package com.orengolan.cheaptrips.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The {@code Redis} class is a component providing simplified and efficient interactions with Redis, a key-value data store.
+ * It encapsulates common Redis operations, such as caching, data retrieval, and expiration handling, through a set of methods.
+ *
+ * Key Features:
+ * - Utilizes the Spring `RedisTemplate` for interfacing with Redis, allowing seamless integration with the Spring ecosystem.
+ * - Offers methods for checking and logging the connection status to Redis during the application initialization.
+ * - Provides common operations for managing cache expiration, key existence, and deletion.
+ * - Supports operations related to strings, hashes, sets, and lists in Redis.
+ * - Includes functionality for incrementing and decrementing numeric values within Redis hashes.
+ *
+ * Example Usage:
+ * The class is utilized within services and controllers to interact with Redis, facilitating efficient caching and data retrieval.
+ * It allows developers to store and retrieve data in various Redis data structures, ensuring seamless integration with the application.
+ *
+ * Note: This class plays a crucial role in optimizing application performance by leveraging Redis as a caching mechanism and data store.
+ */
 @Lazy
 @Component
 public class Redis {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
+    public Redis(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
     //=============================common============================
@@ -73,7 +89,7 @@ public class Redis {
             if(key.length==1){
                 redisTemplate.delete(key[0]);
             }else{
-                redisTemplate.delete(CollectionUtils.arrayToList(key));
+                redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
             }
         }
     }
@@ -94,9 +110,9 @@ public class Redis {
      * @param value 值
      * @return true成功 false失败
      */
-    public boolean set(String key,Object value) {
+    public boolean set(String key,String value) {
         try {
-            return redisTemplate.opsForValue().setIfAbsent(key, value);
+            return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, value));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -526,8 +542,14 @@ public class Redis {
     }
 
     public Set<String> getKeys(String pattern) {
-        return redisTemplate.keys(pattern+"*");
+        pattern = "*" + pattern + "*";
+        return redisTemplate.keys(pattern);
     }
-
+    public void retrieveValues(Set<String> keys) {
+        for (String key : keys) {
+            String value = (String) redisTemplate.opsForValue().get(key);
+            System.out.println("Key: " + key + ", Value: " + value);
+        }
+    }
 
 }

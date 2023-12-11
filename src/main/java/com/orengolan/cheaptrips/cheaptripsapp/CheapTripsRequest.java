@@ -1,16 +1,29 @@
 package com.orengolan.cheaptrips.cheaptripsapp;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-
-
+import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Arrays;
+import java.util.List;
 
-public class CheapTripsRequestMonthly implements Serializable {
+/**
+ * The {@code CheapTripRequest} class represents a request object for querying cheap trips information.
+ * It encapsulates the parameters required to search for travel destinations, including origin and destination
+ * city IATA codes, city names, radius, departure and return dates, and other optional parameters.
+ *
+ * Key Features:
+ * - Validation annotations ensure that the request parameters meet specific constraints.
+ * - Provides default values and validation for optional date parameters (departure_at and return_at).
+ * - Defines a list of kinds representing the types of places or activities to include in the search.
+ *
+ * Example Usage:
+ * CheapTripRequest tripRequest = new CheapTripRequest("TLV", "AMS", "2023-11-01", "2023-11-10", "amsterdam", 100, 5);
+ * tripRequest.setKinds(Arrays.asList("interesting_places", "amusements", "sport"));
+ * // Use the request object to query information about cheap trips.
+ */
+public class CheapTripsRequest {
+
 
     @ApiModelProperty(position = 1, example = "TLV")
     @NotNull
@@ -32,16 +45,17 @@ public class CheapTripsRequestMonthly implements Serializable {
     @ApiModelProperty(position = 5,example ="2")
     @Max(20)
     private Integer limitPlaces;
-    @ApiModelProperty(position = 6,example = "['interesting_places', 'amusements', 'sport', 'tourist_facilities', 'accommodations', 'adult']")
+
+    @ApiModelProperty(position = 6,hidden = true)
     private List<String> kinds;
 
-    public CheapTripsRequestMonthly(String origin_cityIATACode, String destination_cityIATACode, String destination_cityName, Integer radius, Integer limitPlaces, List<String> kinds) {
+    public CheapTripsRequest(String origin_cityIATACode, String destination_cityIATACode, String destination_cityName, Integer radius, Integer limitPlaces) {
         this.origin_cityIATACode = origin_cityIATACode !=null ? origin_cityIATACode :"TLV";
         this.destination_cityIATACode = destination_cityIATACode;
         this.destination_cityName = destination_cityName;
         this.radius = radius != null ? radius :10000;
         this.limitPlaces = limitPlaces != null ? limitPlaces :2;
-        this.kinds = (kinds != null && !kinds.isEmpty()) ? kinds : Arrays.asList("interesting_places", "amusements", "sport","tourist_facilities","accomodations","adult");
+        this.kinds = Arrays.asList("interesting_places", "amusements", "sport","tourist_facilities","accomodations","adult");
     }
 
     public String getOrigin_cityIATACode() {

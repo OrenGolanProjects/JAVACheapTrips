@@ -9,6 +9,36 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+/**
+ * The {@code City} class represents a city entity in the CheapTrips backend application. Instances of this class
+ * are annotated with {@code @Document} from Spring Data MongoDB, indicating that they will be stored in a MongoDB
+ * collection named "cities."
+ *
+ * The class includes attributes that encapsulate essential information about a city:
+ * - {@code cityName}: The name of the city.
+ * - {@code cityIATACode}: The IATA code of the city, a three-letter code, annotated with {@code @Size(max = 3)} and
+ *   {@code @Indexed(unique = true)} to ensure uniqueness in the MongoDB collection.
+ * - {@code timeZone}: The time zone of the city.
+ * - {@code latCoordinates}: The latitude coordinates of the city location, constrained between -90 and 90.
+ * - {@code lonCoordinates}: The longitude coordinates of the city location, constrained between -180 and 180.
+ * - {@code expireAt}: A date representing the expiration of the city data in the database, set to one year from
+ *   the creation date.
+ * - {@code countryIATACode}: The IATA code of the country where the city is located, a three-letter code.
+ *
+ * The class provides a constructor to initialize its attributes, and getter and setter methods for each attribute
+ * to facilitate access and modification. Additionally, it overrides the {@code toString()} method for easy
+ * representation of the object.
+ *
+ * Usage Example:
+ * <pre>
+ * {@code
+ * City city = new City("Example City", "XYZ", "UTC+2", 12.34, 56.78, "CTY");
+ * }
+ * </pre>
+ *
+ * This {@code City} class is designed to hold essential information about cities, making it suitable for integration
+ * with MongoDB for data storage in the CheapTrips application.
+ */
 @Document(collection = "cities")
 public class City {
     @Id

@@ -3,13 +3,31 @@ package com.orengolan.cheaptrips.news;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * The {@code News} class represents news information associated with a specific city.
+ * It is a MongoDB document mapped to the "news" collection, containing details such as
+ * the city name, a list of news articles, and an expiration timestamp for one day.
+ *
+ * Key Features:
+ * - {@code @Document}: Indicates that instances of this class should be stored in the "news" collection.
+ * - {@code @Indexed(expireAfterSeconds)}: Configures an index for automatic document expiration after 24 hours.
+ * - Nested {@code news} class: Represents individual news articles with various attributes such as source,
+ *   author, title, description, URL, image URL, publication date, content, and sentiment analyzer score.
+ *
+ * Example Usage:
+ * The class is utilized to store and retrieve news information for different cities. Each instance of
+ * the class corresponds to a city and contains a list of news articles with associated details. The
+ * expiration timestamp ensures that news data is automatically removed after 24 hours.
+ *
+ * Note: Ensure that MongoDB is properly configured, and the required dependencies are added to use
+ * Spring Data MongoDB annotations and features effectively.
+ */
 @Document(collection = "news")
 public class News {
 
@@ -24,6 +42,9 @@ public class News {
     private List<news> newsList;
     private Integer _newsListCount;
 
+    /**
+     * Nested class representing individual news articles.
+     */
     public static class news{
         private final String source_name;
         private final String author;

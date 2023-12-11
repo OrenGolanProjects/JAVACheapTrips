@@ -5,6 +5,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The {@code KindsCategory} class represents a container for organizing and managing different categories of places based on their kinds.
+ * It includes methods for updating and retrieving categories along with associated place details.
+ *
+ * Key Features:
+ * - {@code categories}: List of categories, each containing a name and a list of associated place details.
+ *
+ * Methods:
+ * - {@code getCategories}: Retrieves the list of categories.
+ * - {@code setCategories}: Sets the list of categories.
+ * - {@code getCategory}: Retrieves a specific category based on the provided name.
+ * - {@code updateCategories}: Updates the categories with the given place details based on their kind.
+ *
+ * Example Usage:
+ * The class is used to organize and update categories of places, ensuring efficient management and retrieval of place details
+ * based on their associated kinds. It validates category names and supports updating categories with new place details.
+ *
+ * Note: Categories are organized based on predefined kinds, and validation is performed to ensure correct category names.
+ */
 public class KindsCategory {
 
     private List<Category> categories;
