@@ -78,40 +78,45 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("CheapTrips API Documentation")
                 .description(
-                        "###**About**\n\n"
-                        + "**CheapTrips is designed to simplify trip planning, offering:**\n"
-                        + "- **Flights:** Search for trips by month or specific dates.\n"
-                        + "- **Local News:** Retrieve destination-based news with sentiment scores (1-5).\n"
-                        + "- **Places to Travel:** Discover places based on coordinates, count, and category.\n\n"
+                        "# CheapTrips API Documentation\n\n"
+                                + "**About**\n\n"
+                                + "CheapTrips is designed to simplify trip planning, offering:\n"
+                                + "- **Flights:** Search for trips by month or specific dates.\n"
+                                + "- **Local News:** Retrieve destination-based news with sentiment scores (1-5).\n"
+                                + "- **Places to Travel:** Discover places based on coordinates, count, and category.\n\n"
 
-                        + "###**How to Use - New User**\n\n"
-                        + "1. **Generate Token and Authorize (JWT Authentication):**\n"
-                        + "     - Use the **/user** endpoint to sign in and obtain a JWT token.\n"
-                        + "     - Click on 'Authorize' in the top left corner of the screen.\n"
-                        + "     - Use the token that received insert format: <Bearer YOUR_TOKEN> and click Authorize.\n"
-                        + "     For more details, see [Authentication Token](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#authentication-token).\n\n"
+                                + "## Getting Started with CheapTrips\n\n"
+                                + "Explore the world of CheapTrips and simplify your travel experience with the following steps:\n"
 
+                                + "### 1. Authentication (JWT)\n"
+                                + "- **Generate Token and Authorize:**\n"
+                                + "- For **New** User Access the `/user` endpoint to sign in and obtain a JWT token.\n"
+                                + "- For **Existing** User Access the `/authentication` endpoint to obtain a JWT token.\n"
+                                + "- Click 'Authorize' in the top left corner, and insert the token in the format: `<Bearer YOUR_TOKEN>`.\n"
+                                + "- \uD83D\uDD10 For more details, check [Obtain / Authorize Authentication Token](https://github.com/OrenGolanProjects/JAVACheapTrips#step-1-obtain-authentication-token).\n\n"
 
-                                + "2. **Register as a New User (User Management):**\n"
-                        + "     - Use the **/app/userinfo/create-specific-user-info** endpoint to register as a new user.\n"
-                        + "     - Insert the user information: username, first name, surname, phone.\n"
-                        + "     For more details, see [User Management Documentation](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#user-management).\n\n"
+                                + "### 2. User Registration (One-Time Setup)\n"
+                                + "- **Register as a New User:**\n"
+                                + "  - Use the `/app/userinfo/create-specific-user-info` endpoint to register as a new user.\n"
+                                + "  - Insert the user information: username, first name, surname, phone.\n"
+                                + "  - \uD83D\uDCDD For more details, see [Create New User Information (If New User)](https://github.com/OrenGolanProjects/JAVACheapTrips#step-3-create-new-user-information-if-new-user).\n\n"
 
-                        + "3. **Search for Trip at (CheapTripsApp):**\n"
-                        + "     - Choose either the **/app/cheap-trip/generate-monthly-trip** or **/app/cheap-trip/generate-trip-by-dates** endpoints.\n"
-                        + "     - Provide the necessary details in the request body for generating trips.\n"
-                        + "     - If needed to search for city IATA code & details choose /cheap-trip/city-search endpoint..\n"
-                        + "     For more details, see [ Usage ](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#usage).\n\n"
+                                + "### 3. Trip Search on CheapTripsApp\n"
+                                + "- **Search for Trips:**\n"
+                                + "  - Choose either `/app/cheap-trip/generate-monthly-trip` or `/app/cheap-trip/generate-trip-by-dates` endpoints.\n"
+                                + "  - Provide necessary details in the request body for trip generation.\n"
+                                + "  - For city IATA code & details, use the `/cheap-trip/city-search` endpoint.\n"
+                                + "  - \uD83C\uDF0D For more details, refer to [Usage Examples](https://github.com/OrenGolanProjects/JAVACheapTrips#usage).\n\n\n"
 
+                                + "## Coming Soon\n\n"
+                                + "Exciting enhancements are on the horizon:\n\n"
+                                + "- Real-time Weather: Stay updated on destination weather.\n"
+                                + "- Holiday Insights: Discover details about upcoming holidays.\n\n\n"
 
-                                + "###**Coming Soon:**\n\n"
-                        + "Enhancements to elevate your experience:\n"
-                        + "- Real-time Weather: Instant updates on destination weather.\n"
-                        + "- Holiday Insights: Details about upcoming holidays. Stay tuned for an enriched travel experience with CheapTrips!\n\n"
-
-                        + "###For code review,examples and README.md file, visit my GitHub repository:\n"
-                        + "\uD83D\uDD17 **GitHub Repository**: [https://github.com/OrenGolanProjects/JAVACheapTrips#readme/](https://github.com/OrenGolanProjects/JAVACheapTrips#readme/)\n"
-                        + "###Designed & Developed by: Oren Golan."
+                                + "## Code Repository and More\n"
+                                + "Explore examples, review code, and access the README.md on GitHub:\n\n"
+                                + "- \uD83D\uDCC2 **GitHub Repository**: [https://github.com/OrenGolanProjects/JAVACheapTrips#readme/](https://github.com/OrenGolanProjects/JAVACheapTrips#readme/)\n"
+                                + "- Designed & Developed by: Oren Golan \uD83D\uDEE0\uFE0F."
                 )
                 .version("1.0")
                 .build();

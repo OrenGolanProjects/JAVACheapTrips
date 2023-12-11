@@ -9,5 +9,6 @@ COPY src/main/resources/application.properties /opt/conf/application.properties
 # Set the working directory
 WORKDIR /usr/src/
 
-# Set the memory limit for the container
-CMD ["java", "-Xmx512m", "-jar", "CheapTrips.jar", "--spring.config.location=file:/opt/conf/application.properties"]
+# Adjust the memory settings based on your requirements
+# Example: Set the maximum heap size to 1GB and the initial heap size to 512MB
+CMD ["java", "-Xmx1g", "-Xms512m", "-jar", "CheapTrips.jar", "--spring.config.location=file:/opt/conf/application.properties"]
