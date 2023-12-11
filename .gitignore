@@ -36,4 +36,4 @@ build/
 # Exclude file
 config.json
 .mvn
-.env
+src/main/resources/.env

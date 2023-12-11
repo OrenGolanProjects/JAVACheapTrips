@@ -78,8 +78,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("CheapTrips API Documentation")
                 .description(
-                        "# CheapTrips API Documentation\n\n"
-                                + "**About**\n\n"
+                                "# **About**\n\n"
                                 + "CheapTrips is designed to simplify trip planning, offering:\n"
                                 + "- **Flights:** Search for trips by month or specific dates.\n"
                                 + "- **Local News:** Retrieve destination-based news with sentiment scores (1-5).\n"
