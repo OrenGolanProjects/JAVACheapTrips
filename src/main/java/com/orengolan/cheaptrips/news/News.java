@@ -34,13 +34,15 @@ public class News {
     @Id
     private String _id;
 
-    private Date _expireAt;
+    @Indexed(expireAfterSeconds = 24 * 60 * 60) // One day expiration
+    private Date expireAt;
     @NotNull
-    @Indexed(unique = true,expireAfterSeconds = 24 * 60 * 60) // One day expiration
+    @Indexed(unique = true)
     @Size(max = 50)
     private final String cityName;
     private List<news> newsList;
     private Integer _newsListCount;
+
 
     /**
      * Nested class representing individual news articles.
@@ -116,7 +118,7 @@ public class News {
     }
 
     public Date getExpireAt() {
-        return this._expireAt;
+        return this.expireAt;
     }
 
     public String getCityName() {
@@ -128,7 +130,7 @@ public class News {
     }
 
     public void setExpireAt(Date expireAt) {
-        this._expireAt = expireAt;
+        this.expireAt = expireAt;
     }
 
     public void setNewsList(List<news> newsList) {
@@ -142,6 +144,7 @@ public class News {
     public void setNewsListCount(Integer newsListCount) {
         this._newsListCount = newsListCount;
     }
+
 
     @Override
     public String toString() {
