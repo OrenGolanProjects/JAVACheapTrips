@@ -109,11 +109,11 @@ public class CheapTripController {
         }
 
         // Validate depart_date
-        if (depart_date == null || isValidDateFormat(depart_date)) {
+        if (depart_date == null || isDateFormatInvalid(depart_date)) {
             throw new IllegalArgumentException("Invalid depart_date format. Please use yyyy-MM-dd.");
         }
         // Validate return_date
-        if (return_date == null || isValidDateFormat(return_date)) {
+        if (return_date == null || isDateFormatInvalid(return_date)) {
             throw new IllegalArgumentException("Invalid return_date format. Please use yyyy-MM-dd.");
         }
 
@@ -143,11 +143,11 @@ public class CheapTripController {
         return this.cheapTripsService.searchCity(cityName);
     }
 
-    private boolean isValidDateFormat(String date) throws ParseException {
+    private boolean isDateFormatInvalid(String date) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         sdf.setLenient(false);
         sdf.parse(date); // Try to parse the date; if successful, the method won't throw an exception
-        return Boolean.TRUE;
+        return false;
     }
 
     private UserInfo retrieveUserInfoByToken(HttpServletRequest request) throws AuthenticationException {
