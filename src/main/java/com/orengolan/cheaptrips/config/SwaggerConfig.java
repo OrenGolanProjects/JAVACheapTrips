@@ -86,22 +86,22 @@ public class SwaggerConfig {
 
                         + "###**How to Use - New User**\n\n"
                         + "1. **Generate Token and Authorize (JWT Authentication):**\n"
-                        + "     - Use the /user endpoint to sign in and obtain a JWT token.\n"
+                        + "     - Use the **/user** endpoint to sign in and obtain a JWT token.\n"
                         + "     - Click on 'Authorize' in the top left corner of the screen.\n"
                         + "     - Use the token that received insert format: <Bearer YOUR_TOKEN> and click Authorize.\n"
                         + "     For more details, see [Authentication Token](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#authentication-token).\n\n"
 
 
                                 + "2. **Register as a New User (User Management):**\n"
-                        + "     - Use the /app/userinfo/create-specific-user-info endpoint to register as a new user.\n"
+                        + "     - Use the **/app/userinfo/create-specific-user-info** endpoint to register as a new user.\n"
                         + "     - Insert the user information: username, first name, surname, phone.\n"
                         + "     For more details, see [User Management Documentation](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#user-management).\n\n"
 
                         + "3. **Search for Trip at (CheapTripsApp):**\n"
-                        + "     - Choose either the /app/cheap-trip/generate-monthly-trip or /app/cheap-trip/generate-trip-by-dates endpoints.\n"
+                        + "     - Choose either the **/app/cheap-trip/generate-monthly-trip** or **/app/cheap-trip/generate-trip-by-dates** endpoints.\n"
                         + "     - Provide the necessary details in the request body for generating trips.\n"
                         + "     - If needed to search for city IATA code & details choose /cheap-trip/city-search endpoint..\n"
-                        + "     For more details, see [Usage](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#usage).\n\n"
+                        + "     For more details, see [ Usage ](https://github.com/OrenGolanProjects/JAVACheapTrips/tree/dev#usage).\n\n"
 
 
                                 + "###**Coming Soon:**\n\n"
