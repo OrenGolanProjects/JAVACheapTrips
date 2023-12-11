@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+
 /**
  * The {@code GlobalExceptionHandler} class is a controller advice that handles global exception scenarios across the application.
  * It provides methods to handle specific types of exceptions, ensuring consistent and meaningful responses to clients for various error situations.
@@ -29,6 +30,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler extends Exception {
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<String> handleRateLimitExceededException(RateLimitExceededException e) {
+        printTrack(e);
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body("Rate limit exceeded: " + e.getMessage());
+    }
 
     @ExceptionHandler({NumberFormatException.class, IllegalArgumentException.class,IllegalStateException.class})
     public ResponseEntity<String> handleBadRequestException(Exception e) {

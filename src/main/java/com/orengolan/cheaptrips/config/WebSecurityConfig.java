@@ -128,12 +128,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/"
         ).permitAll()
         .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-         .antMatchers("/api/**").denyAll()
+        .antMatchers("/api/**").denyAll()
 
         // all other requests need to be authenticated
         // make sure we use stateless session; session won't be used to
         // store user's state.
-
         .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

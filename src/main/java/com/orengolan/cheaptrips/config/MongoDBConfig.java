@@ -49,7 +49,7 @@ import com.mongodb.client.MongoClients;
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
 
     /**
-     * MongoDB connection URI injected from application properties.
+     * MongoDB's connection URI injected from application properties.
      */
     @Value("${spring.data.mongodb.uri}")
     private String uri;

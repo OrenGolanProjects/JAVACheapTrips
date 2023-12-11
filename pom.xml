@@ -132,6 +132,13 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+		<!-- security for testing -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- actuator -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -160,6 +167,17 @@
 			<version>1.4.200</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Rate limiter -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.1.0</version>
+		</dependency>
+
+
+
+
 
 	</dependencies>
 
