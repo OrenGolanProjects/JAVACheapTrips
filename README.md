@@ -54,9 +54,11 @@ CheapTrips is built using the following technologies:
     - [Generate Monthly Trip Example](#generate-monthly-trip-example)
     - [Generate Trip by Dates Example](#generate-trip-by-dates-example)
 - [API Documentation](#api-documentation)
-    - [Obtain Authentication Token](#obtain-authentication-token)
-    - sd
-    - 
+  - [Step 1: Obtain Authentication Token](#step-1-obtain-authentication-token) 
+  - [Step 2: Authorize](#step-2-authorize)  
+  - [Step 3: Create New User Information (If New User)](#step-3-create-new-user-information-if-new-user)
+  - [Step 4: Start Using the CheapTrips Services](#step-4-start-using-the-cheaptrips-services)
+
 
 ## Prerequisites
 
