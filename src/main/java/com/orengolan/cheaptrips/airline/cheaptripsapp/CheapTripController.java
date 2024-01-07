@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.cheaptripsapp;
+package com.orengolan.cheaptrips.airline.cheaptripsapp;
 
 import com.orengolan.cheaptrips.city.City;
 import com.orengolan.cheaptrips.service.RateLimitExceededException;
@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -43,7 +42,6 @@ public class CheapTripController {
     private static final Logger logger = Logger.getLogger(CheapTripController.class.getName());
     private final CheapTripsService cheapTripsService;
     private final Bucket rateLimitBucket;  // Inject the Bucket bean
-
 
     public CheapTripController(CheapTripsService cheapTripsService, Bucket rateLimitBucket) {
         this.cheapTripsService = cheapTripsService;
@@ -75,7 +73,7 @@ public class CheapTripController {
         }
 
         UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, null, null,user);
+        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, null, null,user,false);
     }
 
     @RequestMapping(value="/generate-trip-by-dates", method = RequestMethod.POST)
@@ -108,17 +106,10 @@ public class CheapTripController {
             throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
         }
 
-        // Validate depart_date
-        if (depart_date == null || isDateFormatInvalid(depart_date)) {
-            throw new IllegalArgumentException("Invalid depart_date format. Please use yyyy-MM-dd.");
-        }
-        // Validate return_date
-        if (return_date == null || isDateFormatInvalid(return_date)) {
-            throw new IllegalArgumentException("Invalid return_date format. Please use yyyy-MM-dd.");
-        }
+
 
         UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, depart_date, return_date,user);
+        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, depart_date, return_date,user,true);
     }
 
 
@@ -141,13 +132,6 @@ public class CheapTripController {
             throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
         }
         return this.cheapTripsService.searchCity(cityName);
-    }
-
-    private boolean isDateFormatInvalid(String date) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        sdf.setLenient(false);
-        sdf.parse(date); // Try to parse the date; if successful, the method won't throw an exception
-        return false;
     }
 
     private UserInfo retrieveUserInfoByToken(HttpServletRequest request) throws AuthenticationException {

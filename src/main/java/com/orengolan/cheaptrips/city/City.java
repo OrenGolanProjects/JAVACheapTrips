@@ -72,8 +72,8 @@ public class City {
 
     public City(@NotNull String cityName, @NotNull String cityIATACode,
                 @NotNull String timeZone, @NotNull Double latCoordinates, @NotNull Double lonCoordinates,@NotNull String countryIATACode) {
-        this.cityName = cityName;
-        this.cityIATACode = cityIATACode;
+        this.cityName = cityName.toLowerCase();
+        this.cityIATACode = cityIATACode.toUpperCase();
         this.timeZone = timeZone;
         this.latCoordinates = latCoordinates;
         this.lonCoordinates = lonCoordinates;

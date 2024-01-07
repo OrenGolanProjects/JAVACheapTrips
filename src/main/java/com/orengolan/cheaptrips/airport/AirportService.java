@@ -96,7 +96,6 @@ public class AirportService {
             Double lonCoordinates       =  airportNode.path("coordinates").path("lon").asDouble();
             Double latCoordinates       =  airportNode.path("coordinates").path("lat").asDouble();
 
-
             // Create a new City object and save it to the repository
             Airport airport = new Airport(
                     airportName,

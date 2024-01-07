@@ -128,7 +128,6 @@ public class FlightService {
 
 
     public void saveFlightTickets(@NotNull FlightTicket flightTicket, @NotNull Flight flight ) throws JsonProcessingException {
-        logger.info("FlightService>>  saveFlightTickets: Start method.");
         String generateTicketKey = flightTicket.generateTicketKey(flight.getOrigin().getCity().getCityIATACode(),flight.getDestination().getCity().getCityIATACode());
 
         String existFlightTicket = (String) this.redis.get(generateTicketKey);
@@ -136,9 +135,8 @@ public class FlightService {
         if (existFlightTicket == null )
         {
             this.redis.set(generateTicketKey,flightTicket.toJson(), flightTicket.generateExpireTime());
-            logger.info("FlightService>>  saveFlightTickets: Successfully saved.");
         }
-        logger.info("FlightService>>  saveFlightTickets: End method.");
+
     }
 
     public List<FlightTicket> getTicketByParseKey(String partKey) throws JsonProcessingException {
@@ -207,6 +205,8 @@ public class FlightService {
                 LocalDateTime expiresAt;
                 LocalDateTime newExpiresAt;
 
+                // true: search for a trip by dates
+                // false: search for a trip by months
                 if( value.matches("-?\\d+(\\.\\d+)?")){
                     price = ticketNode.path(value).get("price").asDouble();
                     airlineIataCode = ticketNode.path(value).get("airline").asText();
@@ -216,7 +216,6 @@ public class FlightService {
                     returnAt = Dates.parseStringToLocalDateTime(ticketNode.path(value).get("return_at").asText());
                     expiresAt = Dates.parseStringToLocalDateTime(ticketNode.path(value).get("expires_at").asText());
                 }else {
-
                     price = ticketNode.get("price").asDouble();
                     airlineIataCode = ticketNode.get("airline").asText();
                     flightNumber = ticketNode.get("flight_number").asInt();

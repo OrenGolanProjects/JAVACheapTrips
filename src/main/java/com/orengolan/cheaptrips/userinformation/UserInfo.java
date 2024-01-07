@@ -1,6 +1,6 @@
 package com.orengolan.cheaptrips.userinformation;
 
-import com.orengolan.cheaptrips.cheaptripsapp.CheapTripsResponse;
+import com.orengolan.cheaptrips.airline.cheaptripsapp.CheapTripsResponse;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;

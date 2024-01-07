@@ -17,6 +17,8 @@ public class DBUserService {
     }
 
     public void save(DBUser user) {
-        repository.save(user);
+        if (repository.findByEmail(user.getName()).isEmpty()) {
+            repository.save(user);
+        }
     }
 }

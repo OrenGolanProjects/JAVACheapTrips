@@ -11,4 +11,4 @@ WORKDIR /usr/src/
 
 # Adjust the memory settings based on your requirements
 # Example: Set the maximum heap size to 1GB and the initial heap size to 512MB
-CMD ["java", "-Xmx1g", "-Xms512m", "-jar", "CheapTrips.jar", "--spring.config.location=file:/opt/conf/application.properties"]
+CMD ["java", "-Xmx256", "-Xms256m", "-jar", "CheapTrips.jar", "--spring.config.location=file:/opt/conf/application.properties"]

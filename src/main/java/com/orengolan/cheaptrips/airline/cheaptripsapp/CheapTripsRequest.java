@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.cheaptripsapp;
+package com.orengolan.cheaptrips.airline.cheaptripsapp;
 
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Max;
@@ -23,7 +23,6 @@ import java.util.List;
  * // Use the request object to query information about cheap trips.
  */
 public class CheapTripsRequest {
-
 
     @ApiModelProperty(position = 1, example = "TLV")
     @NotNull
@@ -81,8 +80,6 @@ public class CheapTripsRequest {
     public void setDestination_cityName(String destination_cityName) {
         this.destination_cityName = destination_cityName;
     }
-
-
 
     public Integer getRadius() {
         return radius;

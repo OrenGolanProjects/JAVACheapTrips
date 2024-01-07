@@ -1,5 +1,6 @@
 package com.orengolan.cheaptrips.jwt;
 
+import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -86,9 +87,7 @@ public class JwtAuthenticationController {
     })
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequest authenticationRequest) throws Exception {
-
         authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
@@ -97,12 +96,12 @@ public class JwtAuthenticationController {
     /**
      * Endpoint for creating a new user account with JWT authentication.
      *
-     * @param userRequest The user's registration request containing email and password.
+     * @param jwtRequestNewUser The user's registration request containing email and password.
      * @return ResponseEntity containing the generated JWT token upon successful user creation.
      */
     @ApiOperation(
-            value = "Create User",
-            notes = "Create a new user with JWT authentication.\n\n" +
+            value = "Create JwtUser & NewUser",
+            notes = "Create a new user with JWT authentication and new user information.\n\n" +
                     "**User Registration Keys:**\n" +
                     "- Email: The email address associated with the user account.\n" +
                     "- Password: The user's password for authentication."
@@ -112,13 +111,18 @@ public class JwtAuthenticationController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequest userRequest) {
-        String encodedPass = passwordEncoder.encode(userRequest.getPassword());
-        DBUser user = DBUser.UserBuilder.anUser().name(userRequest.getEmail())
-                .password(encodedPass).build();
+    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequestNewUser jwtRequestNewUser) {
+        String encodedPass = passwordEncoder.encode(jwtRequestNewUser.getJwtRequest().getPassword());
+        DBUser user = DBUser.UserBuilder.anUser().name(jwtRequestNewUser.getJwtRequest().getEmail()).password(encodedPass).build();
+
+        // Save the user in JWT DB.
         userServiceJWT.save(user);
-        UserDetails userDetails = new User(userRequest.getEmail(), encodedPass, new ArrayList<>());
-        return ResponseEntity.ok(new JwtResponse(jwtTokenUtil.generateToken(userDetails)));
+        UserDetails userDetails = new User(jwtRequestNewUser.getJwtRequest().getEmail(), encodedPass, new ArrayList<>());
+        String jwtToken = jwtTokenUtil.generateToken(userDetails);
+
+        // Create & Save the user details.
+        userDetailsService.createUserInfo(jwtRequestNewUser.getUserInfoRequest(),userDetails.getUsername());
+        return ResponseEntity.ok(new JwtResponse(jwtToken));
     }
 
     private void authenticate(String username, String password) throws Exception {

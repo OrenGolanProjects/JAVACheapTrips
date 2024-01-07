@@ -94,13 +94,7 @@ public class SwaggerConfig {
                                 + "- Click 'Authorize' in the top left corner, and insert the token in the format: `<Bearer YOUR_TOKEN>`.\n"
                                 + "- \uD83D\uDD10 For more details, check [Obtain / Authorize Authentication Token](https://github.com/OrenGolanProjects/JAVACheapTrips#step-1-obtain-authentication-token).\n\n"
 
-                                + "### 2. User Registration (One-Time Setup)\n"
-                                + "- **Register as a New User:**\n"
-                                + "  - Use the `/app/userinfo/create-specific-user-info` endpoint to register as a new user.\n"
-                                + "  - Insert the user information: username, first name, surname, phone.\n"
-                                + "  - \uD83D\uDCDD For more details, see [Create New User Information (If New User)](https://github.com/OrenGolanProjects/JAVACheapTrips#step-3-create-new-user-information-if-new-user).\n\n"
-
-                                + "### 3. Trip Search on CheapTripsApp\n"
+                                + "### 2. Trip Search on CheapTripsApp\n"
                                 + "- **Search for Trips:**\n"
                                 + "  - Choose either `/app/cheap-trip/generate-monthly-trip` or `/app/cheap-trip/generate-trip-by-dates` endpoints.\n"
                                 + "  - Provide necessary details in the request body for trip generation.\n"

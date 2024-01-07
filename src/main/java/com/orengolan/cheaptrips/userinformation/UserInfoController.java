@@ -12,6 +12,7 @@ import javax.validation.constraints.Pattern;
 import java.util.logging.Logger;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 /**
@@ -57,6 +58,7 @@ public class UserInfoController {
         return this.userService.getUserByIdentifier(userIdentifier);
     }
 
+    @ApiIgnore
     @RequestMapping(value="/create-specific-user-info", method = RequestMethod.POST)
     @ApiOperation(value = "Create specific user information", notes = "Create a new user with specific information.")
     @ApiResponses({
