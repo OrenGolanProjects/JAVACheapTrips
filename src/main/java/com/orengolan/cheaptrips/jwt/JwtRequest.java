@@ -1,5 +1,7 @@
 package com.orengolan.cheaptrips.jwt;
 
+import com.orengolan.cheaptrips.userinformation.UserInfo;
+import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.core.annotation.Order;
 
@@ -39,4 +41,5 @@ public class JwtRequest implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

@@ -51,7 +51,6 @@ public class UserInfoService {
             return user;
         }
         logger.severe("UserService>>  createNewUser: Found user from DB!.");
-
         return userInfo;
     }
 

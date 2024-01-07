@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.cheaptripsapp;
+package com.orengolan.cheaptrips.airline.cheaptripsapp;
 
 import com.orengolan.cheaptrips.flight.Flight;
 import com.orengolan.cheaptrips.news.News;
@@ -33,7 +33,6 @@ public class CheapTripsResponse {
         this.news = news;
         this.placesData = placesData;
     }
-
 
 
     public Flight getFlight() {

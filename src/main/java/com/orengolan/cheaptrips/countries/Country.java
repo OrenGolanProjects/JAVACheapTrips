@@ -48,8 +48,8 @@ public class Country implements Serializable {
     private Date expireAt;
 
     public Country(@NotNull String countryName, @NotNull String countryIATACode, @NotNull String currency) {
-        this.countryName = countryName;
-        this.countryIATACode = countryIATACode;
+        this.countryName = countryName.toLowerCase();
+        this.countryIATACode = countryIATACode.toUpperCase();
         this.currency = currency;
         this.expireAt = new Date(System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000)); // 1 year in milliseconds
     }

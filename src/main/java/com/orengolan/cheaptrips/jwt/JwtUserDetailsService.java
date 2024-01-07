@@ -1,12 +1,14 @@
 package com.orengolan.cheaptrips.jwt;
 
+import com.orengolan.cheaptrips.userinformation.UserInfo;
+import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
+import com.orengolan.cheaptrips.userinformation.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -14,7 +16,14 @@ import java.util.Optional;
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private DBUserService userService;
+    private final DBUserService userService;
+
+    private final UserInfoService userInfoService;
+
+    public JwtUserDetailsService(DBUserService userService, UserInfoService userInfoService) {
+        this.userService = userService;
+        this.userInfoService = userInfoService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String UserEmail) throws UsernameNotFoundException {
@@ -25,5 +34,9 @@ public class JwtUserDetailsService implements UserDetailsService {
         } else {
             throw new UsernameNotFoundException("User not found : " + UserEmail);
         }
+    }
+
+    public void createUserInfo(UserInfoRequest userInfoRequest,String UserEmail){
+        userInfoService.createNewUser(userInfoRequest.toUserInto(UserEmail));
     }
 }

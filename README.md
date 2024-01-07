@@ -56,8 +56,7 @@ CheapTrips is built using the following technologies:
 - [API Documentation](#api-documentation)
   - [Step 1: Obtain Authentication Token](#step-1-obtain-authentication-token) 
   - [Step 2: Authorize](#step-2-authorize)  
-  - [Step 3: Create New User Information (If New User)](#step-3-create-new-user-information-if-new-user)
-  - [Step 4: Start Using the CheapTrips Services](#step-4-start-using-the-cheaptrips-services)
+  - [Step 3: Start Using the CheapTrips Services](#step-3-start-using-the-cheaptrips-services)
 
 
 ## Prerequisites
@@ -168,33 +167,6 @@ Note: Replace <your-token>, <your-departure_at>, and <your-return_at> with the a
 ```
 Note: Make sure to replace the values (<departure_at>, <return_at>) when using the swagger-ui.
 
-### Create New User Example
-To create a new user and register with CheapTrips, use the following curl command:
-```bash
-curl -X POST 
-  --header 'Content-Type: application/json' 
-  --header 'Accept: application/json' 
-  --header 'Authorization: Bearer <your-token>' 
-  -d '{
-        "username": "your_username",
-        "firstName": "your_first_name",
-        "surname": "your_surname",
-        "phone": "your_phone_number"
-       }' 'https://www.search-trips-api.com/app/userinfo/create-specific-user-info'
-```
-Note: Replace the placeholder values (your_username, your_first_name, your_surname, your_phone_number, and your_email) with the actual user details. Adjust the formatting or wording as needed.
-
-**Example JSON for creating a new user:**
-```json
-{
-  "username": "your_username",
-  "firstName": "your_first_name",
-  "surname": "your_surname",
-  "phone": "your_phone_number"
-}
-```
-Note: Upon successful registration, a new user will be created, and you can use the generated JWT token for further authentication in other CheapTrips API endpoints
-
 ---
 
 ## API Documentation
@@ -218,14 +190,22 @@ curl -X POST
 ```
 
 For New User:
-If you don't have a JWT token, create a new user and get the token by making a request to the /user endpoint.
+Create a new user and get the token by making a request to the /user endpoint.
 ```bash
 curl -X POST 
   --header 'Content-Type: application/json' 
   -d '{
-        "username": "your_username",
-        "password": "your_password"
-       }' 'https://www.search-trips-api.com/user'
+          "jwtRequest": {
+            "email": "your_email",
+            "password": "your_password"
+          },
+          "userInfoRequest": {
+            "username": "your_username",
+            "firstName": "your_first_name",
+            "surname": "your_surname",
+            "phone": "your_phone_number"
+          }
+      }' 'https://www.search-trips-api.com/user'
 ```
 
 ### Step 2: Authorize
@@ -233,23 +213,7 @@ Once you have the authentication token, authorize your requests by including it 
 - **Header:** Authorization
 - **Value:** Bearer \<your-token\>
 
-
-### Step 3: Create New User Information (If New User)
-If you are a new user, create your user information using the following curl command:
-```bash
-curl -X POST 
-  --header 'Content-Type: application/json' 
-  --header 'Authorization: Bearer <your-token>' 
-  -d '{
-        "username": "your_username",
-        "firstName": "your_first_name",
-        "surname": "your_surname",
-        "phone": "your_phone_number"
-       }' 'https://www.search-trips-api.com/app/userinfo/create-specific-user-info?email=your_email'
-```
-Replace the placeholder values with your actual details.
-
-### Step 4: Start Using the CheapTrips Services
+### Step 3: Start Using the CheapTrips Services
 Now, you're ready to explore CheapTrips services. 
 Use the Swagger UI to interactively explore and test the available API endpoints.
 

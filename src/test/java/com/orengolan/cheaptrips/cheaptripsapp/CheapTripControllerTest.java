@@ -2,6 +2,7 @@ package com.orengolan.cheaptrips.cheaptripsapp;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orengolan.cheaptrips.airline.cheaptripsapp.CheapTripsRequest;
 import com.orengolan.cheaptrips.userinformation.UserInfo;
 import com.orengolan.cheaptrips.userinformation.UserInfoService;
 import org.junit.jupiter.api.BeforeAll;

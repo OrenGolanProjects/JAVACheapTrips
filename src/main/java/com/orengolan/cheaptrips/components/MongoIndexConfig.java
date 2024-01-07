@@ -54,7 +54,7 @@ public class MongoIndexConfig {
         createTTLIndex("countries",     364*24*60*60);    // 1 year: 365 days * 24 hours * 60 minutes * 60 seconds
         createTTLIndex("news",          24*60*60);        // 24 hours * 60 minutes * 60 seconds
         createTTLIndex("opentripmap",   364*24*60*60);    // 1 year: 365 days * 24 hours * 60 minutes * 60 seconds
-        createTTLIndex("userinfo",      7*24*60*60);      // 3 days * 24 hours * 60 minutes * 60 seconds
+        createTTLIndex("userinfo",      364*24*60*60);      // 3 days * 24 hours * 60 minutes * 60 seconds
         mongoTemplate.indexOps("userinfo").ensureIndex(new Index().on("email", Sort.Direction.ASC).unique());
     }
 
