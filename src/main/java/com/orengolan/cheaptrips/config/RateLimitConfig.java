@@ -30,8 +30,8 @@ import java.time.Duration;
 public class RateLimitConfig {
 
     // Constants for rate limits
-    public static final long REQUESTS_PER_30_MINUTES = 10;
-    public static final long REQUESTS_PER_HOUR = 50;
+    public static final long REQUESTS_PER_30_MINUTES = 100;
+    public static final long REQUESTS_PER_HOUR = 300;
 
     /**
      * Creates and returns a Bucket instance configured with rate limits for 30 minutes and 1 hour.

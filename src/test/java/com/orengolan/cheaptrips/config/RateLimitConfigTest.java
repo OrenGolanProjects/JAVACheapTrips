@@ -21,8 +21,8 @@ public class RateLimitConfigTest {
     @Test
     @WithMockUser // Add this annotation to simulate an authenticated user
     public void testRateLimit() throws Exception {
-        // Simulate 10 requests within a short time period
-        for (int i = 0; i < 10; i++) {
+        // Simulate 100 requests within a short time period
+        for (int i = 0; i < 100; i++) {
             mockMvc.perform(MockMvcRequestBuilders.get("/cheap-trip/city-search?cityName=London")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.status().isOk());

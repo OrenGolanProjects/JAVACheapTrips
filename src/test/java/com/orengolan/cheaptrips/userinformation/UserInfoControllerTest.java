@@ -33,6 +33,7 @@ public class UserInfoControllerTest {
 
     @BeforeAll
     static void setUp(@Autowired MockMvc mockMvc) throws Exception {
+
         // Assign the mockMvc instance to the static field
         UserInfoControllerTest.mockMvc = mockMvc;
 

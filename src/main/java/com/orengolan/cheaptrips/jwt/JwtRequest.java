@@ -1,16 +1,13 @@
 package com.orengolan.cheaptrips.jwt;
 
-import com.orengolan.cheaptrips.userinformation.UserInfo;
-import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.core.annotation.Order;
-
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.util.regex.Matcher;
+
 
 public class JwtRequest implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
     @ApiModelProperty(position = 1)
     private String email;
 
@@ -40,6 +37,18 @@ public class JwtRequest implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    public void validateEmailFormat(String email) {
+        if (!isValidEmailFormat(email)) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+    }
+
+    private boolean isValidEmailFormat(String email) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(emailRegex);
     }
 
 }
