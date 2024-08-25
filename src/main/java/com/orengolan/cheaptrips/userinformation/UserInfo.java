@@ -1,6 +1,6 @@
 package com.orengolan.cheaptrips.userinformation;
 
-import com.orengolan.cheaptrips.airline.cheaptripsapp.CheapTripsResponse;
+import com.orengolan.cheaptrips.cheaptripsapp.CheapTripsResponse;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -43,11 +43,11 @@ public class UserInfo {
     private String email;
 
     @NotNull
-    @Pattern(regexp = "[0-9]{10}")
+    @Pattern(regexp = "^\\d{3}-\\d{7}$", message = "Phone number must be in the format XXX-XXXXXXX")
     private String phone;
 
     @NotNull
-    @Size(max=10)
+    @Size(min = 2, max = 10)
     @Indexed(unique = true)
     private String userName;
 

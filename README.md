@@ -84,6 +84,27 @@ Before diving into the CheapTrips application, ensure you have the following pre
 
    Ensure that you have a Redis instance ready.
 
+4. .env file:
+   
+    Ensure you have .env file under resources folder with the following content:
+      ```bash
+       city_ENDPOINT   = APIEndpoint
+       country_ENDPOINT=APIEndpoint
+       airport_ENDPOINT=APIEndpoint
+       airline_ENDPOINT=APIEndpoint
+    
+       flight_monthlyENDPOINT=APIEndpoint
+       flight_cheapENDPOINT = APIEndpoint
+       flight_TOKEN=APIEndpoint
+    
+       news_ENDPOINT=APIEndpoint
+       news_TOKEN=APIEndpoint
+    
+       opentripmap_ENDPOINT_Geo=APIEndpoint
+       opentripmap_ENDPOINT_Places=APIEndpoint
+       opentripmap_TOKEN=APIEndpoint
+
+      ```
 ## Using Docker
 
 Build and Run with Docker:

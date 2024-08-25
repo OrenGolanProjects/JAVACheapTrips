@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.airline.cheaptripsapp;
+package com.orengolan.cheaptrips.cheaptripsapp;
 
 import com.orengolan.cheaptrips.city.City;
 import com.orengolan.cheaptrips.service.RateLimitExceededException;
@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -64,7 +65,7 @@ public class CheapTripController {
             @ApiResponse(code = 401, message = "Unauthorized, authentication failure"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    public CheapTripsResponse generateMonthlyTrip(@Valid @RequestBody CheapTripsRequest cheapTripsRequest, HttpServletRequest request) throws ParseException, IOException {
+    public CheapTripsResponse generateMonthlyTrip(@Valid @RequestBody CheapTripsRequest cheapTripsRequest, HttpServletRequest request) throws ParseException, IOException, BindException {
         logger.info("** CheapTripController>>  generateTrip: Start method.");
 
         // Rate limiting check
@@ -98,7 +99,7 @@ public class CheapTripController {
             @Valid @RequestBody CheapTripsRequest cheapTripsRequest,
             @RequestParam(defaultValue = "yyyy-MM-dd") String depart_date,
             @RequestParam(defaultValue = "yyyy-MM-dd") String return_date,
-            HttpServletRequest request) throws ParseException, IOException {
+            HttpServletRequest request) throws ParseException, IOException, BindException {
         logger.info("** CheapTripController>>  generateTrip: Start method.");
 
         // Rate limiting check

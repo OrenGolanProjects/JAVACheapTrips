@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.airline.cheaptripsapp;
+package com.orengolan.cheaptrips.cheaptripsapp;
 
 import com.orengolan.cheaptrips.city.City;
 import com.orengolan.cheaptrips.city.CityService;
@@ -12,6 +12,8 @@ import com.orengolan.cheaptrips.userinformation.UserInfo;
 import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import com.orengolan.cheaptrips.userinformation.UserInfoService;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindException;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,9 +57,9 @@ public class CheapTripsService {
         this.cityService = cityService;
     }
 
-    public UserInfo newUser(UserInfoRequest userInfoRequest,String userNameToken){
+    public UserInfo newUser(UserInfoRequest userInfoRequest,String userNameToken) throws BindException {
         logger.info("CheapTripsService>>  newUser: Start method.");
-        UserInfo userInfo = userInfoRequest.toUserInto(userNameToken);
+        UserInfo userInfo = userInfoRequest.toUserInfo(userNameToken);
         logger.info("CheapTripsService>>  newUser: Created user info object.");
         this.userInfoService.createNewUser(userInfo);
 
@@ -69,7 +71,7 @@ public class CheapTripsService {
         return this.userInfoService.getUserByIdentifier(userName);
     }
 
-    public CheapTripsResponse generateNewByTrip(CheapTripsRequest cheapTripsRequest,String departure_at,String return_at,UserInfo userInfo,boolean cheak_dates) throws ParseException, IOException {
+    public CheapTripsResponse generateNewByTrip(CheapTripsRequest cheapTripsRequest,String departure_at,String return_at,UserInfo userInfo,boolean cheak_dates) throws ParseException, IOException, BindException {
         logger.info("CheapTripsService>>  generateNewTrip: Start method.");
 
         if (cheak_dates){
@@ -126,7 +128,7 @@ public class CheapTripsService {
     }
 
 
-    private UserInfo saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) {
+    private UserInfo saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) throws BindException {
         logger.info("CheapTripsService>>  saveUserTrip: Start method.");
         userInfo.setTripHistory(cheapTripsResponse);
         this.userInfoService.deleteSpecificUser(userInfo.getEmail());

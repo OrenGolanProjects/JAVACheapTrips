@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.config;
+package com.orengolan.cheaptrips;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

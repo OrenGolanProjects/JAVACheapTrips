@@ -127,7 +127,11 @@ public class CityService {
     public List<City> fetchSpecificCityByName(String cityName) {
         logger.info("CityService>>  fetchSpecificCityByName: Start method fetch Specific City:"+ cityName);
         // Start by searching for search the EXACT string.
-        return this.cityRepository.findByCityName(cityName);
+        List<City> cities = this.cityRepository.findByCityName(cityName);
+        if (cities.isEmpty()) {
+            throw new IllegalArgumentException("City with name " + cityName + " not found.");
+        }
+        return cities;
     }
 
     public City fetchSpecificCityByIATA(String cityIATACode) {

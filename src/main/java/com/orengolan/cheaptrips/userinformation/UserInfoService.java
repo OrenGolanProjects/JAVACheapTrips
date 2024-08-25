@@ -4,6 +4,10 @@ package com.orengolan.cheaptrips.userinformation;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.Validator;
+
 import java.util.logging.Logger;
 
 /**
@@ -33,6 +37,9 @@ public class UserInfoService {
         this.userInfoRepository = userInfoRepository;
     }
 
+    @Autowired
+    private Validator validator;
+
     /**
      * Creates a new user in the system.
      *
@@ -40,18 +47,26 @@ public class UserInfoService {
      * @return The created user.
      * @throws IllegalArgumentException If the user already exists.
      */
-    public UserInfo createNewUser(@NotNull UserInfo user)  {
+    public UserInfo createNewUser(@NotNull UserInfo user) throws BindException {
         logger.info("UserService>>  createNewUser: Start method.");
 
         UserInfo userInfo = this.userInfoRepository.findUserByEmail(user.getEmail());
+
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(user, "UserInfo");
+        validator.validate(user, result);
+
+        if (result.hasErrors()) {
+            throw new BindException(result);
+        }
 
         if( userInfo==null){
             this.userInfoRepository.save(user);
             logger.info("UserService>>  createNewUser: End method.");
             return user;
         }
-        logger.severe("UserService>>  createNewUser: Found user from DB!.");
-        return userInfo;
+
+        throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists.");
+
     }
 
     /**
@@ -68,7 +83,7 @@ public class UserInfoService {
         UserInfo userByName = this.userInfoRepository.findUserByUserName(userIdentifier);
 
         if(userByEmail==null && userByName==null){
-            throw new IllegalArgumentException("User did not found, create a new user.");
+            throw new IllegalArgumentException("User identifier not found, pleas try again.");
         }
 
         return (userByEmail != null) ? userByEmail : userByName;
@@ -81,7 +96,12 @@ public class UserInfoService {
      */
     public UserInfo deleteSpecificUser(String email) {
         logger.info("UserService>>  deleteSpecificUser: Start method.");
-        return this.userInfoRepository.deleteByEmail(email);
+        UserInfo userInfo = this.userInfoRepository.deleteByEmail(email);
+        // if user is not found, throw an exception
+        if(userInfo==null){
+            throw new IllegalArgumentException("User not found.");
+        }
+        return userInfo;
     }
 
 
@@ -99,12 +119,22 @@ public class UserInfoService {
         // Check if the user exists
         UserInfo existingUser = this.getUserByIdentifier(userIdentifier);
 
+
         if (existingUser != null) {
             // Perform the update with the new information
-            existingUser.setUserName(updatedUserInfo.getUserName());
-            existingUser.setFirstName(updatedUserInfo.getFirstName());
-            existingUser.setSurName(updatedUserInfo.getSurName());
-            existingUser.setPhone(updatedUserInfo.getPhone());
+
+            if (updatedUserInfo.getUserName() != null && !updatedUserInfo.getUserName().isEmpty()) {
+                existingUser.setUserName(updatedUserInfo.getUserName());
+            }
+            if (updatedUserInfo.getFirstName() != null && !updatedUserInfo.getFirstName().isEmpty()) {
+                existingUser.setFirstName(updatedUserInfo.getFirstName());
+            }
+            if (updatedUserInfo.getSurName() != null && !updatedUserInfo.getSurName().isEmpty()) {
+                existingUser.setSurName(updatedUserInfo.getSurName());
+            }
+            if (updatedUserInfo.getPhone() != null && !updatedUserInfo.getPhone().isEmpty()) {
+                existingUser.setPhone(updatedUserInfo.getPhone());
+            }
 
             // Save the updated user back to the repository
             userInfoRepository.save(existingUser);

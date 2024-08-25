@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.airline.cheaptripsapp;
+package com.orengolan.cheaptrips.cheaptripsapp;
 
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Max;

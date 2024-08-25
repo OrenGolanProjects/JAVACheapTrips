@@ -1,19 +1,16 @@
 package com.orengolan.cheaptrips.jwt;
 
-import com.orengolan.cheaptrips.userinformation.UserInfo;
-import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.core.annotation.Order;
-
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 public class JwtRequest implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Invalid email format")
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", message = "Invalid email format, must be a valid email address")
     @ApiModelProperty(position = 1)
     private String email;
 
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$", message = "Invalid password format, must contain at least one digit, one lowercase and one uppercase letter, and at least 8 characters")
     @ApiModelProperty(position = 2)
     private String password;
 
