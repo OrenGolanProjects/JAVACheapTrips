@@ -109,9 +109,6 @@ public class NewsService {
     public News getNews(String cityName, Integer pageSize) throws IOException {
         logger.info("NewsService>>  getNews: Start method.");
         logger.info("NewsService>>  getNews: Data: cityName:"+cityName+" , pageSize: "+pageSize);
-        if(cityName.length()>10){
-            throw new IllegalArgumentException("Invalid city name, City name must be until 10 letters.");
-        }
 
         News existingNews = this.newsRepository.findByCityName(cityName);
         if(existingNews != null){

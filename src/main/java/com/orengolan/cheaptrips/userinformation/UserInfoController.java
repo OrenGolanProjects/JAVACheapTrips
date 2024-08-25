@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Pattern;
@@ -46,6 +47,9 @@ public class UserInfoController {
         this.userService = userService;
     }
 
+    // ==============================================
+    // ============= get-user-info ==================
+    // ==============================================
     @RequestMapping(value="/get-specific-user-info", method = RequestMethod.GET)
     @ApiOperation(value = "Get specific user information", notes = "Retrieve information for a specific user by email.")
     @ApiResponses({
@@ -58,6 +62,7 @@ public class UserInfoController {
         return this.userService.getUserByIdentifier(userIdentifier);
     }
 
+
     @ApiIgnore
     @RequestMapping(value="/create-specific-user-info", method = RequestMethod.POST)
     @ApiOperation(value = "Create specific user information", notes = "Create a new user with specific information.")
@@ -65,12 +70,15 @@ public class UserInfoController {
             @ApiResponse(code = 201, message = "User successfully created"),
             @ApiResponse(code = 400, message = "Invalid request data"),
             @ApiResponse(code = 500, message = "Internal server error")
-    })    public ResponseEntity<UserInfo> createSpecificUser(@RequestBody UserInfoRequest userInfoRequest,HttpServletRequest request) {
+    })    public ResponseEntity<UserInfo> createSpecificUser(@RequestBody UserInfoRequest userInfoRequest,HttpServletRequest request) throws BindException {
         logger.info("** UserController>>  deleteAllUsers: Start method.");
 
-        return ResponseEntity.status(201).body(this.userService.createNewUser(userInfoRequest.toUserInto(this.retrieveUserIdentifier(request))));
+        return ResponseEntity.status(201).body(this.userService.createNewUser(userInfoRequest.toUserInfo(this.retrieveUserIdentifier(request))));
     }
 
+    // ==============================================
+    // ============= UPDATE-USER-INFO ===============
+    // ==============================================
     @RequestMapping(value = "/update-specific-user-info", method = RequestMethod.PUT)
     @ApiOperation(value = "Update specific user information", notes = "Update information for a specific user by email or username.")
     @ApiResponses({
@@ -84,11 +92,14 @@ public class UserInfoController {
         logger.info("** UserController>>  updateSpecificUser: Start method.");
         String email = this.retrieveUserIdentifier(request);
 
-        UserInfo updatedUser = this.userService.updateUserInfo(email, updatedUserInfoRequest.toUserInto(email));
+        UserInfo updatedUser = this.userService.updateUserInfo(email, updatedUserInfoRequest.toUserInfo(email));
         return ResponseEntity.ok(updatedUser);
     }
 
 
+    // ==============================================
+    // ============= DELETE-USER-INFO ===============
+    // ==============================================
     @RequestMapping(value="/delete-specific-user-info", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete specific user information", notes = "Delete a specific user by email.")
     @ApiResponses({
@@ -98,9 +109,10 @@ public class UserInfoController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
 
-    public UserInfo deleteSpecificUser(HttpServletRequest request){
+    public ResponseEntity<UserInfo> deleteSpecificUser(HttpServletRequest request){
         logger.info("** UserController>>  deleteSpecificUser: Start method.");
-        return this.userService.deleteSpecificUser(this.retrieveUserIdentifier(request));
+
+        return ResponseEntity.ok(this.userService.deleteSpecificUser(this.retrieveUserIdentifier(request)));
     }
 
     private String retrieveUserIdentifier(HttpServletRequest request) throws AuthenticationException {

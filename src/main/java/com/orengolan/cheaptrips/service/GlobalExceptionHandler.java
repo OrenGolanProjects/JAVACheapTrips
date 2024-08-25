@@ -3,9 +3,14 @@ package com.orengolan.cheaptrips.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -40,7 +45,7 @@ public class GlobalExceptionHandler extends Exception {
     @ExceptionHandler({NumberFormatException.class, IllegalArgumentException.class,IllegalStateException.class})
     public ResponseEntity<String> handleBadRequestException(Exception e) {
         printTrack(e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad request: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler({Exception.class})
@@ -60,6 +65,19 @@ public class GlobalExceptionHandler extends Exception {
         return ResponseEntity.badRequest().body("Validation error: " + ex.getMessage());
     }
 
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<Map<String, String>> handleBindExceptions(BindException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    // Custom method to print the caller class, method, and line number
     private void printTrack(Exception e) {
         StackTraceElement[] stackTrace = e.getStackTrace();
         for (StackTraceElement caller : stackTrace) {

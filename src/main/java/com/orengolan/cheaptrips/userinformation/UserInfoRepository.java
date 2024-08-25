@@ -27,6 +27,8 @@ public interface UserInfoRepository extends MongoRepository<UserInfo,String> {
      * @return The user information if found, null otherwise.
      */
     UserInfo findUserByEmail(String email);
+
+
     /**
      * Delete a user by their email address.
      *
@@ -34,6 +36,9 @@ public interface UserInfoRepository extends MongoRepository<UserInfo,String> {
      * @return The user information before deletion.
      */
     UserInfo deleteByEmail(String email);
+
+
+
     /**
      * Find a user by their username.
      *

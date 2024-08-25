@@ -87,8 +87,6 @@ public class JwtAuthenticationController {
     })
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequest authenticationRequest) throws Exception {
-        // check for email validation
-        authenticationRequest.validateEmailFormat(authenticationRequest.getEmail());
         authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
@@ -114,8 +112,6 @@ public class JwtAuthenticationController {
     })
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequestNewUser jwtRequestNewUser) {
-        // check for email validation
-        jwtRequestNewUser.getJwtRequest().validateEmailFormat(jwtRequestNewUser.getJwtRequest().getEmail());
         String encodedPass = passwordEncoder.encode(jwtRequestNewUser.getJwtRequest().getPassword());
         DBUser user = DBUser.UserBuilder.anUser().name(jwtRequestNewUser.getJwtRequest().getEmail()).password(encodedPass).build();
 

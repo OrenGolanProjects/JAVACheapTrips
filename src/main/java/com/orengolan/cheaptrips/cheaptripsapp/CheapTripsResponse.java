@@ -1,4 +1,4 @@
-package com.orengolan.cheaptrips.airline.cheaptripsapp;
+package com.orengolan.cheaptrips.cheaptripsapp;
 
 import com.orengolan.cheaptrips.flight.Flight;
 import com.orengolan.cheaptrips.news.News;

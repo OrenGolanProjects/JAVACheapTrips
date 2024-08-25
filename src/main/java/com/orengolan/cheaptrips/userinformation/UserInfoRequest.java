@@ -90,7 +90,7 @@ public class UserInfoRequest {
     * @param email The email associated with the user.
     * @return The corresponding {@link UserInfo} entity.
     */
-    public UserInfo toUserInto(String email){
+    public UserInfo toUserInfo(String email) {
 
         return new UserInfo(
                 this.getFirstName(),

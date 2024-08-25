@@ -3,14 +3,14 @@ package com.orengolan.cheaptrips.jwt;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
-import java.util.regex.Matcher;
-
 
 public class JwtRequest implements Serializable {
     private static final long serialVersionUID = 5926468583005150707L;
+    @Pattern(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", message = "Invalid email format, must be a valid email address")
     @ApiModelProperty(position = 1)
     private String email;
 
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$", message = "Invalid password format, must contain at least one digit, one lowercase and one uppercase letter, and at least 8 characters")
     @ApiModelProperty(position = 2)
     private String password;
 
@@ -37,18 +37,6 @@ public class JwtRequest implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-
-    public void validateEmailFormat(String email) {
-        if (!isValidEmailFormat(email)) {
-            throw new IllegalArgumentException("Invalid email format");
-        }
-    }
-
-    private boolean isValidEmailFormat(String email) {
-        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        return email.matches(emailRegex);
     }
 
 }
