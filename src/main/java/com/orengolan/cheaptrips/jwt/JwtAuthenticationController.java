@@ -1,12 +1,11 @@
 package com.orengolan.cheaptrips.jwt;
 
-
+import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,7 +13,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.BindException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -43,11 +42,11 @@ import java.util.ArrayList;
  * for API consumers, explaining the available operations and expected inputs.
  *
  * Note: Ensure that the necessary Spring beans (AuthenticationManager, JwtTokenUtil, JwtUserDetailsService,
- * DBUserService) are configured and injected appropriately for proper functionality.
+ * DBUserService, and PasswordEncoder) are configured and injected appropriately for proper functionality.
  */
 @RestController
 @CrossOrigin
-@Api(tags = "JWT Authentication ")
+@Api(tags = "JWT Authentication ", description = "Operations related to JWT authentication.")
 public class JwtAuthenticationController {
 
     @Autowired
@@ -63,13 +62,10 @@ public class JwtAuthenticationController {
     private DBUserService userServiceJWT;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
     AuthenticationManager am;
 
-
-
-    // ===========================
-    // ==== authenticate User ====
-    // ===========================
     /**
      * Endpoint for creating an authentication token by providing valid credentials.
      *
@@ -81,35 +77,22 @@ public class JwtAuthenticationController {
             value = "Create Authentication Token",
             notes = "Authenticate and generate a JWT token.\n\n" +
                     "**User Authentication Keys:**\n" +
-                    "- **Email:** Must be a valid email format (e.g., user@example.com).\n" +
-                    "- **Password:** Must contain at least one digit, one lowercase letter, one uppercase letter, no whitespace, and be at least 8 characters long."
+                    "- Email: The email address associated with the user account.\n" +
+                    "- Password: The user's password for authentication."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully generated JWT token"),
-            @ApiResponse(code = 201, message = "Successfully generated JWT token"),
             @ApiResponse(code = 401, message = "Invalid credentials or user disabled"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequest authenticationRequest) {
-        try {
-            authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
-            final String token = jwtTokenUtil.generateToken(userDetails);
-            return ResponseEntity.ok(new JwtResponse(token));
-        } catch (DisabledException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User account is disabled");
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A user with this email and password does not exist");
-        }
+    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequest authenticationRequest) throws Exception {
+        authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
+        final String token = jwtTokenUtil.generateToken(userDetails);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
-
-    // ===========================
-    // ======= Create User =======
-    // ===========================
     /**
      * Endpoint for creating a new user account with JWT authentication.
      *
@@ -120,38 +103,31 @@ public class JwtAuthenticationController {
             value = "Create JwtUser & NewUser",
             notes = "Create a new user with JWT authentication and new user information.\n\n" +
                     "**User Registration Keys:**\n" +
-                    "- **Email:** Must be a valid email format (e.g., user@example.com).\n" +
-                    "- **Password:** Password must be at least 8 characters long and contain at least one letter and one number.\n"+
-                    "- **UserName:** Cannot be blank, must be between 3 and 10 characters, and must be unique.\n" +
-                    "- **FirstName:** Cannot be blank, must be between 2 and 10 characters.\n" +
-                    "- **SurName:** Cannot be blank, must be between 2 and 10 characters.\n" +
-                    "- **Phone:** Cannot be blank, must be a 10-digit number."
+                    "- Email: The email address associated with the user account.\n" +
+                    "- Password: The user's password for authentication."
     )
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successfully created the user and generated JWT token"),
+            @ApiResponse(code = 200, message = "Successfully created the user and generated JWT token"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequestNewUser jwtRequestNewUser) throws BindException, BindException {
-
-        DBUser user = DBUser.UserBuilder.anUser().email(jwtRequestNewUser.getJwtRequest().getEmail()).password(jwtRequestNewUser.getJwtRequest().getPassword()).build();
+    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequestNewUser jwtRequestNewUser) {
+        String encodedPass = passwordEncoder.encode(jwtRequestNewUser.getJwtRequest().getPassword());
+        DBUser user = DBUser.UserBuilder.anUser().name(jwtRequestNewUser.getJwtRequest().getEmail()).password(encodedPass).build();
 
         // Save the user in JWT DB.
-        userServiceJWT.saveDBUser(user);
-
-        UserDetails userDetails = new User(jwtRequestNewUser.getJwtRequest().getEmail(), user.getPassword(), new ArrayList<>());
+        userServiceJWT.save(user);
+        UserDetails userDetails = new User(jwtRequestNewUser.getJwtRequest().getEmail(), encodedPass, new ArrayList<>());
         String jwtToken = jwtTokenUtil.generateToken(userDetails);
 
         // Create & Save the user details.
         userDetailsService.createUserInfo(jwtRequestNewUser.getUserInfoRequest(),userDetails.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new JwtResponse(jwtToken));
-
+        return ResponseEntity.ok(new JwtResponse(jwtToken));
     }
 
-    private void authenticate(String email, String password) throws Exception {
+    private void authenticate(String username, String password) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

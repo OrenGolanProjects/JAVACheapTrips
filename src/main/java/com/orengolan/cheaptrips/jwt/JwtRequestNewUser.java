@@ -7,7 +7,9 @@ public class JwtRequestNewUser {
     private JwtRequest jwtRequest;
     private UserInfoRequest userInfoRequest;
 
-    public JwtRequestNewUser() {
+    public JwtRequestNewUser(JwtRequest jwtRequest, UserInfoRequest userInfoRequest) {
+        this.jwtRequest = jwtRequest;
+        this.userInfoRequest = userInfoRequest;
     }
 
     public JwtRequest getJwtRequest() {
