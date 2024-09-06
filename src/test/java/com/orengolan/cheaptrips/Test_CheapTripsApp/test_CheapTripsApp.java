@@ -93,28 +93,58 @@ public class test_CheapTripsApp {
 
     // =================== START TEST SEARCH CHEAP TRIPS ===================
 
-
     // Method to provide test data for monthly trips
     static Stream<Arguments> provideMonthlyTripData() {
         return Stream.of(
-                //Arguments.of("TLV", "AMS", "amsterdam", 10000, 2),
-                Arguments.of("TLV", "BKK", "bangkok", 10000, 4),
-                Arguments.of("AMM", "LON", "london", 30000, 2),
-                Arguments.of("STR", "ADD", "addis ababa", 20000, 5),
-                Arguments.of("YHZ", "PMI", "palma de mallorca", 40000, 3)
+                // TLV to common destinations
+                Arguments.of("TLV", "NYC", "New York", 9000, 2),
+                Arguments.of("TLV", "LON", "London", 4000, 4),
+                Arguments.of("TLV", "PAR", "Paris", 3300, 3),
+                Arguments.of("TLV", "BKK", "Bangkok", 7000, 5),
+                Arguments.of("TLV", "BER", "Berlin", 2800, 3),
+                Arguments.of("TLV", "ROM", "Rome", 2300, 4),
+                Arguments.of("TLV", "BOM", "Mumbai", 4000, 3),
+                Arguments.of("TLV", "ATH", "Athens", 1200, 5),
+                Arguments.of("TLV", "IST", "Istanbul", 1100, 3),
+                Arguments.of("TLV", "BCN", "Barcelona", 3200, 4),
+
+                // Random origins and destinations
+                Arguments.of("NYC", "LON", "London", 5600, 2),
+                Arguments.of("PAR", "TYO", "Tokyo", 9700, 4),
+                Arguments.of("LAX", "HKG", "Hong Kong", 11400, 5),
+                Arguments.of("DXB", "MAD", "Madrid", 6000, 2),
+                Arguments.of("SYD", "SIN", "Singapore", 6300, 3),
+                Arguments.of("SEL", "BKK", "Bangkok", 4500, 4)
         );
     }
 
     // Method to provide test data for trips by dates
     static Stream<Arguments> provideTripByDatesData() {
         return Stream.of(
-                //Arguments.of("TLV", "AMS", "amsterdam", 10000, 2, "2023-12-01", "2023-12-15"),
-                Arguments.of("TLV", "BKK", "bangkok", 10000, 4, "2024-11-01", "2024-11-15"),
-                Arguments.of("AMM", "LON", "london", 30000, 2, "2024-10-01", "2024-10-15"),
-                Arguments.of("STR", "ADD", "addis ababa", 20000, 5, "2024-09-01", "2024-09-15"),
-                Arguments.of("YHZ", "PMI", "palma de mallorca", 40000, 3, "2024-08-01", "2024-08-15")
+                // TLV to common destinations
+                Arguments.of("TLV", "NYC", "New York", 9000, 2, "2024-09-07", "2024-09-22"),
+                Arguments.of("TLV", "LON", "London", 4000, 4, "2024-10-07", "2024-10-22"),
+                Arguments.of("TLV", "PAR", "Paris", 3300, 3, "2024-11-06", "2024-11-21"),
+                Arguments.of("TLV", "BKK", "Bangkok", 7000, 5, "2024-12-06", "2024-12-21"),
+                Arguments.of("TLV", "BER", "Berlin", 2800, 3, "2025-01-05", "2025-01-20"),
+                Arguments.of("TLV", "ROM", "Rome", 2300, 4, "2025-02-04", "2025-02-19"),
+                Arguments.of("TLV", "BOM", "Mumbai", 4000, 3, "2025-03-06", "2025-03-21"),
+                Arguments.of("TLV", "ATH", "Athens", 1200, 5, "2025-04-05", "2025-04-20"),
+                Arguments.of("TLV", "IST", "Istanbul", 1100, 3, "2025-05-05", "2025-05-20"),
+                Arguments.of("TLV", "BCN", "Barcelona", 3200, 4, "2025-06-04", "2025-06-19"),
+
+                // Random origins and destinations
+                Arguments.of("NYC", "LON", "London", 5600, 2, "2025-07-04", "2025-07-19"),
+                Arguments.of("PAR", "TYO", "Tokyo", 9700, 4, "2025-08-03", "2025-08-18"),
+                Arguments.of("LAX", "HKG", "Hong Kong", 11400, 5, "2025-10-02", "2025-10-17"),
+                Arguments.of("DXB", "MAD", "Madrid", 6000, 2, "2025-11-01", "2025-11-16"),
+                Arguments.of("SYD", "SIN", "Singapore", 6300, 3, "2025-12-01", "2025-12-16"),
+                Arguments.of("SEL", "BKK", "Bangkok", 4500, 4, "2026-01-30", "2026-02-14")
+
         );
     }
+
+
 
     @ParameterizedTest
     @MethodSource("provideMonthlyTripData")

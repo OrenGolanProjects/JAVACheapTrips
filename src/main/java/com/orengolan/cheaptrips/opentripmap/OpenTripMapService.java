@@ -89,7 +89,7 @@ public class OpenTripMapService {
                 JsonNode rootNode = this.getListPlaces(placesData, kind,counterPlaces);
                 JsonNode dataNode = rootNode.get("features");
                 if (dataNode.isEmpty()) {
-                    throw new IllegalArgumentException("Did not found places.");
+                    continue;
                 }
 
                 for (JsonNode mainPlaceDataNode : dataNode) {
@@ -148,11 +148,11 @@ public class OpenTripMapService {
         PlaceDetails.Point point = new PlaceDetails.Point(lon,lat);
 
         PlaceDetails.Address address = new PlaceDetails.Address(
-                placeData.path("address").get("city").textValue(),
+                ifFieldExists(placeData,"address","city"),
                 ifFieldExists(placeData,"address","state"),
-                placeData.path("address").get("country").textValue(),
+                ifFieldExists(placeData,"address","county"),
                 ifFieldExists(placeData,"address","postcode"),
-                placeData.path("address").get("country_code").textValue(),
+                ifFieldExists(placeData,"address","country_code"),
                 ifFieldExists(placeData,"address","road"),
                 ifFieldExists(placeData,"address","suburb"),
                 ifFieldExists(placeData,"address","house_number"),
