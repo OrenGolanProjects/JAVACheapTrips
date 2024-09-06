@@ -1,0 +1,205 @@
+2024-08-22 12:37:16.193  INFO 21104 --- [main] c.o.cheaptrips.CheapTripsApplication     : Starting CheapTripsApplication using Java 22.0.2 on Oren-Golan-PC with PID 21104 (C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes started by user in C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+Starting CheapTripsApplication using Java 22.0.2 on Oren-Golan-PC with PID 21104 (C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes started by user in C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+2024-08-22 12:37:16.197 DEBUG 21104 --- [main] c.o.cheaptrips.CheapTripsApplication     : Running with Spring Boot v2.5.2, Spring v5.3.8
+Running with Spring Boot v2.5.2, Spring v5.3.8
+2024-08-22 12:37:16.198  INFO 21104 --- [main] c.o.cheaptrips.CheapTripsApplication     : No active profile set, falling back to default profiles: default
+No active profile set, falling back to default profiles: default
+2024-08-22 12:37:21.848 DEBUG 21104 --- [main] c.o.cheaptrips.jwt.JwtRequestFilter      : Filter 'jwtRequestFilter' configured for use
+Filter 'jwtRequestFilter' configured for use
+2024-08-22 12:37:22.216 ERROR 21104 --- [main] o.s.boot.SpringApplication               : Application run failed
+Application run failed
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'airlineService' defined in file [C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes\com\orengolan\cheaptrips\airline\AirlineService.class]: Unsatisfied dependency expressed through constructor parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dotenv' defined in class path resource [com/orengolan/cheaptrips/config/DotenvConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1354)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1204)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:564)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:524)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:944)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:338)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1332)
+	at com.orengolan.cheaptrips.CheapTripsApplication.main(CheapTripsApplication.java:50)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dotenv' defined in class path resource [com/orengolan/cheaptrips/config/DotenvConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:658)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:486)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1334)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1177)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:564)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:524)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1380)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1300)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 19 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:185)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 33 common frames omitted
+Caused by: io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at io.github.cdimascio.dotenv.internal.ClasspathHelper.loadFileFromClasspath(ClassPathHelper.kt:37)
+	at io.github.cdimascio.dotenv.internal.DotenvReader.read(DotenvReader.kt:36)
+	at io.github.cdimascio.dotenv.internal.DotenvParser.parse(DotenvParser.kt:26)
+	at io.github.cdimascio.dotenv.DotenvBuilder.load(Dotenv.kt:124)
+	at com.orengolan.cheaptrips.config.DotenvConfig.dotenv(DotenvConfig.java:40)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$a8fc43d7.CGLIB$dotenv$0(<generated>)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$a8fc43d7$$FastClassBySpringCGLIB$$e2c92c26.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:244)
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:331)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$a8fc43d7.dotenv(<generated>)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+	... 34 common frames omitted
+	Suppressed: io.github.cdimascio.dotenv.DotEnvException: Could not find .\.env on the file system (working directory: C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+		at io.github.cdimascio.dotenv.internal.DotenvReader.read(DotenvReader.kt:40)
+		... 45 common frames omitted
+2024-08-22 12:38:02.769  INFO 1808 --- [main] c.o.cheaptrips.CheapTripsApplication     : Starting CheapTripsApplication using Java 22.0.2 on Oren-Golan-PC with PID 1808 (C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes started by user in C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+Starting CheapTripsApplication using Java 22.0.2 on Oren-Golan-PC with PID 1808 (C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes started by user in C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+2024-08-22 12:38:02.772 DEBUG 1808 --- [main] c.o.cheaptrips.CheapTripsApplication     : Running with Spring Boot v2.5.2, Spring v5.3.8
+Running with Spring Boot v2.5.2, Spring v5.3.8
+2024-08-22 12:38:02.772  INFO 1808 --- [main] c.o.cheaptrips.CheapTripsApplication     : No active profile set, falling back to default profiles: default
+No active profile set, falling back to default profiles: default
+2024-08-22 12:38:08.227 DEBUG 1808 --- [main] c.o.cheaptrips.jwt.JwtRequestFilter      : Filter 'jwtRequestFilter' configured for use
+Filter 'jwtRequestFilter' configured for use
+2024-08-22 12:38:08.584 ERROR 1808 --- [main] o.s.boot.SpringApplication               : Application run failed
+Application run failed
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'airlineService' defined in file [C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes\com\orengolan\cheaptrips\airline\AirlineService.class]: Unsatisfied dependency expressed through constructor parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dotenv' defined in class path resource [com/orengolan/cheaptrips/config/DotenvConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1354)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1204)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:564)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:524)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:944)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:338)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1332)
+	at com.orengolan.cheaptrips.CheapTripsApplication.main(CheapTripsApplication.java:50)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dotenv' defined in class path resource [com/orengolan/cheaptrips/config/DotenvConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:658)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:486)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1334)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1177)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:564)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:524)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1380)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1300)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 19 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:185)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 33 common frames omitted
+Caused by: io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at io.github.cdimascio.dotenv.internal.ClasspathHelper.loadFileFromClasspath(ClassPathHelper.kt:37)
+	at io.github.cdimascio.dotenv.internal.DotenvReader.read(DotenvReader.kt:36)
+	at io.github.cdimascio.dotenv.internal.DotenvParser.parse(DotenvParser.kt:26)
+	at io.github.cdimascio.dotenv.DotenvBuilder.load(Dotenv.kt:124)
+	at com.orengolan.cheaptrips.config.DotenvConfig.dotenv(DotenvConfig.java:40)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$81927d62.CGLIB$dotenv$0(<generated>)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$81927d62$$FastClassBySpringCGLIB$$7df2d97b.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:244)
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:331)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$81927d62.dotenv(<generated>)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+	... 34 common frames omitted
+	Suppressed: io.github.cdimascio.dotenv.DotEnvException: Could not find .\.env on the file system (working directory: C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+		at io.github.cdimascio.dotenv.internal.DotenvReader.read(DotenvReader.kt:40)
+		... 45 common frames omitted
+2024-08-22 12:40:10 - c.o.cheaptrips.CheapTripsApplication - Starting CheapTripsApplication using Java 22.0.2 on Oren-Golan-PC with PID 17480 (C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes started by user in C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+2024-08-22 12:40:10 - c.o.cheaptrips.CheapTripsApplication - Running with Spring Boot v2.5.2, Spring v5.3.8
+2024-08-22 12:40:10 - c.o.cheaptrips.CheapTripsApplication - No active profile set, falling back to default profiles: default
+2024-08-22 12:40:15 - c.o.cheaptrips.jwt.JwtRequestFilter - Filter 'jwtRequestFilter' configured for use
+2024-08-22 12:40:16 - o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'airlineService' defined in file [C:\Users\user\Desktop\Personal\Study\JAVACheapTrips\target\classes\com\orengolan\cheaptrips\airline\AirlineService.class]: Unsatisfied dependency expressed through constructor parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dotenv' defined in class path resource [com/orengolan/cheaptrips/config/DotenvConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:229)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1354)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1204)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:564)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:524)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:944)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:434)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:338)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1343)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1332)
+	at com.orengolan.cheaptrips.CheapTripsApplication.main(CheapTripsApplication.java:50)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dotenv' defined in class path resource [com/orengolan/cheaptrips/config/DotenvConfig.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:658)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:486)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1334)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1177)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:564)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:524)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:276)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1380)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1300)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:887)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 19 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.github.cdimascio.dotenv.Dotenv]: Factory method 'dotenv' threw exception; nested exception is io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:185)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 33 common frames omitted
+Caused by: io.github.cdimascio.dotenv.DotEnvException: Could not find /.env on the classpath
+	at io.github.cdimascio.dotenv.internal.ClasspathHelper.loadFileFromClasspath(ClassPathHelper.kt:37)
+	at io.github.cdimascio.dotenv.internal.DotenvReader.read(DotenvReader.kt:36)
+	at io.github.cdimascio.dotenv.internal.DotenvParser.parse(DotenvParser.kt:26)
+	at io.github.cdimascio.dotenv.DotenvBuilder.load(Dotenv.kt:124)
+	at com.orengolan.cheaptrips.config.DotenvConfig.dotenv(DotenvConfig.java:40)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$28fdbb8.CGLIB$dotenv$0(<generated>)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$28fdbb8$$FastClassBySpringCGLIB$$f6365fd4.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:244)
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:331)
+	at com.orengolan.cheaptrips.config.DotenvConfig$$EnhancerBySpringCGLIB$$28fdbb8.dotenv(<generated>)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+	... 34 common frames omitted
+	Suppressed: io.github.cdimascio.dotenv.DotEnvException: Could not find .\.env on the file system (working directory: C:\Users\user\Desktop\Personal\Study\JAVACheapTrips)
+		at io.github.cdimascio.dotenv.internal.DotenvReader.read(DotenvReader.kt:40)
+		... 45 common frames omitted
