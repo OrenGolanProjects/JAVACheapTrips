@@ -1,6 +1,5 @@
 package com.orengolan.cheaptrips.jwt;
 
-import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -14,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -88,6 +88,7 @@ public class JwtAuthenticationController {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
+
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
@@ -111,13 +112,17 @@ public class JwtAuthenticationController {
             @ApiResponse(code = 500, message = "Internal server error")
     })
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequestNewUser jwtRequestNewUser) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody JwtRequestNewUser jwtRequestNewUser) throws BindException {
         String encodedPass = passwordEncoder.encode(jwtRequestNewUser.getJwtRequest().getPassword());
-        DBUser user = DBUser.UserBuilder.anUser().name(jwtRequestNewUser.getJwtRequest().getEmail()).password(encodedPass).build();
+        DBUser user = DBUser.UserBuilder.anUser()
+                .email(jwtRequestNewUser.getJwtRequest().getEmail())
+                .password(jwtRequestNewUser.getJwtRequest().getPassword())
+                .build();
+
 
         // Save the user in JWT DB.
-        userServiceJWT.save(user);
-        UserDetails userDetails = new User(jwtRequestNewUser.getJwtRequest().getEmail(), encodedPass, new ArrayList<>());
+        userServiceJWT.saveDBUser(user);
+        UserDetails userDetails = new User(jwtRequestNewUser.getJwtRequest().getEmail(), jwtRequestNewUser.getJwtRequest().getPassword(), new ArrayList<>());
         String jwtToken = jwtTokenUtil.generateToken(userDetails);
 
         // Create & Save the user details.

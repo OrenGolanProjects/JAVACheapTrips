@@ -30,11 +30,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(1)
     public void positive_test_CreateUserSuccessfully() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -48,11 +49,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(2)
     public void negative_test_duplicateUser() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -66,11 +68,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(3)
     public void negative_test_EmailError() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -84,11 +87,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(4)
     public void negative_test_PhoneError() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "1234567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -102,11 +106,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(5)
     public void negative_test_PhoneAlphabeticChasError() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "@#456asd", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -120,11 +125,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(6)
     public void negative_test_InvalidPassword() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "pass");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -138,11 +144,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(7)
     public void negative_test_BlankUserName() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -156,11 +163,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(8)
     public void negative_test_InvalidFirstName() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -174,11 +182,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(9)
     public void negative_test_InvalidSurName() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -192,11 +201,12 @@ public class testJwtAuthenticationUser {
     @Test
     @Order(10)
     public void negative_test_BlackValues() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("", "");
         UserInfoRequest userInfoRequest = new UserInfoRequest("", "", "", "");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 

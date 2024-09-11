@@ -69,11 +69,12 @@ public class testUserManagement {
     @Test
     @Order(0)
     public void positive_test_CreateUserSuccessfully_first() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 
@@ -261,11 +262,12 @@ public class testUserManagement {
     @Test
     @Order(12)
     public void positive_test_CreateUserSuccessfully_last() throws Exception {
-        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser();
+
 
         JwtRequest jwtRequest = new JwtRequest("user@example.com", "Password1");
         UserInfoRequest userInfoRequest = new UserInfoRequest("John", "Do", "123-4567890", "user123");
 
+        JwtRequestNewUser jwtRequestNewUser = new JwtRequestNewUser(jwtRequest, userInfoRequest);
         jwtRequestNewUser.setJwtRequest(jwtRequest);
         jwtRequestNewUser.setUserInfoRequest(userInfoRequest);
 

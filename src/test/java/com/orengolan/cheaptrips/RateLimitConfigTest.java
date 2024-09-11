@@ -18,8 +18,8 @@ public class RateLimitConfigTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    @WithMockUser // Add this annotation to simulate an authenticated user
+
+    @WithMockUser
     public void testRateLimit() throws Exception {
         // Simulate 100 requests within a short time period
         for (int i = 0; i < 100; i++) {
