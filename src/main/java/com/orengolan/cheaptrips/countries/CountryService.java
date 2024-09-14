@@ -48,7 +48,7 @@ public class CountryService {
         this.countryEndpoint = dotenv.get("country_ENDPOINT");
     }
 
-    private String getCountriesData() throws IOException {
+    public String getCountriesData() throws IOException {
         logger.info("CountryService>>  getCountriesData: Start method.");
         return this.api.buildAndExecuteRequest(countryEndpoint,null);
     }

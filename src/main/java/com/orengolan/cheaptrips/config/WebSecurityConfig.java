@@ -118,7 +118,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
-                        "/", "/login", "/signup", "/welcome",
+                        "/", "/login", "/signup", "/welcome","/combined-city-airport-data",
                         "/style/**", "/js/**", "/images/**", "/css/**", "/fonts/**",
                         "/fragments/**", "/footer", "/header", "/loadingOverlay", "/modal",
                         "/base", "/index",

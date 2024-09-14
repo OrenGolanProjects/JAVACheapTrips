@@ -1,9 +1,14 @@
 package com.orengolan.cheaptrips.cheaptripsapp;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.orengolan.cheaptrips.airport.AirportService;
 import com.orengolan.cheaptrips.city.City;
 import com.orengolan.cheaptrips.city.CityService;
 import com.orengolan.cheaptrips.flight.Flight;
 import com.orengolan.cheaptrips.flight.FlightService;
+import com.orengolan.cheaptrips.countries.CountryService;
 import com.orengolan.cheaptrips.news.News;
 import com.orengolan.cheaptrips.news.NewsService;
 import com.orengolan.cheaptrips.opentripmap.OpenTripMapService;
@@ -13,11 +18,14 @@ import com.orengolan.cheaptrips.userinformation.UserInfoRequest;
 import com.orengolan.cheaptrips.userinformation.UserInfoService;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -47,14 +55,22 @@ public class CheapTripsService {
     private final NewsService newsService;
     private final OpenTripMapService openTripMapService;
     private final CityService cityService;
+    private final AirportService airportService;
+    private final ObjectMapper objectMapper;
+    private final CountryService countryService;
 
 
-    public CheapTripsService(UserInfoService userInfoService, FlightService flightService, NewsService newsService, OpenTripMapService openTripMapService,CityService cityService) {
+
+
+    public CheapTripsService(UserInfoService userInfoService, FlightService flightService, NewsService newsService, OpenTripMapService openTripMapService,CityService cityService,AirportService airportService,ObjectMapper objectMapper,CountryService countryService) {
         this.userInfoService = userInfoService;
         this.flightService = flightService;
         this.newsService = newsService;
         this.openTripMapService = openTripMapService;
         this.cityService = cityService;
+        this.airportService = airportService;
+        this.objectMapper = objectMapper;
+        this.countryService = countryService;
     }
 
     public UserInfo newUser(UserInfoRequest userInfoRequest,String userNameToken) throws BindException {
@@ -131,12 +147,12 @@ public class CheapTripsService {
     }
 
 
-    private UserInfo saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) throws BindException {
+    private void saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) throws BindException {
         logger.info("CheapTripsService>>  saveUserTrip: Start method.");
         userInfo.setTripHistory(cheapTripsResponse);
         this.userInfoService.deleteSpecificUser(userInfo.getEmail());
         logger.info("CheapTripsService>>  saveUserTrip: End method.");
-        return this.userInfoService.createNewUser(userInfo);
+        this.userInfoService.createNewUser(userInfo);
     }
 
 
@@ -147,4 +163,100 @@ public class CheapTripsService {
         return false;
     }
 
+    public List<JsonNode> getCombinedCityAirportData() throws IOException {
+        logger.info("CheapTripsService>> getCombinedCityAirportData: Start method");
+
+        String fileName = "/tmp/combined_city_airport_data.json";
+        File jsonFile = new File(fileName);
+
+        // If the file exists and is not empty, read from the JSON file
+        if (jsonFile.exists() && Files.size(Paths.get(fileName)) > 0) {
+            logger.info("CheapTripsService>> getCombinedCityAirportData: File exists and is not empty, reading from JSON.");
+            return readFromJson(jsonFile);
+        }
+
+        // Fetch city, airport, and country data
+        JsonNode cityList = objectMapper.readTree(cityService.getCitiesData());
+        JsonNode airportList = objectMapper.readTree(airportService.getAirports());
+        JsonNode countryList = objectMapper.readTree(countryService.getCountriesData());
+
+        // Create maps to store cities and countries by their code for quick lookup
+        Map<String, JsonNode> cityMap = new HashMap<>();
+        for (JsonNode city : cityList) {
+            String cityCode = city.path("code").asText();
+            cityMap.put(cityCode, city);
+        }
+
+        Map<String, JsonNode> countryMap = new HashMap<>();
+        for (JsonNode country : countryList) {
+            String countryCode = country.path("code").asText();
+            countryMap.put(countryCode, country);
+        }
+
+        // Combine city, airport, and country data
+        List<JsonNode> combinedData = new ArrayList<>();
+        for (JsonNode airport : airportList) {
+            String cityCode = airport.path("city_code").asText();
+            JsonNode city = cityMap.get(cityCode);
+            String countryCode = airport.path("country_code").asText();
+            JsonNode country = countryMap.get(countryCode);
+
+            if (city != null && country != null) {
+                ObjectNode combinedNode = objectMapper.createObjectNode();
+
+                // Add airport data if it exists
+                if (airport.has("code") && airport.has("name_translations") && airport.get("name_translations").has("en")) {
+                    ObjectNode airportNode = objectMapper.createObjectNode();
+                    airportNode.put("code", airport.path("code").asText());
+                    airportNode.put("name", airport.get("name_translations").path("en").asText());
+                    combinedNode.set("airport", airportNode);
+                }
+
+                // Add city data if it exists
+                if (city.has("code") && city.has("name_translations") && city.get("name_translations").has("en")) {
+                    ObjectNode cityNode = objectMapper.createObjectNode();
+                    cityNode.put("code", city.path("code").asText());
+                    cityNode.put("name", city.get("name_translations").path("en").asText());
+                    combinedNode.set("city", cityNode);
+                }
+
+                // Add country data if it exists
+                if (country.has("code") && country.has("name_translations") && country.get("name_translations").has("en")) {
+                    ObjectNode countryNode = objectMapper.createObjectNode();
+                    countryNode.put("code", country.path("code").asText());
+                    countryNode.put("name", country.get("name_translations").path("en").asText());
+                    combinedNode.set("country", countryNode);
+                }
+
+                // Only add to combinedData if at least one of the fields was added
+                if (combinedNode.size() > 0) {
+                    combinedData.add(combinedNode);
+                }
+            }
+        }
+
+        // Write the combined data to JSON file
+        writeToJson(combinedData, jsonFile);
+        return combinedData;
+    }
+
+
+    private List<JsonNode> readFromJson(File jsonFile) throws IOException {
+        // Read JSON array from file and convert it to a List<JsonNode>
+        JsonNode jsonNodeArray = objectMapper.readTree(jsonFile);
+        List<JsonNode> result = new ArrayList<>();
+        if (jsonNodeArray.isArray()) {
+            for (JsonNode node : jsonNodeArray) {
+                result.add(node);
+            }
+        }
+        return result;
+    }
+
+    private void writeToJson(List<JsonNode> data, File jsonFile) throws IOException {
+        // Write the List<JsonNode> to a JSON file
+        try (FileWriter writer = new FileWriter(jsonFile)) {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(writer, data);
+        }
+    }
 }

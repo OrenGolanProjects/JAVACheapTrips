@@ -1,22 +1,29 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::scripts})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::script})}">
+
 <head>
     <title>CheapTrips - חיפוש טיסות</title>
 </head>
 <body>
 <main>
-    <h2 class="text-center mb-4">מיליוני טיסות זולות. חיפוש אחד פשוט.</h2>
+    <h2 class="text-center mb-4 right_to_left">גלה את הטיסות הזולות, חדשות מקומיות, ומקומות תיירות לחופשה שלך – פשוט וקל</h2>
     <div class="card">
         <div class="card-body">
             <form id="searchForm">
                 <div class="row mb-3">
                     <div class="col-md-6 mb-3">
-                        <label for="origin" class="form-label">מוצא</label>
-                        <input type="text" class="form-control" id="origin" placeholder="מדינה, עיר או נמל תעופה" value="נמל התעופה הבין-לאומי בן גוריון (TLV)">
+                        <label for="originInput" class="form-label">מוצא</label>
+                        <div class="dropdown-container">
+                            <input type="text" class="form-control dropdown-input" id="originInput" placeholder="Tel Aviv-Yafo (TLV) - Israel" value="Tel Aviv-Yafo (TLV) - Israel">
+                            <div id="originDropdown" class="dropdown-menu"></div>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="destination" class="form-label">יעד</label>
-                        <input type="text" class="form-control" id="destination" placeholder="מדינה, עיר או נמל תעופה">
+                        <label for="destinationInput" class="form-label">יעד</label>
+                        <div class="dropdown-container">
+                            <input type="text" class="form-control dropdown-input" id="destinationInput" placeholder="בחר יעד">
+                            <div id="destinationDropdown" class="dropdown-menu"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -61,19 +68,156 @@
     </div>
 </main>
 
-<scripts>
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('showPlacesCard').addEventListener('change', function() {
-                document.getElementById('placesCard').style.display = this.checked ? 'block' : 'none';
-            });
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
 
-            document.getElementById('searchForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log('Search form submitted');
-            });
+    // Function to get cookie value by name
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Get JWT token from cookies
+    const jwtToken = getCookie('jwtToken');
+    console.log('JWT Token:', jwtToken);
+
+    // Check if airport data is already cached in localStorage
+    const cachedAirportsCities = localStorage.getItem('airportsCities');
+    console.log('Checking for cached airport data:', cachedAirportsCities);
+
+    if (cachedAirportsCities) {
+        console.log('Using cached airport data');
+        populateDropdowns(JSON.parse(cachedAirportsCities));
+    } else {
+        console.log('No cached data, fetching from server...');
+        fetch('/cheap-trip/combined-city-airport-data', {
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+        .then(response => {
+            console.log('Received response:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Fetched airport data:', data);
+            // Ensure data is an array
+            const airportsCities = Array.isArray(data) ? data : [data];
+            console.log('Using airport data:', airportsCities);
+
+            // Cache the data in localStorage
+            localStorage.setItem('airportsCities', JSON.stringify(airportsCities));
+            console.log('Airport data cached in localStorage');
+
+            // Populate the dropdowns
+            populateDropdowns(airportsCities);
+        })
+        .catch(error => console.error('Error fetching airport data:', error));
+    }
+
+    // Function to populate dropdowns
+    function populateDropdowns(data) {
+        const originDropdown = document.getElementById('originDropdown');
+        const destinationDropdown = document.getElementById('destinationDropdown');
+
+        originDropdown.innerHTML = '';
+        destinationDropdown.innerHTML = '';
+
+        data.forEach(item => {
+            const option = document.createElement('a');
+            option.classList.add('dropdown-item');
+            option.href = '#';
+            option.textContent = `${item.city.name} (${item.airport.code}) - ${item.country.name}`;
+            option.dataset.value = JSON.stringify(item);
+
+            const clonedOption = option.cloneNode(true);
+
+            originDropdown.appendChild(clonedOption);
+            destinationDropdown.appendChild(option);
         });
-    </script>
-</scripts>
+
+        // Add click event listeners to all dropdown items
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', handleDropdownItemClick);
+        });
+    }
+
+    // Function to handle dropdown item click
+    function handleDropdownItemClick(e) {
+        e.preventDefault();
+        const dropdownContainer = e.target.closest('.dropdown-container');
+        const input = dropdownContainer.querySelector('.dropdown-input');
+        const dropdown = dropdownContainer.querySelector('.dropdown-menu');
+
+        input.value = e.target.textContent;
+        input.dataset.selected = e.target.dataset.value;
+        dropdown.style.display = 'none';
+
+        console.log(`Selected: ${input.value}`);
+        console.log(`Selected data: ${input.dataset.selected}`);
+    }
+
+    // Function to filter dropdown based on input value
+    function filterDropdown(input, dropdown) {
+        const filter = input.value.toUpperCase();
+        const items = dropdown.getElementsByTagName('a');
+        let hasVisibleItems = false;
+        for (let i = 0; i < items.length; i++) {
+            const txtValue = items[i].textContent || items[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                items[i].style.display = "";
+                hasVisibleItems = true;
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+        dropdown.style.display = hasVisibleItems ? 'block' : 'none';
+    }
+
+    // Add event listeners for input fields
+    document.getElementById('originInput').addEventListener('input', function() {
+        filterDropdown(this, document.getElementById('originDropdown'));
+    });
+
+    document.getElementById('destinationInput').addEventListener('input', function() {
+        filterDropdown(this, document.getElementById('destinationDropdown'));
+    });
+
+    // Add focus event listeners to show dropdown when input is focused
+    document.getElementById('originInput').addEventListener('focus', function() {
+        document.getElementById('originDropdown').style.display = 'block';
+    });
+
+    document.getElementById('destinationInput').addEventListener('focus', function() {
+        document.getElementById('destinationDropdown').style.display = 'block';
+    });
+
+    // Toggle the advanced options card
+    document.getElementById('showPlacesCard').addEventListener('change', function() {
+        console.log('Advanced options toggled. Checked:', this.checked);
+        document.getElementById('placesCard').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // Handle form submission
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const originData = JSON.parse(document.getElementById('originInput').dataset.selected || '{}');
+        const destinationData = JSON.parse(document.getElementById('destinationInput').dataset.selected || '{}');
+        console.log('Search form submitted');
+        console.log('Form data - Origin:', originData, 'Destination:', destinationData, 'Depart Date:', document.getElementById('departDate').value, 'Return Date:', document.getElementById('returnDate').value);
+    });
+
+    // Close dropdown if click outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.matches('.dropdown-input') && !event.target.matches('.dropdown-item')) {
+            const dropdowns = document.querySelectorAll('.dropdown-menu');
+            dropdowns.forEach(dropdown => dropdown.style.display = 'none');
+        }
+    });
+});
+</script>
 </body>
 </html>

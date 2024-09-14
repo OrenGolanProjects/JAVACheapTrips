@@ -74,7 +74,7 @@ public class CityService {
         this.cityEndpoint = dotenv.get("city_ENDPOINT");
     }
 
-    private String getCitiesData() throws IOException {
+    public String getCitiesData() throws IOException {
         logger.info("CityService>>  getCitiesList: Start method.");
         logger.info("CityService>>  getCitiesList: ENDPOINT URL: "+cityEndpoint);
         return this.api.buildAndExecuteRequest(cityEndpoint,null);

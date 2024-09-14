@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Logger;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 /**
  * The {@code CheapTripController} class handles the RESTful API endpoints related to user and travel services management.
@@ -107,8 +111,6 @@ public class CheapTripController {
             throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
         }
 
-
-
         UserInfo user = this.retrieveUserInfoByToken(request);
         return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, depart_date, return_date,user,true);
     }
@@ -133,6 +135,33 @@ public class CheapTripController {
             throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
         }
         return this.cheapTripsService.searchCity(cityName);
+    }
+
+    @RequestMapping(value="/combined-city-airport-data", method = RequestMethod.GET)
+    @ApiOperation(
+            value = "Get Combined City and Airport Data",
+            notes = "Retrieves a combined list of airports and their corresponding city data."
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Successfully retrieved combined city and airport data"),
+            @ApiResponse(code = 429, message = "Rate limit exceeded"),
+            @ApiResponse(code = 500, message = "Internal server error")
+    })
+    public ResponseEntity<List<JsonNode>> getCombinedCityAirportData(HttpServletRequest request) {
+        logger.info("CheapTripController>> getCombinedCityAirportData: Start method");
+
+        // Rate limiting check
+        if (!rateLimitBucket.tryConsume(1)) {
+            throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
+        }
+
+        try {
+            List<JsonNode> combinedData = cheapTripsService.getCombinedCityAirportData();
+            return ResponseEntity.ok(combinedData);
+        } catch (IOException e) {
+            logger.severe("Error occurred while fetching combined city and airport data: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     private UserInfo retrieveUserInfoByToken(HttpServletRequest request) throws AuthenticationException {

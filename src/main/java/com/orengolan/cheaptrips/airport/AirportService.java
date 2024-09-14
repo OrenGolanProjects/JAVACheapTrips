@@ -63,7 +63,7 @@ public class AirportService {
 
     }
 
-    private String getAirports() throws IOException {
+    public String getAirports() throws IOException {
         logger.info("AirportService>>  getAirports: Start method");
 
         return this.api.buildAndExecuteRequest(this.airportEndpoint,null);
