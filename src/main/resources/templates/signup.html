@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(title=~{::title}, content=~{::main}, scripts=~{::scripts})}">
+<head>
+    <title th:fragment="title">CheapTrips - משתמש חדש</title>
+</head>
+<body>
+<main th:fragment="main">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-center">Sign Up</h2>
+                        <form id="signupForm" method="POST">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email"
+                                       pattern="^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}$" required>
+                                <div id="emailHelp" class="form-text text-danger" style="display: none;">
+                                    Please enter a valid email address in the format XXX@XXX.XXX.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password"
+                                       pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\S+$).{8,}$" required>
+                                <div id="passwordHelp" class="form-text text-danger" style="display: none;">
+                                    Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, and one number. No spaces are allowed.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="userName" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="userName" name="userName" placeholder="Username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="surName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="surName" name="surName" placeholder="Last Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone"
+                                       pattern="^\d{3}-\d{7}$" required>
+                                <div id="phoneHelp" class="form-text text-danger" style="display: none;">
+                                    Phone number must be in the format XXX-XXXXXXX, where X is a digit.
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+                        </form>
+                        <p id="errorMessage" class="text-danger mt-3"></p>
+                        <div class="login-prompt mt-3">
+                            Already signed up? <a href="/login" class="btn btn-link">Log In</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script th:fragment="scripts">
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('signupForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const phoneInput = document.getElementById('phone');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const signupData = {
+                jwtRequest: {
+                    email: emailInput.value,
+                    password: passwordInput.value
+                },
+                userInfoRequest: {
+                    userName: document.getElementById('userName').value,
+                    firstName: document.getElementById('firstName').value,
+                    surName: document.getElementById('surName').value,
+                    phone: phoneInput.value
+                }
+            };
+
+            fetch('/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(signupData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Signup failed: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.token) {
+                    document.cookie = `jwtToken=${data.token}; path=/; max-age=3600; SameSite=Strict; Secure`;
+                    window.location.href = '/login';
+                } else {
+                    throw new Error('Token not received');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 'An error occurred during signup. Please try again.';
+            });
+        });
+
+        function validateField(input, helpId) {
+            const helpElement = document.getElementById(helpId);
+            const pattern = new RegExp(input.pattern);
+
+            input.addEventListener('input', function () {
+                if (!pattern.test(input.value)) {
+                    helpElement.style.display = 'block';
+                } else {
+                    helpElement.style.display = 'none';
+                }
+            });
+        }
+
+        validateField(emailInput, 'emailHelp');
+        validateField(passwordInput, 'passwordHelp');
+        validateField(phoneInput, 'phoneHelp');
+    });
+</script>
+
+</body>
+</html>

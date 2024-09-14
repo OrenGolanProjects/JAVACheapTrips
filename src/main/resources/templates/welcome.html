@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::scripts})}">
+<head>
+    <title>CheapTrips - חיפוש טיסות</title>
+</head>
+<body>
+<main>
+    <h2 class="text-center mb-4">מיליוני טיסות זולות. חיפוש אחד פשוט.</h2>
+    <div class="card">
+        <div class="card-body">
+            <form id="searchForm">
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="origin" class="form-label">מוצא</label>
+                        <input type="text" class="form-control" id="origin" placeholder="מדינה, עיר או נמל תעופה" value="נמל התעופה הבין-לאומי בן גוריון (TLV)">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="destination" class="form-label">יעד</label>
+                        <input type="text" class="form-control" id="destination" placeholder="מדינה, עיר או נמל תעופה">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="departDate" class="form-label">יציאה</label>
+                        <input type="date" class="form-control" id="departDate">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="returnDate" class="form-label">חזרה</label>
+                        <input type="date" class="form-control" id="returnDate">
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="showPlacesCard">
+                    <label class="form-check-label" for="showPlacesCard">הצג אפשרויות מתקדמות</label>
+                </div>
+
+                <div id="placesCard" class="card mb-3" style="display: none;">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="radius" class="form-label">רדיוס (ק"מ)</label>
+                                <input type="range" class="form-range" id="radius" min="10" max="50" step="1" value="10">
+                                <div class="d-flex justify-content-between">
+                                    <span>10 ק"מ</span>
+                                    <span>50 ק"מ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="places" class="form-label">מספר מקומות</label>
+                                <input type="number" class="form-control" id="places" min="1" max="10" value="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">חיפוש</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<scripts>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('showPlacesCard').addEventListener('change', function() {
+                document.getElementById('placesCard').style.display = this.checked ? 'block' : 'none';
+            });
+
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Search form submitted');
+            });
+        });
+    </script>
+</scripts>
+</body>
+</html>
