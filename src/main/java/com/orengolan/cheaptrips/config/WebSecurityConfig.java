@@ -114,7 +114,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf()
-                .ignoringAntMatchers("/authenticate", "/api/**","/user")  // Disable CSRF for API and authentication
+                .ignoringAntMatchers("/authenticate", "/api/**","/user","/styles")  // Disable CSRF for API and authentication
                 .and()
                 .authorizeRequests()
                 .antMatchers(
