@@ -89,6 +89,4 @@ public class GlobalExceptionHandler extends Exception {
         }
         System.out.println("\u001B[31mError Message: " + e.getMessage() + "\u001B[0m"); // Reset color
     }
-
-
 }

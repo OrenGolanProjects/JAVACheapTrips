@@ -112,28 +112,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-
-        // We don't need CSRF for this example
-        // don't authenticate this particular request
-        httpSecurity.csrf().disable().authorizeRequests()
-        .antMatchers(
-                "/authenticate", "/user", "/actuator/**",
-                "/swagger-ui.html",
-                "/api/swagger-ui.html",
-                "/v2/api-docs",
-                "/configuration/ui",
-                "/swagger-resources/**",
-                "/configuration/security",
-                "/webjars/**",
-                "/"
-        ).permitAll()
-        .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-        .antMatchers("/api/**").denyAll()
-
-        // all other requests need to be authenticated
-        // make sure we use stateless session; session won't be used to
-        // store user's state.
-        .anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+        httpSecurity
+                .csrf()
+                .ignoringAntMatchers("/authenticate", "/api/**","/user")  // Disable CSRF for API and authentication
+                .and()
+                .authorizeRequests()
+                .antMatchers(
+                        "/", "/login", "/signup", "/welcome",
+                        "/style/**", "/js/**", "/images/**", "/css/**", "/fonts/**",
+                        "/fragments/**", "/footer", "/header", "/loadingOverlay", "/modal",
+                        "/base", "/index",
+                        "/pages/**",
+                        "/actuator/**",
+                        "/swagger-ui.html",
+                        "/api/swagger-ui.html",
+                        "/v2/api-docs",
+                        "/configuration/ui",
+                        "/swagger-resources/**",
+                        "/configuration/security",
+                        "/webjars/**"
+                ).permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

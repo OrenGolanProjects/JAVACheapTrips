@@ -68,13 +68,34 @@ public class CheapTripsApplication {
 		System.out.println("Access the Swagger UI at: " + baseUrl + "swagger-ui.html");
 	}
 
+
 	@Controller
-	@ApiIgnore
-	static class RedirectController {
+	static class MainController {
 		@GetMapping({"/"})
-		public RedirectView redirectToSwagger() {
-			// Assuming Swagger UI is available at /swagger-ui.html
-			return new RedirectView("swagger-ui.html");
+		public String home() {
+			return "welcome";
 		}
+
+		@GetMapping("/signup")
+		public String signup() {
+			return "signup";
+		}
+
+		@GetMapping("/login")
+		public String login() {
+			return "login";
+		}
+
+		@GetMapping("/welcome")
+		public String welcome() {
+			return "welcome";
+		}
+
+		@GetMapping("/swagger")
+		public String swagger() {
+			return "redirect:/swagger-ui.html";
+		}
+
 	}
+
 }

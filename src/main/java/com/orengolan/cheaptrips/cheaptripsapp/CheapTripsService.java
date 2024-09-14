@@ -123,6 +123,9 @@ public class CheapTripsService {
         return cheapTripsResponse;
     }
 
+
+
+
     public List<City> searchCity(String cityName){
         return this.cityService.fetchSpecificCityByName(cityName.toLowerCase());
     }
