@@ -82,81 +82,87 @@
     <!-- JWT Check, Logout, and Modal Handling -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Function to get a cookie by name
-            function getCookie(name) {
-                let cookieArr = document.cookie.split(";");
-                for (let i = 0; i < cookieArr.length; i++) {
-                    let cookiePair = cookieArr[i].split("=");
-                    if (name == cookiePair[0].trim()) {
-                        return decodeURIComponent(cookiePair[1]);
-                    }
+        // Function to get a cookie by name
+        function getCookie(name) {
+            let cookieArr = document.cookie.split(";");
+            for (let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split("=");
+                if (name == cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
                 }
-                return null;
             }
+            return null;
+        }
 
-            // Function to delete a cookie by name
-            function deleteCookie(name) {
-                document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            }
+        // Function to delete a cookie by name
+        function deleteCookie(name) {
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        }
 
-            // Function to show the Bootstrap modal
-            function showModal() {
-                var modal = new bootstrap.Modal(document.getElementById('warningModal'), {
-                    backdrop: 'static',  // Prevent closing by clicking outside
-                    keyboard: false      // Disable closing with escape key
-                });
-                modal.show();
-            }
+        // Function to clear JWT token from local storage
+        function clearLocalStorage() {
+            localStorage.removeItem("jwtToken");
+        }
 
-            // Check if JWT token exists
-            const jwtToken = getCookie("jwtToken");
-            const currentPath = window.location.pathname;
-
-            // Show logout button and hide login button if token exists
-            if (jwtToken) {
-                document.getElementById('loginButton').classList.add('d-none');
-                document.getElementById('logoutButton').classList.remove('d-none');
-            }
-
-            // If no token and not on login/signup, show modal
-            if (!jwtToken && currentPath !== '/signup' && currentPath !== '/login') {
-                showModal();
-            }
-
-            // Redirect to signup or login when modal buttons are clicked
-            document.getElementById('signupRedirect').addEventListener('click', function () {
-                window.location.href = "/signup";
+        // Function to show the Bootstrap modal
+        function showModal() {
+            var modal = new bootstrap.Modal(document.getElementById('warningModal'), {
+                backdrop: 'static',  // Prevent closing by clicking outside
+                keyboard: false      // Disable closing with escape key
             });
-            document.getElementById('loginRedirect').addEventListener('click', function () {
-                window.location.href = "/login";
-            });
+            modal.show();
+        }
 
-            // Handle logout button click
-            document.getElementById('logoutButton').addEventListener('click', function () {
-                deleteCookie("jwtToken");
-                window.location.reload();
-            });
+        // Check if JWT token exists
+        const jwtToken = getCookie("jwtToken") || localStorage.getItem("jwtToken");
+        const currentPath = window.location.pathname;
 
-            // Show loading overlay for research actions
-            var links = document.querySelectorAll('a[href*="/research"]');
-            var buttons = document.querySelectorAll('form[action*="/research"]');
+        // Show logout button and hide login button if token exists
+        if (jwtToken) {
+            document.getElementById('loginButton').classList.add('d-none');
+            document.getElementById('logoutButton').classList.remove('d-none');
+        }
 
-            function showLoadingOverlay() {
-                document.getElementById('loadingOverlay').style.display = 'flex';
-            }
+        // If no token and not on login/signup, show modal
+        if (!jwtToken && currentPath !== '/signup' && currentPath !== '/login') {
+            showModal();
+        }
 
-            links.forEach(function (link) {
-                link.addEventListener('click', function () {
-                    showLoadingOverlay();
-                });
-            });
+        // Redirect to signup or login when modal buttons are clicked
+        document.getElementById('signupRedirect').addEventListener('click', function () {
+            window.location.href = "/signup";
+        });
+        document.getElementById('loginRedirect').addEventListener('click', function () {
+            window.location.href = "/login";
+        });
 
-            buttons.forEach(function (button) {
-                button.addEventListener('submit', function () {
-                    showLoadingOverlay();
-                });
+        // Handle logout button click
+        document.getElementById('logoutButton').addEventListener('click', function () {
+            deleteCookie("jwtToken");
+            clearLocalStorage();  // Clear the token from local storage
+            window.location.reload();
+        });
+
+        // Show loading overlay for research actions
+        var links = document.querySelectorAll('a[href*="/research"]');
+        var buttons = document.querySelectorAll('form[action*="/research"]');
+
+        function showLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        links.forEach(function (link) {
+            link.addEventListener('click', function () {
+                showLoadingOverlay();
             });
         });
+
+        buttons.forEach(function (button) {
+            button.addEventListener('submit', function () {
+                showLoadingOverlay();
+            });
+        });
+    });
     </script>
 
     <!-- Page-specific scripts -->

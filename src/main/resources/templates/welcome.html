@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::script})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::script})}" lang="en">
 
 <head>
     <title>CheapTrips - חיפוש טיסות</title>
 </head>
 <body>
+
 <main>
     <h2 class="text-center mb-4 right_to_left">גלה את הטיסות הזולות, חדשות מקומיות, ומקומות תיירות לחופשה שלך – פשוט וקל</h2>
     <div class="card">
@@ -70,18 +71,24 @@
 
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
+    // Check if the JWT token exists in localStorage
+    const jwtToken = localStorage.getItem('jwtToken');
 
-    // Function to get cookie value by name
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
+    if (!jwtToken) {
+        const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
+        warningModal.show();
     }
 
-    // Get JWT token from cookies
-    const jwtToken = getCookie('jwtToken');
-    console.log('JWT Token:', jwtToken);
+    // Add event listeners for the Login and Sign Up buttons
+    document.getElementById('loginRedirect')?.addEventListener('click', function() {
+        window.location.href = '/login'; // Adjust the path for your login page
+    });
+
+    document.getElementById('signupRedirect')?.addEventListener('click', function() {
+        window.location.href = '/signup'; // Adjust the path for your sign-up page
+    });
+
+    console.log('DOM fully loaded and parsed');
 
     // Check if airport data is already cached in localStorage
     const cachedAirportsCities = localStorage.getItem('airportsCities');
@@ -94,8 +101,7 @@
         console.log('No cached data, fetching from server...');
         fetch('/cheap-trip/combined-city-airport-data', {
             headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${jwtToken}`
+                'Accept': 'application/json'
             }
         })
         .then(response => {
@@ -122,6 +128,11 @@
     function populateDropdowns(data) {
         const originDropdown = document.getElementById('originDropdown');
         const destinationDropdown = document.getElementById('destinationDropdown');
+
+        if (!originDropdown || !destinationDropdown) {
+            console.error('Dropdown elements not found');
+            return;
+        }
 
         originDropdown.innerHTML = '';
         destinationDropdown.innerHTML = '';
@@ -178,37 +189,53 @@
     }
 
     // Add event listeners for input fields
-    document.getElementById('originInput').addEventListener('input', function() {
-        filterDropdown(this, document.getElementById('originDropdown'));
-    });
+    const originInput = document.getElementById('originInput');
+    const destinationInput = document.getElementById('destinationInput');
+    const originDropdown = document.getElementById('originDropdown');
+    const destinationDropdown = document.getElementById('destinationDropdown');
 
-    document.getElementById('destinationInput').addEventListener('input', function() {
-        filterDropdown(this, document.getElementById('destinationDropdown'));
-    });
+    if (originInput && originDropdown) {
+        originInput.addEventListener('input', function() {
+            filterDropdown(this, originDropdown);
+        });
+        originInput.addEventListener('focus', function() {
+            originDropdown.style.display = 'block';
+        });
+    }
 
-    // Add focus event listeners to show dropdown when input is focused
-    document.getElementById('originInput').addEventListener('focus', function() {
-        document.getElementById('originDropdown').style.display = 'block';
-    });
-
-    document.getElementById('destinationInput').addEventListener('focus', function() {
-        document.getElementById('destinationDropdown').style.display = 'block';
-    });
+    if (destinationInput && destinationDropdown) {
+        destinationInput.addEventListener('input', function() {
+            filterDropdown(this, destinationDropdown);
+        });
+        destinationInput.addEventListener('focus', function() {
+            destinationDropdown.style.display = 'block';
+        });
+    }
 
     // Toggle the advanced options card
-    document.getElementById('showPlacesCard').addEventListener('change', function() {
-        console.log('Advanced options toggled. Checked:', this.checked);
-        document.getElementById('placesCard').style.display = this.checked ? 'block' : 'none';
-    });
+    const showPlacesCard = document.getElementById('showPlacesCard');
+    const placesCard = document.getElementById('placesCard');
+    if (showPlacesCard && placesCard) {
+        showPlacesCard.addEventListener('change', function() {
+            console.log('Advanced options toggled. Checked:', this.checked);
+            placesCard.style.display = this.checked ? 'block' : 'none';
+        });
+    }
 
     // Handle form submission
-    document.getElementById('searchForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const originData = JSON.parse(document.getElementById('originInput').dataset.selected || '{}');
-        const destinationData = JSON.parse(document.getElementById('destinationInput').dataset.selected || '{}');
-        console.log('Search form submitted');
-        console.log('Form data - Origin:', originData, 'Destination:', destinationData, 'Depart Date:', document.getElementById('departDate').value, 'Return Date:', document.getElementById('returnDate').value);
-    });
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const originData = JSON.parse(originInput.dataset.selected || '{}');
+            const destinationData = JSON.parse(destinationInput.dataset.selected || '{}');
+            const departDate = document.getElementById('departDate')?.value;
+            const returnDate = document.getElementById('returnDate')?.value;
+            console.log('Search form submitted');
+            console.log('Form data - Origin:', originData, 'Destination:', destinationData, 'Depart Date:', departDate, 'Return Date:', returnDate);
+            // Here you would typically send this data to your server or perform further actions
+        });
+    }
 
     // Close dropdown if click outside
     document.addEventListener('click', function(event) {

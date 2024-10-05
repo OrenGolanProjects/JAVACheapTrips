@@ -50,6 +50,10 @@
             if (data.token) {
                 // Store the token in a cookie
                 document.cookie = `jwtToken=${data.token}; path=/; max-age=3600; SameSite=Strict; Secure`;
+
+                // Store the token in localStorage (new addition)
+                localStorage.setItem('jwtToken', data.token);
+
                 // Redirect to the welcome page
                 window.location.href = '/welcome';
             } else {
