@@ -93,6 +93,11 @@ public class CheapTripsApplication {
 			return "welcome";
 		}
 
+		@GetMapping("/trip-results")
+		public String tripResults() {
+			return "trip-results";
+		}
+
 		@GetMapping("/swagger")
 		public String swagger() {
 			return "redirect:/swagger-ui.html";

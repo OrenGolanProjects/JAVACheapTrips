@@ -33,13 +33,13 @@ import java.util.logging.Logger;
  * It coordinates interactions between various components such as user information, flight details, news updates,
  * OpenTripMap data, and city information. This service handles the logic for generating monthly and date-specific
  * cheap trip responses, retrieving user information, and saving user trip history.
- *
+
  * Key Features:
  * - Generates comprehensive trip responses combining flight details, news updates, and OpenTripMap data.
  * - Manages user information, including fetching, updating, and saving user trip history.
  * - Coordinates interactions with external services like FlightService, NewsService, OpenTripMapService, and CityService.
  * - Supports searching for city information based on the city name.
- *
+
  * Example Usage:
  * CheapTripsService cheapTripsService = new CheapTripsService(userInfoService, flightService, newsService, openTripMapService, cityService);
  * UserInfo userInfo = cheapTripsService.retrieveUserByIdentified("user@example.com");
@@ -58,8 +58,6 @@ public class CheapTripsService {
     private final AirportService airportService;
     private final ObjectMapper objectMapper;
     private final CountryService countryService;
-
-
 
 
     public CheapTripsService(UserInfoService userInfoService, FlightService flightService, NewsService newsService, OpenTripMapService openTripMapService,CityService cityService,AirportService airportService,ObjectMapper objectMapper,CountryService countryService) {
@@ -139,13 +137,9 @@ public class CheapTripsService {
         return cheapTripsResponse;
     }
 
-
-
-
     public List<City> searchCity(String cityName){
         return this.cityService.fetchSpecificCityByName(cityName.toLowerCase());
     }
-
 
     private void saveUserTrip(UserInfo userInfo, CheapTripsResponse cheapTripsResponse) throws BindException {
         logger.info("CheapTripsService>>  saveUserTrip: Start method.");
@@ -154,7 +148,6 @@ public class CheapTripsService {
         logger.info("CheapTripsService>>  saveUserTrip: End method.");
         this.userInfoService.createNewUser(userInfo);
     }
-
 
     private boolean isDateFormatInvalid(String date) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -177,7 +170,7 @@ public class CheapTripsService {
 
         // Fetch city, airport, and country data
         JsonNode cityList = objectMapper.readTree(cityService.getCitiesData());
-        JsonNode airportList = objectMapper.readTree(airportService.getAirports());
+        JsonNode airportList = objectMapper.readTree(airportService.getAirportsData());
         JsonNode countryList = objectMapper.readTree(countryService.getCountriesData());
 
         // Create maps to store cities and countries by their code for quick lookup
@@ -196,19 +189,19 @@ public class CheapTripsService {
         // Combine city, airport, and country data
         List<JsonNode> combinedData = new ArrayList<>();
         for (JsonNode airport : airportList) {
-            String cityCode = airport.path("city_code").asText();
+            String cityCode = airport.path("airport").get("city_code").asText();
             JsonNode city = cityMap.get(cityCode);
-            String countryCode = airport.path("country_code").asText();
+            String countryCode = airport.path("airport").get("country_code").asText();
             JsonNode country = countryMap.get(countryCode);
 
             if (city != null && country != null) {
                 ObjectNode combinedNode = objectMapper.createObjectNode();
 
                 // Add airport data if it exists
-                if (airport.has("code") && airport.has("name_translations") && airport.get("name_translations").has("en")) {
+                if (airport.has("airport") ) {
                     ObjectNode airportNode = objectMapper.createObjectNode();
-                    airportNode.put("code", airport.path("code").asText());
-                    airportNode.put("name", airport.get("name_translations").path("en").asText());
+                    airportNode.put("code", airport.path("airport").get("code").asText());
+                    airportNode.put("name", airport.path("airport").get("name").asText());
                     combinedNode.set("airport", airportNode);
                 }
 
@@ -229,7 +222,7 @@ public class CheapTripsService {
                 }
 
                 // Only add to combinedData if at least one of the fields was added
-                if (combinedNode.size() > 0) {
+                if (!combinedNode.isEmpty()) {
                     combinedData.add(combinedNode);
                 }
             }

@@ -123,7 +123,6 @@ public class CheapTripController {
             value = "Search Cities",
             notes = "**Search city by name:**\n" +
                     "- CityName: The name of the target city for the search."
-
     )
     @ApiResponses({
             @ApiResponse(code = 200, message = "Successfully retrieved cities"),

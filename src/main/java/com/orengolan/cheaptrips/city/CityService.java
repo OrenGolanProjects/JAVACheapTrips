@@ -21,17 +21,17 @@ import java.util.logging.Logger;
  * CheapTrips backend application. It acts as an intermediary between the CityController (presentation layer)
  * and CityRepository (data access layer), encapsulating functionalities such as data synchronization with an external API,
  * CRUD operations, and city data management.
- *
+
  * The service offers the following main functionalities:
  * - Synchronize City data with an external API.
  * - Delete all existing cities from the database.
  * - Fetch specific cities by name or IATA code.
  * - Create a new city with specified details.
  * - Update details of an existing city.
- *
+
  * The class employs the CityRepository for database interactions, MongoDB for data storage, and the API class
  * for making requests to external endpoints.
- *
+
  * Usage Example:
  * <pre>
  * {@code
@@ -64,6 +64,7 @@ public class CityService {
     private final CityRepository cityRepository;
     private final API api;
     private final String cityEndpoint;
+
 
 
     public CityService(Dotenv dotenv, MongoTemplate mongoTemplate, ObjectMapper objectMapper, CityRepository cityRepository, API api) {
