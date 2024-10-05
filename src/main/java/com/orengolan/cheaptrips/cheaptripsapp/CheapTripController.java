@@ -53,6 +53,8 @@ public class CheapTripController {
         this.rateLimitBucket = rateLimitBucket;
     }
 
+
+
     @RequestMapping(value="/generate-monthly-trip", method = RequestMethod.POST)
     @ApiOperation(
             value = "Generate Monthly Trip",

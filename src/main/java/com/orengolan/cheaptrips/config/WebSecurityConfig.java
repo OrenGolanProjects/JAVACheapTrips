@@ -114,7 +114,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf()
-                .ignoringAntMatchers("/authenticate", "/api/**","/user","/styles")  // Disable CSRF for API and authentication
+                .ignoringAntMatchers("/authenticate", "/user","/styles","/cheap-trip/**","/app/**")  // Disable CSRF for API and authentication
                 .and()
                 .authorizeRequests()
                 .antMatchers(
@@ -133,7 +133,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/webjars/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .exceptionHandling()

@@ -143,13 +143,12 @@ public class test_CheapTripsApp {
     }
 
 
-
     @ParameterizedTest
     @MethodSource("provideMonthlyTripData")
     @Order(3)
     public void positive_test_monthlyTrip(String origin, String destination, String cityName, int radius, int limitPlaces) throws Exception {
         // Mock the behavior of the service
-        when(userInfoService.getUserByIdentifier(userIdentifier)).thenReturn(new UserInfo("John", "Dho", "john@example.com", "1234567890", "JohnD"));
+        when(userInfoService.getUserByIdentifier(userIdentifier)).thenReturn(new UserInfo("John", "Dho", "user@example.com", "123-4567890", "user123"));
 
         // Create a CheapTripsRequest object with necessary data
         CheapTripsRequest request = new CheapTripsRequest(origin, destination, cityName, radius, limitPlaces);
@@ -174,7 +173,7 @@ public class test_CheapTripsApp {
     @Order(4)
     public void positive_test_generateTripByDates(String origin, String destination, String cityName, int radius, int limitPlaces, String departDate, String returnDate) throws Exception {
         // Mock the behavior of the service
-        when(userInfoService.getUserByIdentifier(userIdentifier)).thenReturn(new UserInfo("John", "Dho", "john@example.com", "1234567890", "JohnD"));
+        when(userInfoService.getUserByIdentifier(userIdentifier)).thenReturn(new UserInfo("John", "Dho", "user@example.com", "123-4567890", "user123"));
 
         // Create a CheapTripsRequest object with necessary data
         CheapTripsRequest request = new CheapTripsRequest(origin, destination, cityName, radius, limitPlaces);
