@@ -23,14 +23,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * configuring security settings for the CheapTrips web application. It extends
  * {@link org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter}
  * to provide custom security configurations.
- *
+
  * The class includes settings for JWT-based authentication and authorization using
  * Spring Security. It configures authentication, password encoding, and authorization rules
  * for different API endpoints.
- *
+
  * Security-related beans and filters, such as {@link JwtAuthenticationEntryPoint},
  * {@link JwtRequestFilter}, and {@link PasswordEncoder}, are configured within this class.
- *
+
  * Key Configurations:
  * - {@code configureGlobal}: Configures the global {@code AuthenticationManager} with user
  *   details service and password encoder.
@@ -40,16 +40,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * - {@code configure}: Configures HTTP security settings, including authentication exceptions,
  *   authorization rules, and session management. It also adds a filter to validate JWT tokens
  *   with every request.
- *
+
  * The class allows public access to certain endpoints such as authentication, Actuator endpoints,
  * and Swagger UI documentation. It denies access to other API endpoints by default, ensuring that
  * users must be authenticated to access protected resources.
- *
+
  * Example:
  * - An unauthenticated user can access /authenticate, /user, Actuator endpoints, and Swagger UI.
  * - Access to other API endpoints (/api/**) is denied without proper authentication.
  * - JWT tokens are validated with every request using the {@code JwtRequestFilter}.
- *
+
  * Note: This class is critical for securing the application and controlling access to various parts
  * of the API based on user authentication and authorization.
  */
