@@ -113,206 +113,216 @@
         const jwtToken = localStorage.getItem('jwtToken');
         if (!jwtToken) {
             warningModal.show();
-        }
-
-        // Add event listeners for the Login and Sign Up buttons
-        document.getElementById('loginRedirect')?.addEventListener('click', function() {
-            window.location.href = '/login';
-        });
-
-        document.getElementById('signupRedirect')?.addEventListener('click', function() {
-            window.location.href = '/signup';
-        });
-
-        // Function to load and cache airport data
-        async function loadAirportData() {
-            const cachedData = localStorage.getItem('airportsCities');
-            if (cachedData) {
-                return JSON.parse(cachedData);
-            }
-
-            try {
-                const response = await fetch('/cheap-trip/combined-city-airport-data', {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${jwtToken}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const airportsCities = Array.isArray(data) ? data : [data];
-                localStorage.setItem('airportsCities', JSON.stringify(airportsCities));
-                return airportsCities;
-            } catch (error) {
-                console.error('Error loading airport data:', error);
-                throw error;
-            }
-        }
-
-        // Function to populate dropdowns
-        function populateDropdowns(data) {
-            const dropdowns = {
-                origin: document.getElementById('originDropdown'),
-                destination: document.getElementById('destinationDropdown')
-            };
-
-            Object.values(dropdowns).forEach(dropdown => {
-                if (!dropdown) return;
-
-                dropdown.innerHTML = '';
-                data.forEach(item => {
-                    const option = document.createElement('a');
-                    option.classList.add('dropdown-item');
-                    option.href = '#';
-                    const displayText = `${item.city.name} (${item.city.code}) - Airport (${item.airport.code}) - ${item.country.name}`;
-                    option.textContent = displayText;
-                    option.dataset.value = JSON.stringify(item);
-                    dropdown.appendChild(option.cloneNode(true));
-                });
+            // Add event listeners for the Login and Sign Up buttons
+            document.getElementById('loginRedirect')?.addEventListener('click', function() {
+                window.location.href = '/login';
             });
-
-            // Add click event listeners
-            document.querySelectorAll('.dropdown-item').forEach(item => {
-                item.addEventListener('click', handleDropdownItemClick);
+            document.getElementById('signupRedirect')?.addEventListener('click', function() {
+                window.location.href = '/signup';
             });
+            console.log("No JWT token found, redirecting to login page");
+            return; // Exit early if no token
         }
 
-        // Function to handle dropdown item selection
-        function handleDropdownItemClick(e) {
-            e.preventDefault();
-            const dropdownContainer = e.target.closest('.dropdown-container');
-            const input = dropdownContainer.querySelector('.dropdown-input');
-            const dropdown = dropdownContainer.querySelector('.dropdown-menu');
-
-            input.value = e.target.textContent;
-            const selectedData = JSON.parse(e.target.dataset.value);
-            input.dataset.selected = selectedData.airport.code;
-            dropdown.style.display = 'none';
-        }
-
-        // Function to filter dropdown options
-        function filterDropdown(input, dropdown) {
-            const filter = input.value.toUpperCase();
-            const items = dropdown.getElementsByTagName('a');
-            let hasVisibleItems = false;
-
-            for (let item of items) {
-                const txtValue = item.textContent || item.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    item.style.display = "";
-                    hasVisibleItems = true;
-                } else {
-                    item.style.display = "none";
-                }
-            }
-
-            dropdown.style.display = hasVisibleItems ? 'block' : 'none';
-        }
-
-        // Setup input event listeners
-        const inputs = {
-            origin: document.getElementById('originInput'),
-            destination: document.getElementById('destinationInput')
-        };
-
-        Object.entries(inputs).forEach(([key, input]) => {
-            const dropdown = document.getElementById(`${key}Dropdown`);
-            if (input && dropdown) {
-                input.addEventListener('input', () => filterDropdown(input, dropdown));
-                input.addEventListener('focus', () => dropdown.style.display = 'block');
-            }
-        });
-
-        // Toggle advanced options
-        const showPlacesCard = document.getElementById('showPlacesCard');
-        const placesCard = document.getElementById('placesCard');
-        if (showPlacesCard && placesCard) {
-            showPlacesCard.addEventListener('change', () => {
-                placesCard.style.display = showPlacesCard.checked ? 'block' : 'none';
-            });
-        }
-
-        // Handle form submission
-        const searchForm = document.getElementById('searchForm');
-        if (searchForm) {
-            searchForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-
-                // Basic validation
-                if (!inputs.origin.dataset.selected || !inputs.destination.dataset.selected) {
-                    alert('נא למלא את שדות המוצא והיעד');
-                    return;
+        // Main function to initialize the page
+        function initializePage() {
+            // Function to load and cache airport data
+            async function loadAirportData() {
+                const cachedData = localStorage.getItem('airportsCities');
+                if (cachedData) {
+                    return JSON.parse(cachedData);
                 }
 
                 try {
-                    loadingModal.show();
-
-                    const formData = new FormData(searchForm);
-                    const cheapTripsRequest = Object.fromEntries(formData.entries());
-
-                    // Override the IATA codes with the selected values
-                    cheapTripsRequest.origin_cityIATACode = inputs.origin.value          .split('(')[1]?.split(')')[0]?.trim();
-                    cheapTripsRequest.destination_cityIATACode = inputs.destination.value.split('(')[1]?.split(')')[0]?.trim();
-
-                    // Add city names
-                    cheapTripsRequest.origin_cityName       = inputs.origin.value.split('(')[0].trim();
-                    cheapTripsRequest.destination_cityName  = inputs.destination.value.split('(')[0].trim();
-
-                    // Convert radius to meters
-                    cheapTripsRequest.radius = parseInt(cheapTripsRequest.radius) * 1000;
-
-                    // Explicitly add date fields to the request
-                    cheapTripsRequest.depart_date = document.getElementById('departDate').value;
-                    cheapTripsRequest.return_date = document.getElementById('returnDate').value;
-
-                    // Determine the endpoint based on the presence of both dates
-                    const endpoint = cheapTripsRequest.depart_date && cheapTripsRequest.return_date
-                        ? '/cheap-trip/generate-trip-by-dates'
-                        : '/cheap-trip/generate-monthly-trip';
-
-                    console.log('city origin:', cheapTripsRequest.origin_cityName);
-                    console.log('city destination:', cheapTripsRequest.destination_cityName);
-                    console.log('Sending request to:', endpoint);
-                    console.log('Request payload:', cheapTripsRequest);
-
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
+                    const response = await fetch('/cheap-trip/combined-city-airport-data', {
                         headers: {
-                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
                             'Authorization': `Bearer ${jwtToken}`
-                        },
-                        body: JSON.stringify(cheapTripsRequest)
+                        }
                     });
 
                     if (!response.ok) {
-                        const errorData = await response.json().catch(() => null);
-                        throw new Error(errorData?.message || `שגיאת שרת: ${response.status}`);
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    console.log('Trip generated:', data);
-                    localStorage.setItem('tripData', JSON.stringify(data));
-
-                    // Redirect to results page
-                    window.location.href = '/trip-results';
-
+                    const airportsCities = Array.isArray(data) ? data : [data];
+                    localStorage.setItem('airportsCities', JSON.stringify(airportsCities));
+                    return airportsCities;
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert(`שגיאה בחיפוש: ${error.message}`);
-                } finally {
-                    loadingModal.hide();
+                    console.error('Error loading airport data:', error);
+                    throw error;
+                }
+            }
+
+            // Function to populate dropdowns
+            function populateDropdowns(data) {
+                const dropdowns = {
+                    origin: document.getElementById('originDropdown'),
+                    destination: document.getElementById('destinationDropdown')
+                };
+
+                Object.values(dropdowns).forEach(dropdown => {
+                    if (!dropdown) return;
+
+                    dropdown.innerHTML = '';
+                    data.forEach(item => {
+                        const option = document.createElement('a');
+                        option.classList.add('dropdown-item');
+                        option.href = '#';
+                        const displayText = `${item.city.name} (${item.city.code}) - Airport (${item.airport.code}) - ${item.country.name}`;
+                        option.textContent = displayText;
+                        option.dataset.value = JSON.stringify(item);
+                        dropdown.appendChild(option.cloneNode(true));
+                    });
+                });
+
+                // Add click event listeners
+                document.querySelectorAll('.dropdown-item').forEach(item => {
+                    item.addEventListener('click', handleDropdownItemClick);
+                });
+            }
+
+            // Function to handle dropdown item selection
+            function handleDropdownItemClick(e) {
+                e.preventDefault();
+                const dropdownContainer = e.target.closest('.dropdown-container');
+                const input = dropdownContainer.querySelector('.dropdown-input');
+                const dropdown = dropdownContainer.querySelector('.dropdown-menu');
+
+                input.value = e.target.textContent;
+                const selectedData = JSON.parse(e.target.dataset.value);
+                input.dataset.selected = selectedData.airport.code;
+                dropdown.style.display = 'none';
+            }
+
+            // Function to filter dropdown options
+            function filterDropdown(input, dropdown) {
+                const filter = input.value.toUpperCase();
+                const items = dropdown.getElementsByTagName('a');
+                let hasVisibleItems = false;
+
+                for (let item of items) {
+                    const txtValue = item.textContent || item.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        item.style.display = "";
+                        hasVisibleItems = true;
+                    } else {
+                        item.style.display = "none";
+                    }
+                }
+
+                dropdown.style.display = hasVisibleItems ? 'block' : 'none';
+            }
+
+            // Setup input event listeners
+            const inputs = {
+                origin: document.getElementById('originInput'),
+                destination: document.getElementById('destinationInput')
+            };
+
+            Object.entries(inputs).forEach(([key, input]) => {
+                const dropdown = document.getElementById(`${key}Dropdown`);
+                if (input && dropdown) {
+                    input.addEventListener('input', () => filterDropdown(input, dropdown));
+                    input.addEventListener('focus', () => dropdown.style.display = 'block');
                 }
             });
+
+            // Toggle advanced options
+            const showPlacesCard = document.getElementById('showPlacesCard');
+            const placesCard = document.getElementById('placesCard');
+            if (showPlacesCard && placesCard) {
+                showPlacesCard.addEventListener('change', () => {
+                    placesCard.style.display = showPlacesCard.checked ? 'block' : 'none';
+                });
+            }
+
+            // Handle form submission
+            const searchForm = document.getElementById('searchForm');
+            if (searchForm) {
+                searchForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    // Basic validation
+                    if (!inputs.origin.dataset.selected || !inputs.destination.dataset.selected) {
+                        alert('נא למלא את שדות המוצא והיעד');
+                        return;
+                    }
+
+                    try {
+                        loadingModal.show();
+
+                        const formData = new FormData(searchForm);
+                        const cheapTripsRequest = Object.fromEntries(formData.entries());
+
+                        // Override the IATA codes with the selected values
+                        cheapTripsRequest.origin_cityIATACode = inputs.origin.value          .split('(')[1]?.split(')')[0]?.trim();
+                        cheapTripsRequest.destination_cityIATACode = inputs.destination.value.split('(')[1]?.split(')')[0]?.trim();
+
+                        // Add city names
+                        cheapTripsRequest.origin_cityName = inputs.origin.value.split('(')[0].trim();
+                        cheapTripsRequest.destination_cityName = inputs.destination.value.split('(')[0].trim();
+
+                        // Convert radius to meters
+                        cheapTripsRequest.radius = parseInt(cheapTripsRequest.radius) * 1000;
+
+                        // Determine the endpoint and prepare the request
+                        let endpoint = '/cheap-trip/generate-monthly-trip';
+                        let requestOptions = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${jwtToken}`
+                            },
+                            body: JSON.stringify(cheapTripsRequest)
+                        };
+
+                        // If both dates are present, use the generate-trip-by-dates endpoint
+                        if (cheapTripsRequest.depart_date && cheapTripsRequest.return_date) {
+                            endpoint = '/cheap-trip/generate-trip-by-dates';
+                            endpoint += `?depart_date=${cheapTripsRequest.depart_date}&return_date=${cheapTripsRequest.return_date}`;
+                        }
+
+                        console.log('Sending request to:', endpoint);
+                        console.log('Request payload:', cheapTripsRequest);
+
+                        const response = await fetch(endpoint, requestOptions);
+
+                        if (!response.ok) {
+                            if (response.status === 429) {
+                                throw new Error('Rate limit exceeded. Please try again later.');
+                            } else {
+                                const errorData = await response.json().catch(() => null);
+                                throw new Error(errorData?.message || `שגיאת שרת: ${response.status}`);
+                            }
+                        }
+
+                        const data = await response.json();
+                        console.log('Trip generated:', data);
+                        localStorage.setItem('tripData', JSON.stringify(data));
+
+                        // Redirect to results page
+                        window.location.href = '/trip-results';
+
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert(`שגיאה בחיפוש: ${error.message}`);
+                    } finally {
+                        loadingModal.hide();
+                    }
+                });
+            }
+
+
+            // Load initial airport data
+            loadAirportData()
+                .then(populateDropdowns)
+                .catch(error => console.error('Failed to load airport data:', error));
         }
 
-        // Load initial airport data
-        loadAirportData()
-            .then(populateDropdowns)
-            .catch(error => console.error('Failed to load airport data:', error));
+        // Call the main function to initialize the page
+        initializePage();
     });
 </script>
 

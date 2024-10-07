@@ -87,21 +87,21 @@
           const flight = tripData.flight;
           const summary = document.getElementById('tripSummary');
           summary.innerHTML = `
-              <div class="text-center" style="font-size: 1.2rem; direction: rtl;">
+              <div class="text-center" style="font-size: 1.2rem; direction: rtl; text-align: right;">
                   <div class="fw-bold mb-2">
                       טיסה ${flight.destination.city.cityName.toUpperCase()} ⟵ ${flight.origin.city.cityName.toUpperCase()}
                   </div>
-                  <div class="trip-details d-flex flex-column align-items-center">
+                  <div class="trip-details d-flex flex-column align-items-end">
                       ${flight.departure_at ? `
-                          <div class="mb-2 d-flex gap-2 justify-content-center">
-                              <span class="fw-bold">:יציאה</span>
+                          <div class="mb-2 d-flex gap-2 justify-content-end">
                               <span>${formatDate(flight.departure_at)}</span>
+                              <span class="fw-bold">:יציאה</span>
                           </div>
                       ` : ''}
                       ${flight.return_at ? `
-                          <div class="d-flex gap-2 justify-content-center">
-                              <span class="fw-bold">:חזרה</span>
+                          <div class="d-flex gap-2 justify-content-end">
                               <span>${formatDate(flight.return_at)}</span>
+                              <span class="fw-bold">:חזרה</span>
                           </div>
                       ` : ''}
                   </div>

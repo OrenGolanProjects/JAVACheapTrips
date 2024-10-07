@@ -55,7 +55,7 @@ public class CheapTripController {
 
 
 
-    @RequestMapping(value="/generate-monthly-trip", method = RequestMethod.POST)
+    @PostMapping("/generate-monthly-trip")
     @ApiOperation(
             value = "Generate Monthly Trip",
             notes = "**Travel Search Parameters:**\n" +
@@ -69,21 +69,25 @@ public class CheapTripController {
             @ApiResponse(code = 200, message = "Successfully generated monthly trip"),
             @ApiResponse(code = 400, message = "Bad request, check the request parameters"),
             @ApiResponse(code = 401, message = "Unauthorized, authentication failure"),
+            @ApiResponse(code = 429, message = "Rate limit exceeded"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    public CheapTripsResponse generateMonthlyTrip(@Valid @RequestBody CheapTripsRequest cheapTripsRequest, HttpServletRequest request) throws ParseException, IOException, BindException {
-        logger.info("** CheapTripController>>  generateTrip: Start method.");
+    public ResponseEntity<CheapTripsResponse> generateMonthlyTrip(
+            @Valid @RequestBody CheapTripsRequest cheapTripsRequest,
+            HttpServletRequest request) throws BindException, ParseException, IOException {
+        logger.info("CheapTripController>> generateMonthlyTrip: Start method");
 
         // Rate limiting check
         if (!rateLimitBucket.tryConsume(1)) {
             throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
         }
 
-        UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, null, null,user,false);
+        UserInfo user = retrieveUserInfoByToken(request);
+        CheapTripsResponse response = cheapTripsService.generateNewByTrip(cheapTripsRequest, null, null, user, false);
+        return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(value="/generate-trip-by-dates", method = RequestMethod.POST)
+    @PostMapping("/generate-trip-by-dates")
     @ApiOperation(
             value = "Generate Trip by Dates",
             notes = "**Travel Search Parameters:**\n" +
@@ -99,22 +103,28 @@ public class CheapTripController {
             @ApiResponse(code = 200, message = "Successfully generated trip by dates"),
             @ApiResponse(code = 400, message = "Bad request, check the request parameters"),
             @ApiResponse(code = 401, message = "Unauthorized, authentication failure"),
+            @ApiResponse(code = 429, message = "Rate limit exceeded"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    public CheapTripsResponse generateTripByDates(
+    public ResponseEntity<CheapTripsResponse> generateTripByDates(
             @Valid @RequestBody CheapTripsRequest cheapTripsRequest,
-            @RequestParam(defaultValue = "yyyy-MM-dd") String depart_date,
-            @RequestParam(defaultValue = "yyyy-MM-dd") String return_date,
-            HttpServletRequest request) throws ParseException, IOException, BindException {
-        logger.info("** CheapTripController>>  generateTrip: Start method.");
+            @RequestParam String depart_date,
+            @RequestParam String return_date,
+            HttpServletRequest request) throws BindException, ParseException, IOException {
+        logger.info("CheapTripController>> generateTripByDates: Start method");
 
-        // Rate limiting check
         if (!rateLimitBucket.tryConsume(1)) {
             throw new RateLimitExceededException("Rate limit exceeded. Try again later.");
         }
 
-        UserInfo user = this.retrieveUserInfoByToken(request);
-        return this.cheapTripsService.generateNewByTrip(cheapTripsRequest, depart_date, return_date,user,true);
+        if (depart_date == null || return_date == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        UserInfo user = retrieveUserInfoByToken(request);
+        CheapTripsResponse response = cheapTripsService.generateNewByTrip(cheapTripsRequest, depart_date, return_date, user, true);
+        return ResponseEntity.ok(response);
+
     }
 
 
@@ -169,17 +179,14 @@ public class CheapTripController {
 
         String authorizationHeader = request.getHeader("Authorization");
 
-        String email;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            email = authentication.getName();
-
-        } else {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             logger.warning("No valid JWT token found in the request.");
-            throw new AuthenticationException("Invalid JWT token") {
-            };
+            throw new AuthenticationException("Invalid JWT token") {};
         }
-        return this.cheapTripsService.retrieveUserByIdentified(email);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return cheapTripsService.retrieveUserByIdentified(email);
     }
 
 }

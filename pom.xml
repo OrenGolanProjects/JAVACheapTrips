@@ -36,7 +36,7 @@
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.6.1</version>
-		</dependency><!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
+		</dependency>
 
 		<!--	SWAGGER2	-->
 		<dependency>
@@ -104,7 +104,6 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-
 		<!-- json-simple -->
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
@@ -116,7 +115,7 @@
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
-			<version>1.7</version> <!-- or the version you prefer -->
+			<version>1.7</version>
 		</dependency>
 
 		<!-- JWT- jsonwebtoken -->
@@ -145,7 +144,6 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-
 		<!-- java-dotenv-->
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
@@ -168,7 +166,6 @@
 			<version>8.1.0</version>
 		</dependency>
 
-
 		<!-- Junit 5 -->
 		<dependency>
 			<groupId>org.junit.platform</groupId>
@@ -183,7 +180,6 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
-
 		<!-- BCrypt for password encoding -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -197,22 +193,11 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
 		<!-- Jackson CSV -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-csv</artifactId>
 			<version>2.15.1</version>
-		</dependency>
-
-
-		<!-- Import Jackson BOM -->
-		<dependency>
-			<groupId>com.fasterxml.jackson</groupId>
-			<artifactId>jackson-bom</artifactId>
-			<version>2.15.0</version>
-			<type>pom</type>
-			<scope>import</scope>
 		</dependency>
 
 	</dependencies>
