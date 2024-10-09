@@ -33,7 +33,6 @@ import java.util.List;
 public interface CityRepository extends MongoRepository<City, String> {
     City findByCityIATACode(String cityIATACode);
 
-
     @Query("{'cityName': { $regex: ?0, $options: 'i' }}")
     List<City> findByCityName(String cityName);
 }

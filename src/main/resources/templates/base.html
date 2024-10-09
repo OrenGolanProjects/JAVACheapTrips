@@ -143,10 +143,28 @@
 
         // Handle logout button click
         document.getElementById('logoutButton').addEventListener('click', function () {
-            deleteCookie("jwtToken");
-            clearLocalStorage();  // Clear the token from local storage
+            // Function to delete all cookies
+            function deleteAllCookies() {
+                const cookies = document.cookie.split("; ");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookieName = cookies[i].split("=")[0];
+                    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                }
+            }
+
+            // Function to clear local storage
+            function clearLocalStorage() {
+                localStorage.clear();  // Clears all local storage items
+            }
+
+            // Execute cookie deletion and local storage clearing
+            deleteAllCookies();
+            clearLocalStorage();
+
+            // Reload the page to apply changes
             window.location.reload();
         });
+
 
         // Show loading overlay for research actions
         var links = document.querySelectorAll('a[href*="/research"]');

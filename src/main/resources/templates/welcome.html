@@ -35,7 +35,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="originInput" class="form-label">מוצא</label>
                         <div class="dropdown-container">
-                            <input type="text" class="form-control dropdown-input" id="originInput" name="origin_cityIATACode" placeholder="Tel Aviv-Yafo (TLV) - Airport (TLV) - Israel" required>
+                            <input type="text" class="form-control dropdown-input" id="originInput" name="origin_cityIATACode" value="Tel Aviv-Yafo (TLV) - Airport (TLV) - Israel" required>
                             <div id="originDropdown" class="dropdown-menu"></div>
                         </div>
                     </div>
@@ -69,7 +69,10 @@
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3">
                                 <label for="radius" class="form-label">רדיוס (ק"מ)</label>
-                                <input type="range" class="form-range" id="radius" name="radius" min="10" max="50" step="1" value="10">
+                                <div class="d-flex justify-content-between align-items-center" style="position: relative;">
+                                    <span id="radiusValue" style="position: absolute; top: -20px; margin-left: 10px; font-weight: bold;">10 ק"מ</span>
+                                    <input type="range" class="form-range" id="radius" name="radius" min="10" max="50" step="1" value="10">
+                                </div>
                                 <div class="d-flex justify-content-between">
                                     <span>10 ק"מ</span>
                                     <span>50 ק"מ</span>
@@ -109,6 +112,19 @@
         const warningModal = new bootstrap.Modal(document.getElementById('warningModal'));
         const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
 
+        const radiusInput = document.getElementById('radius');
+        const radiusValue = document.getElementById('radiusValue');
+
+        // Update the displayed value whenever the slider is moved
+        radiusInput.addEventListener('input', function() {
+            radiusValue.textContent = radiusInput.value + ' ק"מ';
+
+            // Position the radius value above the range input
+            const percentage = (radiusInput.value - radiusInput.min) / (radiusInput.max - radiusInput.min);
+            const offset = (percentage * radiusInput.offsetWidth) - (radiusValue.offsetWidth / 2);
+            radiusValue.style.left = offset + 'px';
+        });
+
         // Check JWT token
         const jwtToken = localStorage.getItem('jwtToken');
         if (!jwtToken) {
@@ -126,8 +142,10 @@
 
         // Main function to initialize the page
         function initializePage() {
+
             // Function to load and cache airport data
-            async function loadAirportData() {
+            async function loadAirportData(retry = 0) {
+                const maxRetries = 3;
                 const cachedData = localStorage.getItem('airportsCities');
                 if (cachedData) {
                     return JSON.parse(cachedData);
@@ -149,9 +167,18 @@
                     const airportsCities = Array.isArray(data) ? data : [data];
                     localStorage.setItem('airportsCities', JSON.stringify(airportsCities));
                     return airportsCities;
+
                 } catch (error) {
-                    console.error('Error loading airport data:', error);
-                    throw error;
+                    console.error(`Error loading airport data (attempt ${retry + 1}):`, error);
+
+                    if (retry < maxRetries) {
+                        console.log(`Retrying to load airport data... (${retry + 2}/${maxRetries})`);
+                        return loadAirportData(retry + 1);  // Retry by calling the function again
+                    } else {
+                        console.error('Failed to load airport data after 3 attempts.');
+                        alert('שגיאה בטעינת נתוני שדות תעופה. נסה שנית מאוחר יותר.');
+                        throw error;
+                    }
                 }
             }
 
@@ -290,13 +317,22 @@
                         const response = await fetch(endpoint, requestOptions);
 
                         if (!response.ok) {
+                            const errorResponse = await response.text(); // Fetch response text once
+
                             if (response.status === 429) {
                                 throw new Error('Rate limit exceeded. Please try again later.');
+                            } else if (errorResponse.includes("Did not found flight tickets for Flight")) {
+                                console.error('Error Response:', errorResponse); // Log raw response for debugging
+                                throw new Error(`לא נמצאה טיסה עבור היעד: ${cheapTripsRequest.destination_cityName}`);
+                            } else if (response.status === 400) {
+                                console.error('Error Response:', errorResponse); // Log raw response for debugging
+                                throw new Error(`מצאה שגיאה באחד מהשדות: ${errorResponse}`);
                             } else {
-                                const errorData = await response.json().catch(() => null);
-                                throw new Error(errorData?.message || `שגיאת שרת: ${response.status}`);
+                                console.error('Unexpected Error Response:', errorResponse); // Log unexpected error
+                                throw new Error(errorResponse || `שגיאת שרת: ${response.status}`);
                             }
                         }
+
 
                         const data = await response.json();
                         console.log('Trip generated:', data);
@@ -315,7 +351,7 @@
             }
 
 
-            // Load initial airport data
+           // Load initial airport data with retry mechanism
             loadAirportData()
                 .then(populateDropdowns)
                 .catch(error => console.error('Failed to load airport data:', error));
@@ -323,6 +359,23 @@
 
         // Call the main function to initialize the page
         initializePage();
+
+        // Add this function to handle clicks outside the dropdown
+        document.addEventListener('click', function(event) {
+            const originInput = document.getElementById('originInput');
+            const destinationInput = document.getElementById('destinationInput');
+            const originDropdown = document.getElementById('originDropdown');
+            const destinationDropdown = document.getElementById('destinationDropdown');
+
+            // Check if the click was outside both the input and dropdown
+            if (!originInput.contains(event.target) && !originDropdown.contains(event.target)) {
+                originDropdown.style.display = 'none'; // Close origin dropdown
+            }
+
+            if (!destinationInput.contains(event.target) && !destinationDropdown.contains(event.target)) {
+                destinationDropdown.style.display = 'none'; // Close destination dropdown
+            }
+        });
     });
 </script>
 

@@ -201,3 +201,15 @@ button:hover {
     text-align: right;
     font-size: 1.2rem;
 }
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
