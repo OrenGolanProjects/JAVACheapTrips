@@ -11,9 +11,10 @@
     <div class="row mb-4">
       <div class="col">
         <h2 class="text-center mb-3">תוצאות החיפוש שלך</h2>
-        <div id="tripSummary" class="alert alert-info text-center"></div>
+        <div id="tripSummary" class="alert custom-alert text-center"></div>
       </div>
     </div>
+
 
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs mb-4" id="resultTabs" role="tablist">
@@ -62,358 +63,370 @@
 
 
 <script th:inline="javascript">
-  document.addEventListener('DOMContentLoaded', function() {
-        const tripData = JSON.parse(localStorage.getItem('tripData'));
+    document.addEventListener('DOMContentLoaded', function() {
+          const tripData = JSON.parse(localStorage.getItem('tripData'));
 
-        console.log('Loaded tripData:', tripData);
+          console.log('Loaded tripData:', tripData);
 
-        if (!tripData) {
-            console.log('No tripData found, redirecting to home');
-            window.location.href = '/';
-            return;
-        }
-
-        function generateFlightSearchUrl(originIataCode, departDate, destinationIataCode, returnDate) {
-          const baseUrl = "https://www.aviasales.com/search/";
-          const marker = "485630.Zz44a4e72a932e40fbbee4cc3-485630";
-
-          // Check if both departure and return dates are provided
-          if (departDate && returnDate) {
-            return `${baseUrl}${originIataCode}${departDate}${destinationIataCode}${returnDate}1/?marker=${marker}`;
-          } else {
-            // Fallback URL if dates are not provided
-            return `${baseUrl}${originIataCode}${destinationIataCode}1/?marker=${marker}`;
-          }
-        }
-
-        if (tripData && tripData.news && tripData.news.newsList) {
-            const scores = tripData.news.newsList.map(item => item.scoreSentimentAnalyzer);
-
-            if (scores.length > 0) {
-                const averageScore = (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1);
-                console.log('Average sentiment score:', averageScore);
-
-                // Display the average sentiment score
-                const sentimentScoreElement = document.getElementById('sentimentScore');
-                sentimentScoreElement.className = 'text-end mt-2';
-                sentimentScoreElement.dir = 'rtl';
-                sentimentScoreElement.textContent = `דירוג הכתבות בהתבסס על ניתוח הטקסט, 1 - שלילי מאוד עד 5 - חיובי מאוד`;
-
-                // Define the stars element
-                const starsElement = document.getElementById('recommendationStars');
-                starsElement.innerHTML = ''; // Clear existing stars
-
-                // Calculate the number of full, half, and empty stars
-                const fullStars = Math.floor(averageScore);  // Full stars based on the integer part of averageScore
-                const halfStar = averageScore % 1 >= 0.5 ? 1 : 0;  // Half star if the decimal part is 0.5 or greater
-                const emptyStars = 5 - fullStars - halfStar;  // Remaining stars to fill up to 5
-
-                // Helper function to create a star element
-                const createStarElement = (symbol, className) => {
-                    const starSpan = document.createElement('span');
-                    starSpan.innerHTML = symbol;
-                    starSpan.className = className;
-                    return starSpan;
-                };
-
-                // Add full stars
-                [...Array(fullStars)].forEach(() => starsElement.appendChild(createStarElement('?', 'text-warning')));
-
-                // Add half star if applicable
-                if (halfStar) starsElement.appendChild(createStarElement('½', 'text-warning'));
-
-                // Add empty stars
-                [...Array(emptyStars)].forEach(() => starsElement.appendChild(createStarElement('?', 'text-muted')));
-
-                // Add explanation text
-                const explanationElement = document.createElement('p');
-                explanationElement.className = 'text-end mt-2';
-                explanationElement.dir = 'rtl';
-                explanationElement.textContent = `דירוג ${averageScore} מתוך 5 כוכבים`;
-
-                starsElement.parentNode.appendChild(explanationElement);
-
-          } else {
-              console.warn('No sentiment scores found in the news data.');
+          if (!tripData) {
+              console.log('No tripData found, redirecting to home');
+              window.location.href = '/';
+              return;
           }
 
-        } else {
-            console.warn('News data or newsList not found in tripData.');
+          function generateFlightSearchUrl(originIataCode, departDate, destinationIataCode, returnDate) {
+            const baseUrl = "https://www.aviasales.com/search/";
+            const marker = "485630.Zz44a4e72a932e40fbbee4cc3-485630";
+
+            // Check if both departure and return dates are provided
+            if (departDate && returnDate) {
+              return `${baseUrl}${originIataCode}${departDate}${destinationIataCode}${returnDate}1/?marker=${marker}`;
+            } else {
+              // Fallback URL if dates are not provided
+              return `${baseUrl}${originIataCode}${destinationIataCode}1/?marker=${marker}`;
+            }
+          }
+
+          if (tripData && tripData.news && tripData.news.newsList) {
+              const scores = tripData.news.newsList.map(item => item.scoreSentimentAnalyzer);
+
+              if (scores.length > 0) {
+                  const averageScore = (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1);
+                  console.log('Average sentiment score:', averageScore);
+
+                  // Display the average sentiment score
+                  const sentimentScoreElement = document.getElementById('sentimentScore');
+                  sentimentScoreElement.className = 'text-end mt-2';
+                  sentimentScoreElement.dir = 'rtl';
+                  sentimentScoreElement.textContent = `דירוג הכתבות מצביע האם הטקסט של הכתבות שלילי (1) עד חיובי (5)`;
+
+                  // Define the stars element
+                  const starsElement = document.getElementById('recommendationStars');
+                  starsElement.innerHTML = ''; // Clear existing stars
+
+                  // Calculate the number of full, half, and empty stars
+                  const fullStars = Math.floor(averageScore);  // Full stars based on the integer part of averageScore
+                  const halfStar = averageScore % 1 >= 0.2 ? 1 : 0;  // Half star if the decimal part is 0.5 or greater
+                  const emptyStars = 5 - fullStars - halfStar;  // Remaining stars to fill up to 5
+                  console.log('Stars:', fullStars, halfStar, emptyStars);
+
+                  // Helper function to create a star element
+                  const createStarElement = (symbol, className) => {
+                      const starSpan = document.createElement('span');
+                      starSpan.innerHTML = symbol;
+                      starSpan.className = className;
+                      return starSpan;
+                  };
+
+                  // Add full stars
+                  [...Array(fullStars)].forEach(() => starsElement.appendChild(createStarElement('★', 'text-warning')));
+
+                  // Add half star if applicable
+                  if (halfStar) starsElement.appendChild(createStarElement('½', 'text-warning'));
+
+                  // Add empty stars
+                  [...Array(emptyStars)].forEach(() => starsElement.appendChild(createStarElement('☆', 'text-muted')));
+
+                  // Add explanation text
+                  const explanationElement = document.createElement('p');
+                  explanationElement.className = 'text-end mt-2';
+                  explanationElement.dir = 'rtl';
+                  explanationElement.textContent = `דירוג ${averageScore} מתוך 5 כוכבים`;
+
+                  starsElement.parentNode.appendChild(explanationElement);
+
+            } else {
+                console.warn('No sentiment scores found in the news data.');
+            }
+
+          } else {
+              console.warn('News data or newsList not found in tripData.');
+          }
+
+          // Formatters for rendering trip data
+          const formatters = {
+              date: (dateString) => {
+                  const date = new Date(dateString);
+                  return new Intl.DateTimeFormat('he-IL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                  }).format(date);
+              },
+              capitalize: (str) => str.replace(/\b\w/g, l => l.toUpperCase()),
+              categoryName: (name) => formatters.capitalize(name.replace(/_/g, ' ')),
+              currency: new Intl.NumberFormat('he-IL', {
+                  style: 'currency',
+                  currency: tripData.flight.currency
+              })
+          };
+
+          // Helper function (make sure this is defined in your code)
+          function formatDateToDDMM(dateString) {
+              const date = new Date(dateString);
+              const day = String(date.getDate()).padStart(2, '0');
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              return `${day}${month}`;
+          }
+
+          function updateTripSummary() {
+              console.log('Updating trip summary');
+              const { flight } = tripData;
+
+              // Generate the flight search URL for the trip summary
+              const tripFlightHref = generateFlightSearchUrl(
+                  flight.origin.city.cityIATACode,
+                  flight.departure_at ? formatDateToDDMM(flight.departure_at) : null,
+                  flight.destination.city.cityIATACode,
+                  flight.return_at ? formatDateToDDMM(flight.return_at) : null
+              );
+
+              const summaryHTML = `
+                  <div class="text-center">
+                      <div class="fw-bold mb-2">
+                          <a>
+                              ${flight.destination.city.cityName.toUpperCase()} ⟵ ${flight.origin.city.cityName.toUpperCase()} טיסה
+                          </a>
+                      </div>
+                      <div class="text-center trip-details d-flex flex-column align-items-center">
+                          ${flight.departure_at ? `
+                              <div class="mb-2 d-flex gap-2 justify-content-center">
+                                  <span>${formatters.date(flight.departure_at)}</span>
+                                  <span class="fw-bold">:יציאה</span>
+                              </div>
+                          ` : ''}
+                          ${flight.return_at ? `
+                              <div class="d-flex gap-2 justify-content-center">
+                                  <span>${formatters.date(flight.return_at)}</span>
+                                  <span class="fw-bold">:חזרה</span>
+                              </div>
+                          ` : ''}
+                      </div>
+                      <a href="${tripFlightHref}" target="_blank" class="btn btn-primary btn-sm mt-2">צפה בטיסות</a>
+                  </div>
+              `;
+              document.getElementById('tripSummary').innerHTML = summaryHTML;
+          }
+
+
+          function renderFlights() {
+              console.log('Rendering flights');
+              const flightCards = tripData.flight.ticketKeys.map(ticket => renderFlightCard(ticket)).join('');
+              document.getElementById('flightsList').innerHTML = flightCards;
+          }
+
+          function renderFlightCard(ticket) {
+              const flightHref = generateFlightSearchUrl(
+                  tripData.flight.origin.city.cityIATACode,
+                  ticket.departureAt ? formatDateToDDMM(ticket.departureAt) : null,
+                  tripData.flight.destination.city.cityIATACode,
+                  ticket.returnAt ? formatDateToDDMM(ticket.returnAt) : null
+              );
+
+              return `
+                  <div class="col-12 col-md-6 mb-4">
+                      <div class="card h-100">
+                          <div class="flight-card">
+                              ${renderAirlineInfo(ticket)}
+                              ${renderFlightDetails(ticket)}
+                          </div>
+                          ${renderCardFooter(ticket, flightHref)}
+                      </div>
+                  </div>
+              `;
+          }
+
+          function renderAirlineInfo(ticket) {
+              return `
+                  <div class="airline-info">
+                      <h3 class="airline-name">${ticket.airlineDetails.name}</h3>
+                      <p class="flight-number">טיסה מס׳ ${ticket.flightNumber}</p>
+                  </div>
+              `;
+          }
+
+          function renderFlightDetails(ticket) {
+              return `
+                  <div class="flight-details">
+                      ${renderDetailItem('מחיר:', `${ticket.price} ${tripData.flight.currency}`)}
+                      ${renderDetailItem('תאריך יציאה:', formatters.date(ticket.departureAt))}
+                      ${ticket.returnAt ? renderDetailItem('תאריך חזרה:', formatters.date(ticket.returnAt)) : ''}
+                      ${renderDetailItem('מספר עצירות:', ticket.transfers)}
+                  </div>
+              `;
+          }
+
+          function renderDetailItem(label, value) {
+              return `
+                  <div class="detail-item">
+                      <span class="detail-label">${label}</span>
+                      <span class="detail-value">${value}</span>
+                  </div>
+              `;
+          }
+
+          function renderCardFooter(ticket, flightHref) {
+              return `
+                  <div class="card-footer text-end">
+                      <small class="text-muted">תוקף המחיר עד, ${formatters.date(ticket.expiresAt)}</small>
+                      <a href="${flightHref}" target="_blank" class="btn btn-primary w-100 mt-2">צפה בטיסה</a>
+                  </div>
+              `;
+          }
+
+
+
+          function renderNews() {
+              console.log('Rendering news');
+
+              const newsCards = tripData.news.newsList.map(article => `
+                  <div class="col-12 col-md-6 col-lg-4 mb-4">
+                      <div class="card h-100">
+                          <div class="card-img-container">
+                              ${article.urlToImage ? `
+                                  <img src="${article.urlToImage}" class="card-img-top" alt="${article.title}"
+                                       onerror="this.onerror=null; this.src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2Zpd2J1czlrYWJkejFpdzZxZTJjdHdyc2QwbWhlYzZtMGl1N3o2aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3zhxq2ttgN6rEw8SDx/giphy.gif'; this.classList.add('placeholder-gif');">
+                              ` : `
+                                  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2Zpd2J1czlrYWJkejFpdzZxZTJjdHdyc2QwbWhlYzZtMGl1N3o2aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3zhxq2ttgN6rEw8SDx/giphy.gif" class="card-img-top placeholder-gif" alt="Placeholder">
+                              `}
+                          </div>
+                          <div class="card-body text-end">
+                              <h5 class="card-title">${article.title}</h5>
+                              <p class="card-text">${article.description || ''}</p>
+
+                              <!-- Sentiment score -->
+                              <div class="sentiment-score">
+                                  <p class="mb-0 fw-bold">דירוג כתבה: ${article.scoreSentimentAnalyzer.toFixed(1)} / 5</p>
+                              </div>
+
+                              <div class="d-flex justify-content-between align-items-center">
+                                  <small class="text-muted">${new Date(article.publishedAt).toLocaleDateString('he-IL')}</small>
+                                  <small class="text-muted">${article.source_name}</small>
+                              </div>
+                          </div>
+                          <div class="card-footer">
+                              <a href="${article.url}" target="_blank" class="btn btn-outline-primary btn-sm w-100">קרא עוד</a>
+                          </div>
+                      </div>
+                  </div>
+              `).join('');
+              document.getElementById('newsList').innerHTML = newsCards;
+
+              // Add CSS for the placeholder GIF
+              const style = document.createElement('style');
+              style.textContent = `
+                  .card-img-container {
+                      height: 200px;
+                      overflow: hidden;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                  }
+                  .card-img-top {
+                      width: 100%;
+                      height: 100%;
+                      object-fit: cover;
+                  }
+                  .placeholder-gif {
+                      width: 50%;
+                      height: auto;
+                      object-fit: contain;
+                  }
+              `;
+              document.head.appendChild(style);
+          }
+
+          function renderPlaces() {
+              console.log('Rendering places');
+
+              const placesAccordion = tripData.placesData.kindsCategory.categories.map((category, index) => `
+                  <div class="accordion-item">
+                      <h2 class="accordion-header">
+                          <button class="accordion-button ${index !== 0 ? 'collapsed' : ''} text-end" type="button"
+                                  data-bs-toggle="collapse" data-bs-target="#category${index}">
+                              <span class="fw-bold">${formatters.categoryName(category.name)}</span>
+                              <span class="ms-2">(${category.places.length})</span>
+                          </button>
+                      </h2>
+                      <div id="category${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}"
+                           data-bs-parent="#placesAccordion">
+                          <div class="accordion-body">
+                              <div class="row">
+                                  ${category.places.map(place => `
+                                      <div class="col-12 col-md-6 mb-4">
+                                          <div class="card h-100">
+                                              ${place.image ? `
+                                                  <img src="${place.image}"
+                                                       class="card-img-top"
+                                                       alt="${place.name}"
+                                                       onerror="this.parentElement.querySelector('.card-img-top').remove()"
+                                                       loading="lazy">
+                                              ` : ''}
+                                              <div class="card-body text-end">
+                                                  <h5 class="card-title">${formatters.categoryName(place.name)}</h5>
+                                                  ${place.wikipedia_extracts ? `
+                                                      <p class="card-text">${place.wikipedia_extracts}</p>
+                                                  ` : ''}
+                                                  ${place.address ? `
+                                                      <p class="card-text">
+                                                          <small class="text-muted">
+                                                              ${[
+                                                                  place.address.road,
+                                                                  place.address.city,
+                                                                  place.address.country
+                                                              ].filter(Boolean).join('? ')}
+                                                          </small>
+                                                      </p>
+                                                  ` : ''}
+                                                  ${place.rate ? `
+                                                      <div class="mb-2">
+                                                          <small class="text-muted">דירוג: ${place.rate}</small>
+                                                      </div>
+                                                  ` : ''}
+                                              </div>
+                                              ${place.url ? `
+                                                  <div class="card-footer">
+                                                      <a href="${place.url}" target="_blank"
+                                                         class="btn btn-outline-primary btn-sm w-100">מידע נוסף</a>
+                                                  </div>
+                                              ` : ''}
+                                          </div>
+                                      </div>
+                                  `).join('')}
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              `).join('');
+              document.getElementById('placesAccordion').innerHTML = placesAccordion;
+          }
+
+          function initializeTabs() {
+              console.log('Initializing tabs');
+              document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tab => {
+                  tab.addEventListener('shown.bs.tab', function(event) {
+                      console.log('Tab changed:', event.target.id);
+                      // You can add more functionality here when tabs change
+                  });
+              });
+          }
+
+        try {
+            updateTripSummary();
+            renderFlights();
+            renderNews();
+            renderPlaces();
+            initializeTabs();
+            console.log('All rendering functions completed successfully');
+        } catch (error) {
+            console.error('Error rendering trip results:', error);
+            alert('אירעה שגיאה בטעינת התוצאות. אנא נסה שנית.');
         }
-
-        // Formatters for rendering trip data
-        const formatters = {
-            date: (dateString) => {
-                const date = new Date(dateString);
-                return new Intl.DateTimeFormat('he-IL', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }).format(date);
-            },
-            capitalize: (str) => str.replace(/\b\w/g, l => l.toUpperCase()),
-            categoryName: (name) => formatters.capitalize(name.replace(/_/g, ' ')),
-            currency: new Intl.NumberFormat('he-IL', {
-                style: 'currency',
-                currency: tripData.flight.currency
-            })
-        };
-
-        // Helper function (make sure this is defined in your code)
-        function formatDateToDDMM(dateString) {
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            return `${day}${month}`;
-        }
-
-        function updateTripSummary() {
-            console.log('Updating trip summary');
-            const { flight } = tripData;
-
-            // Generate the flight search URL for the trip summary
-            const tripFlightHref = generateFlightSearchUrl(
-                flight.origin.city.cityIATACode,
-                flight.departure_at ? formatDateToDDMM(flight.departure_at) : null,
-                flight.destination.city.cityIATACode,
-                flight.return_at ? formatDateToDDMM(flight.return_at) : null
-            );
-
-            const summaryHTML = `
-                <div class="text-center">
-                    <div class="fw-bold mb-2">
-                        <a>
-                            ${flight.destination.city.cityName.toUpperCase()} ⟵ ${flight.origin.city.cityName.toUpperCase()} טיסה
-                        </a>
-                    </div>
-                    <div class="text-center trip-details d-flex flex-column align-items-center">
-                        ${flight.departure_at ? `
-                            <div class="mb-2 d-flex gap-2 justify-content-center">
-                                <span>${formatters.date(flight.departure_at)}</span>
-                                <span class="fw-bold">:יציאה</span>
-                            </div>
-                        ` : ''}
-                        ${flight.return_at ? `
-                            <div class="d-flex gap-2 justify-content-center">
-                                <span>${formatters.date(flight.return_at)}</span>
-                                <span class="fw-bold">:חזרה</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <a href="${tripFlightHref}" target="_blank" class="btn btn-primary btn-sm mt-2">צפה בטיסות</a>
-                </div>
-            `;
-            document.getElementById('tripSummary').innerHTML = summaryHTML;
-        }
-
-
-        function renderFlights() {
-            console.log('Rendering flights');
-            const flightCards = tripData.flight.ticketKeys.map(ticket => {
-                // Use the new function here
-                let flightHref = generateFlightSearchUrl(
-                    tripData.flight.origin.city.cityIATACode,
-                    ticket.departureAt ? formatDateToDDMM(ticket.departureAt) : null,
-                    tripData.flight.destination.city.cityIATACode,
-                    ticket.returnAt ? formatDateToDDMM(ticket.returnAt) : null
-                );
-
-                return `
-                    <div class="col-12 col-md-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-body text-end">
-                                <h5 class="card-title">${ticket.airlineDetails.name}</h5>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <div class="text-end">
-                                        <small>מחיר:</small>
-                                        <p class="mb-0">${ticket.price} ${tripData.flight.currency}</p>
-                                    </div>
-                                    <div class="text-end">
-                                        <small>מספר טיסה:</small>
-                                        <p class="mb-0">${ticket.flightNumber}</p>
-                                    </div>
-                                </div>
-                                <div class="mb-3 text-end">
-                                    <small>תאריך יציאה:</small>
-                                    <p class="mb-0">${formatters.date(ticket.departureAt)}</p>
-                                </div>
-                                ${ticket.returnAt ? `
-                                    <div class="mb-3 text-end">
-                                        <small>תאריך חזרה:</small>
-                                        <p class="mb-0">${formatters.date(ticket.returnAt)}</p>
-                                    </div>
-                                ` : ''}
-                                <div class="text-end">
-                                    <small>מספר עצירות:</small>
-                                    <p class="mb-0">${ticket.transfers}</p>
-                                </div>
-                            </div>
-
-                            <div class="card-footer text-end">
-                                <small class="text-muted">תוקף המחיר עד, ${formatters.date(ticket.expiresAt)}</small>
-                                <a href="${flightHref}" target="_blank" class="btn btn-primary w-100 mt-2">צפה בטיסה</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('flightsList').innerHTML = flightCards;
-        }
-
-
-
-        function renderNews() {
-            console.log('Rendering news');
-
-            const newsCards = tripData.news.newsList.map(article => `
-                <div class="col-12 col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-img-container">
-                            ${article.urlToImage ? `
-                                <img src="${article.urlToImage}" class="card-img-top" alt="${article.title}"
-                                     onerror="this.onerror=null; this.src='https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2Zpd2J1czlrYWJkejFpdzZxZTJjdHdyc2QwbWhlYzZtMGl1N3o2aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3zhxq2ttgN6rEw8SDx/giphy.gif'; this.classList.add('placeholder-gif');">
-                            ` : `
-                                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2Zpd2J1czlrYWJkejFpdzZxZTJjdHdyc2QwbWhlYzZtMGl1N3o2aiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3zhxq2ttgN6rEw8SDx/giphy.gif" class="card-img-top placeholder-gif" alt="Placeholder">
-                            `}
-                        </div>
-                        <div class="card-body text-end">
-                            <h5 class="card-title">${article.title}</h5>
-                            <p class="card-text">${article.description || ''}</p>
-
-                            <!-- Sentiment score -->
-                            <div class="sentiment-score">
-                                <p class="mb-0 fw-bold">דירוג כתבה: ${article.scoreSentimentAnalyzer.toFixed(1)} / 5</p>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">${new Date(article.publishedAt).toLocaleDateString('he-IL')}</small>
-                                <small class="text-muted">${article.source_name}</small>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <a href="${article.url}" target="_blank" class="btn btn-outline-primary btn-sm w-100">קרא עוד</a>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            document.getElementById('newsList').innerHTML = newsCards;
-
-            // Add CSS for the placeholder GIF
-            const style = document.createElement('style');
-            style.textContent = `
-                .card-img-container {
-                    height: 200px;
-                    overflow: hidden;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .card-img-top {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-                .placeholder-gif {
-                    width: 50%;
-                    height: auto;
-                    object-fit: contain;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-
-        function renderPlaces() {
-            console.log('Rendering places');
-
-            const placesAccordion = tripData.placesData.kindsCategory.categories.map((category, index) => `
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button ${index !== 0 ? 'collapsed' : ''} text-end" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#category${index}">
-                            <span class="fw-bold">${formatters.categoryName(category.name)}</span>
-                            <span class="ms-2">(${category.places.length})</span>
-                        </button>
-                    </h2>
-                    <div id="category${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}"
-                         data-bs-parent="#placesAccordion">
-                        <div class="accordion-body">
-                            <div class="row">
-                                ${category.places.map(place => `
-                                    <div class="col-12 col-md-6 mb-4">
-                                        <div class="card h-100">
-                                            ${place.image ? `
-                                                <img src="${place.image}"
-                                                     class="card-img-top"
-                                                     alt="${place.name}"
-                                                     onerror="this.parentElement.querySelector('.card-img-top').remove()"
-                                                     loading="lazy">
-                                            ` : ''}
-                                            <div class="card-body text-end">
-                                                <h5 class="card-title">${formatters.categoryName(place.name)}</h5>
-                                                ${place.wikipedia_extracts ? `
-                                                    <p class="card-text">${place.wikipedia_extracts}</p>
-                                                ` : ''}
-                                                ${place.address ? `
-                                                    <p class="card-text">
-                                                        <small class="text-muted">
-                                                            ${[
-                                                                place.address.road,
-                                                                place.address.city,
-                                                                place.address.country
-                                                            ].filter(Boolean).join('? ')}
-                                                        </small>
-                                                    </p>
-                                                ` : ''}
-                                                ${place.rate ? `
-                                                    <div class="mb-2">
-                                                        <small class="text-muted">דירוג: ${place.rate}</small>
-                                                    </div>
-                                                ` : ''}
-                                            </div>
-                                            ${place.url ? `
-                                                <div class="card-footer">
-                                                    <a href="${place.url}" target="_blank"
-                                                       class="btn btn-outline-primary btn-sm w-100">מידע נוסף</a>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            document.getElementById('placesAccordion').innerHTML = placesAccordion;
-        }
-
-        function initializeTabs() {
-            console.log('Initializing tabs');
-            document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(tab => {
-                tab.addEventListener('shown.bs.tab', function(event) {
-                    console.log('Tab changed:', event.target.id);
-                    // You can add more functionality here when tabs change
-                });
-            });
-        }
-
-      try {
-          updateTripSummary();
-          renderFlights();
-          renderNews();
-          renderPlaces();
-          initializeTabs();
-          console.log('All rendering functions completed successfully');
-      } catch (error) {
-          console.error('Error rendering trip results:', error);
-          alert('אירעה שגיאה בטעינת התוצאות. אנא נסה שנית.');
-      }
-
     });
 </script>
+
 
 </body>
 </html>

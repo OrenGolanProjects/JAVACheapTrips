@@ -115,14 +115,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const arrowMessage = document.querySelector('.arrow-message');
-            arrowMessage.addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent default link behavior
+            if (arrowMessage) {
+                arrowMessage.addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent default link behavior
 
-                // Scroll smoothly to the footer
-                document.querySelector('#contact-footer').scrollIntoView({
-                    behavior: 'smooth'
+                    const contactFooter = document.querySelector('#contact-footer');
+                    if (contactFooter) {
+                        // Scroll smoothly to the footer
+                        contactFooter.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        console.warn('Element with id "contact-footer" not found');
+                    }
                 });
-            });
+            } else {
+                console.warn('Element with class "arrow-message" not found');
+            }
         });
     </script>
 
