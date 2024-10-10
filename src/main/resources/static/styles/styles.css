@@ -77,21 +77,6 @@ button:hover {
     margin-top: 1rem;
 }
 
-/* Responsive media queries */
-@media (max-width: 768px) {
-    main {
-        padding: 1rem;
-    }
-
-    header, footer {
-        padding: 0.5rem;
-    }
-
-    .signup-container, .login-container {
-        padding: 1rem;
-        max-width: 100%; /* Ensure the form takes up full width on mobile */
-    }
-}
 
 @media (max-width: 576px) {
     .d-flex {
@@ -184,6 +169,27 @@ button:hover {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .footer-icon {
+        font-size: 1rem; /* Adjust icon size for mobile */
+    }
+
+    footer .container {
+        padding: 0rem; /* Add some padding for mobile */
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    header, footer {
+        padding: 0.5rem;
+    }
+
+    .signup-container, .login-container {
+        padding: 1rem;
+        max-width: 100%; /* Ensure the form takes up full width on mobile */
+    }
+
     .contact-button-container {
         position: fixed;
 
