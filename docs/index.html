@@ -244,7 +244,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         const mainAppUrl = 'https://cheap-trips.runmydocker-app.com/';
         const loadingOverlay = document.getElementById('loading-overlay');
-
         const retryButton = document.getElementById('retry-button');
         let retryCount = 0;
         const maxRetries = 3;
@@ -269,36 +268,23 @@
             window.open(url, '_blank');
         }
 
-        function loadMainApp() {
-            showLoading();
-            hideRetryButton();
-
-            let attempts = 0;
-            const maxAttempts = 3;
-            let newTab = null;
-
-            function cleanup(forceClose = true) {
-                // Only close the tab if forceClose is true and it's not the final attempt
-                if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
-                    newTab.close();
-                }
+        function cleanup(forceClose = true, newTab, attempts, maxAttempts) {
+            // Only close the tab if forceClose is true and it's not the final attempt
+            if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
+                newTab.close();
+            }
         }
 
         function loadMainApp() {
             showLoading();
             hideRetryButton();
+
             let attempts = 0;
             const maxAttempts = 3;
             let newTab = null;
 
-            function cleanup(forceClose = true) {
-                if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
-                    newTab.close();
-                }
-            }
-
             function attemptLoad() {
-                cleanup(attempts < maxAttempts);
+                cleanup(attempts < maxAttempts, newTab, attempts, maxAttempts);
                 attempts++;
                 console.log(`Attempt ${attempts} of ${maxAttempts}`);
 
@@ -315,7 +301,7 @@
                         attemptLoad();
                     } else {
                         console.log("All attempts exhausted - keeping tab open");
-                        cleanup(false);
+                        cleanup(false, newTab, attempts, maxAttempts);
                         handleError();
                     }
                 }, 5000);
@@ -330,7 +316,7 @@
 
                         if (tabTitle === "CheapTrips - חיפוש טיסות") {
                             console.log("Success: Tab title matches 'CheapTrips - חיפוש טיסות'");
-                            cleanup(false);
+                            cleanup(false, newTab, attempts, maxAttempts);
                             hideLoading();
                         } else {
                             console.log("Tab title does not match expected title");
@@ -339,7 +325,7 @@
                                 attemptLoad();
                             } else {
                                 console.log("All attempts exhausted - keeping tab open");
-                                cleanup(false);
+                                cleanup(false, newTab, attempts, maxAttempts);
                                 handleError();
                             }
                         }
@@ -353,7 +339,7 @@
                             attemptLoad();
                         } else {
                             console.log("All attempts exhausted - keeping tab open");
-                            cleanup(false);
+                            cleanup(false, newTab, attempts, maxAttempts);
                             handleError();
                         }
                     }
@@ -365,21 +351,11 @@
                 showRetryButton();
             }
 
-            attemptLoad();
-
-            window.addEventListener('unload', () => cleanup(false));
-        }
-
-        function handleError() {
-                hideLoading();
-                showRetryButton();
-            }
-
             // Start the first attempt
             attemptLoad();
 
             // Add event listener for unload to cleanup
-            window.addEventListener('unload', () => cleanup(false));
+            window.addEventListener('unload', () => cleanup(false, newTab, attempts, maxAttempts));
         }
 
         retryButton.addEventListener('click', function() {
@@ -397,5 +373,6 @@
         });
     });
 </script>
+
 </body>
 </html>
