@@ -282,15 +282,26 @@
                 if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
                     newTab.close();
                 }
+        }
+
+        function loadMainApp() {
+            showLoading();
+            hideRetryButton();
+            let attempts = 0;
+            const maxAttempts = 3;
+            let newTab = null;
+
+            function cleanup(forceClose = true) {
+                if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
+                    newTab.close();
+                }
             }
 
             function attemptLoad() {
-                cleanup(attempts < maxAttempts); // Only force close if not final attempt
-
+                cleanup(attempts < maxAttempts);
                 attempts++;
                 console.log(`Attempt ${attempts} of ${maxAttempts}`);
 
-                // Open new tab
                 newTab = window.open(mainAppUrl, '_blank');
                 if (!newTab) {
                     console.log("Failed to open new tab - possibly blocked by popup blocker");
@@ -298,28 +309,68 @@
                     return;
                 }
 
-                // Set a timeout for this attempt
                 const timeoutId = setTimeout(() => {
                     if (attempts < maxAttempts) {
                         console.log("Attempt timed out, trying again...");
                         attemptLoad();
                     } else {
                         console.log("All attempts exhausted - keeping tab open");
-                        cleanup(false); // Don't close the tab on final attempt
+                        cleanup(false);
                         handleError();
                     }
-                }, 5000); // 5 second timeout per attempt
+                }, 5000);
 
-                // Use the onload event to detect when the page has loaded
                 newTab.onload = function() {
                     clearTimeout(timeoutId);
-                    console.log("Success: New tab has loaded");
-                    cleanup(false);
-                    hideLoading();
+                    console.log("New tab has loaded, checking title...");
+
+                    try {
+                        const tabTitle = newTab.document.title;
+                        console.log(`Current tab title: "${tabTitle}"`);
+
+                        if (tabTitle === "CheapTrips - חיפוש טיסות") {
+                            console.log("Success: Tab title matches 'CheapTrips - חיפוש טיסות'");
+                            cleanup(false);
+                            hideLoading();
+                        } else {
+                            console.log("Tab title does not match expected title");
+                            if (attempts < maxAttempts) {
+                                console.log("Trying again...");
+                                attemptLoad();
+                            } else {
+                                console.log("All attempts exhausted - keeping tab open");
+                                cleanup(false);
+                                handleError();
+                            }
+                        }
+                    } catch (error) {
+                        console.log("Error accessing tab title:", error.message);
+                        if (error.name === 'SecurityError') {
+                            console.log("Cross-origin error detected. Unable to access tab content.");
+                        }
+                        if (attempts < maxAttempts) {
+                            console.log("Trying again...");
+                            attemptLoad();
+                        } else {
+                            console.log("All attempts exhausted - keeping tab open");
+                            cleanup(false);
+                            handleError();
+                        }
+                    }
                 };
             }
 
             function handleError() {
+                hideLoading();
+                showRetryButton();
+            }
+
+            attemptLoad();
+
+            window.addEventListener('unload', () => cleanup(false));
+        }
+
+        function handleError() {
                 hideLoading();
                 showRetryButton();
             }
