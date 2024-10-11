@@ -244,9 +244,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         const mainAppUrl = 'https://cheap-trips.runmydocker-app.com/';
         const loadingOverlay = document.getElementById('loading-overlay');
-        const retryButton = document.getElementById('retry-button');
-        let retryCount = 0;
-        const maxRetries = 3;
+        const SLOW_RESPONSE_THRESHOLD = 3000; // 3 seconds in milliseconds
+        const FALLBACK_DELAY = 5000; // 5 seconds in milliseconds
 
         function showLoading() {
             loadingOverlay.style.display = 'flex';
@@ -256,129 +255,56 @@
             loadingOverlay.style.display = 'none';
         }
 
-        function showRetryButton() {
-            retryButton.style.display = 'block';
+        function openMainAppInNewTab() {
+            console.log('Opening new tab...');
+            window.open(mainAppUrl, '_blank');
+            hideLoading();
         }
 
-        function hideRetryButton() {
-            retryButton.style.display = 'none';
-        }
-
-        function openInNewTab(url) {
-            window.open(url, '_blank');
-        }
-
-        function cleanup(forceClose = true, newTab, attempts, maxAttempts) {
-            // Only close the tab if forceClose is true and it's not the final attempt
-            if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
-                newTab.close();
-            }
-        }
-
-        function loadMainApp() {
-            console.log("loadMainApp function started.");
-
+        async function loadMainApp() {
             showLoading();
-            hideRetryButton();
+            console.log('Attempting to fetch URL...');
 
-            let attempts = 0;
-            const maxAttempts = 3;
-            let newTab = null;
+            const startTime = performance.now();
 
-            console.log("Starting to load main app, attempts set to 0.");
+            try {
+                const response = await fetch(mainAppUrl, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
 
-            function attemptLoad() {
-                console.log(`Attempt ${attempts + 1} initiated.`);
+                const endTime = performance.now();
+                const fetchDuration = endTime - startTime;
 
-                cleanup(attempts < maxAttempts, newTab, attempts, maxAttempts);
-                attempts++;
+                console.log(`Fetch completed in ${fetchDuration.toFixed(2)}ms`);
+                console.log('Server responded with status:', response.status);
 
-                newTab = window.open(mainAppUrl, '_blank');
-                if (!newTab) {
-                    console.log("Failed to open new tab - possibly blocked by popup blocker.");
-                    handleError();
-                    return;
+                if (fetchDuration > SLOW_RESPONSE_THRESHOLD) {
+                    console.log('Response was slow, delaying tab open...');
+                    setTimeout(openMainAppInNewTab, FALLBACK_DELAY);
+                } else {
+                    openMainAppInNewTab();
                 }
 
-                const timeoutId = setTimeout(() => {
-                    if (attempts < maxAttempts) {
-                        console.log("Attempt timed out, trying again...");
-                        attemptLoad();
-                    } else {
-                        console.log("All attempts exhausted - keeping tab open.");
-                        cleanup(false, newTab, attempts, maxAttempts);
-                        handleError();
-                    }
-                }, 5000);
+            } catch (error) {
+                const endTime = performance.now();
+                const fetchDuration = endTime - startTime;
 
-                // Polling mechanism to check the content of the new tab
-                const checkTabContent = setInterval(() => {
-                    try {
-                        const tabUrl = newTab.location.href;
-                        console.log(`Current tab URL: "${tabUrl}"`);
+                console.log('Fetch failed:', error);
+                console.log(`Failed fetch attempt took ${fetchDuration.toFixed(2)}ms`);
 
-                        if (tabUrl === "https://cheap-trips.runmydocker-app.com/") {
-                            console.log("Success: Tab URL matches.");
-                            const tabContent = newTab.document.body.textContent || newTab.document.body.innerText;
-
-                            if (tabContent.includes("Whitelabel Error Page")) {
-                                console.log("Error: The page contains 'Whitelabel Error Page'.");
-                                clearInterval(checkTabContent); // Stop checking
-                                handleError();
-                                return;
-                            }
-
-                            const tabTitle = newTab.document.title;
-                            console.log(`Current tab title: "${tabTitle}"`);
-
-                            if (tabTitle === "CheapTrips - חיפוש טיסות") {
-                                console.log("Success: Tab title matches 'CheapTrips - חיפוש טיסות'.");
-                                clearInterval(checkTabContent); // Stop checking
-                                cleanup(false, newTab, attempts, maxAttempts);
-                                hideLoading();
-                            } else {
-                                console.log("Tab title does not match expected title.");
-                            }
-                        } else {
-                            console.log("Tab URL does not match the expected URL.");
-                            clearInterval(checkTabContent); // Stop checking
-                            handleError();
-                        }
-                    } catch (error) {
-                        console.log("Error accessing tab details:", error.message);
-                        if (error.name === 'SecurityError') {
-                            console.log("Cross-origin error detected. Unable to access tab content.");
-                        }
-                    }
-                }, 1000); // Check every 1 second
-
-                // Clear the timeout if we stop polling
-                window.addEventListener('unload', () => {
-                    console.log("Window unload event, cleaning up.");
-                    cleanup(false, newTab, attempts, maxAttempts);
-                    clearInterval(checkTabContent);
-                });
+                if (fetchDuration > SLOW_RESPONSE_THRESHOLD) {
+                    console.log('Waiting 5 seconds before opening new tab...');
+                    setTimeout(openMainAppInNewTab, FALLBACK_DELAY);
+                } else {
+                    console.log('Quick failure detected, using shorter delay...');
+                    setTimeout(openMainAppInNewTab, 3000);
+                }
             }
-
-            function handleError() {
-                console.log("Handling error, showing retry button.");
-                hideLoading();
-                showRetryButton();
-            }
-
-            // Start the first attempt
-            console.log("Starting first attempt to load the main app.");
-            attemptLoad();
         }
 
-
-        retryButton.addEventListener('click', function() {
-            console.log("Retry button clicked");
-            retryCount = 0;
-            loadMainApp();
-        });
-
-        const appLinks = document.querySelectorAll('a[href="' + mainAppUrl + '"]');
+        // Event Listeners
+        const appLinks = document.querySelectorAll(`a[href="${mainAppUrl}"]`);
         appLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
