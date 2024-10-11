@@ -13,21 +13,17 @@ body {
     background-color: #f0f0f0;
 }
 
-header {
-    background-color: #007bff;
-    color: white;
-    padding: 1rem;
-}
-
-footer {
-    margin-top: auto;
-    text-align: center;
-}
+.header {
+    position: relative;
+    z-index: 10; 
+  }
+  
 
 /* Main content area */
 main {
     flex: 1;
     padding: 2rem;
+    overflow: overlay;
 }
 
 /* Signup and login containers */
@@ -180,9 +176,7 @@ button:hover {
         border: 2px solid #0056b3; /* Darker border for active tab */
     }
 
-    .footer-icon {
-        font-size: 1rem; /* Adjust icon size for mobile */
-    }
+
 
     footer .container {
         padding: 0rem; /* Add some padding for mobile */
@@ -230,32 +224,26 @@ button:hover {
     }
 }
 
-.footer-icon {
-    background-color: #0047ab; /* Dark blue background */
-    border: 2px solid white; /* White border */
+
+#websiteButton {
+    background-color: #6c757d; /* Dark Blue-Grey background */
     color: white; /* White text color */
+    border: 2px solid white; /* White border */
     padding: 0.5rem 1rem; /* Padding for button */
     text-decoration: none; /* Remove underline */
     transition: background-color 0.3s, color 0.3s ease; /* Smooth transition */
-    display: inline-flex; /* Align icon and text */
-    align-items: center; /* Center icon vertically */
 }
 
-.footer-icon i {
-    font-size: 1.5rem; /* Adjust the icon size */
-    margin-right: 0.5rem; /* Space between icon and text */
-}
-
-.footer-icon:hover {
-    background-color: white; /* White background on hover */
-    color: #0047ab; /* Dark blue text color on hover */
-    border: 2px solid #0047ab; /* Dark blue border on hover */
+#websiteButton:hover {
+    background-color: white; /* Change background to white on hover */
+    color: #6c757d; /* Change text color to dark blue-grey on hover */
+    border: 2px solid #6c757d; /* Change border color to dark blue-grey on hover */
 }
 
 
 /* Contact button styling */
 #contactButton {
-    background-color: #0047ab; /* Dark blue   background */
+    background-color: #535d67; /* Dark blue background */
     color: white; /* White text color */
     border: 2px solid white; /* White border */
     padding: 0.5rem 1rem; /* Padding for button */
@@ -269,8 +257,8 @@ button:hover {
 
 #contactButton:hover {
     background-color: white; /* White background on hover */
-    color: #0047ab; /* Dark blue text color on hover */
-    border: 2px solid #0047ab; /* Dark blue border on hover */
+    color: #1c2833; /* Dark blue text color on hover */
+    border: 2px solid #1c2833; /* Dark blue border on hover */
 }
 
 @keyframes bounce {
@@ -339,6 +327,79 @@ color: #333;
 }
 
 .custom-alert {
-    background-color: #ced4da; 
+    background-color: #dee2e6; 
     color: #333; 
+}
+
+:root {
+    --primary-color:    #007bff; /* Bright Blue */
+    --secondary-color:  #2c3e50; /* Blue-Black */
+    --accent-color:     #1c2833; /* Midnight Blue */
+    --dark-color:       #2c3e50; /* Dark Blue-Grey */
+    --light-color:      #3498db; /* Bright Sky Blue */
+}
+
+.btn-outline-light {
+    background-color: var(--accent-color);
+    color: #ffffff; /* Text color */
+    border-color: var(--accent-color); /* Border color */
+}
+
+.btn-outline-light:hover {
+    background-color: #ffffff; /* Change background to white on hover */
+    color: var(--accent-color); /* Change text color to match the button background */
+}
+
+.hero {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 5rem 0rem;
+    position: relative;
+    overflow: hidden; 
+}
+
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
+    animation: move-background 20s linear infinite;
+    z-index: 0;
+}
+
+
+@keyframes move-background {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50%, 50%); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+footer {
+    background-color: white; /* Clean white background */
+    color: var(--dark-color); /* Dark text color for contrast */
+    padding: 2rem 0;
+    text-align: center; /* Center text for a cleaner look */
+}
+
+.footer-icon {
+    color: var(--accent-color); /* Accent color for icons */
+    font-size: 1.5rem;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.footer-icon:hover {
+    color: var(--secondary-color); /* Change icon color on hover */
+}
+
+.footer-text {
+    font-size: 0.9rem; /* Smaller text for copyright or additional info */
+    margin-top: 0.5rem;
 }

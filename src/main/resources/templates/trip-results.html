@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::script})}" dir="rtl" lang="he">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::script})}" lang="en">
+
 <head>
   <title>CheapTrips - תוצאות חיפוש</title>
 </head>
@@ -204,7 +205,7 @@
                               </div>
                           ` : ''}
                       </div>
-                      <a href="${tripFlightHref}" target="_blank" class="btn btn-primary btn-sm mt-2">צפה בטיסות</a>
+                      <a href="${tripFlightHref}" target="_blank" class="btn btn-primary btn-sm mt-2" id="websiteButton">צפה בטיסות</a>
                   </div>
               `;
               document.getElementById('tripSummary').innerHTML = summaryHTML;
@@ -271,7 +272,7 @@
               return `
                   <div class="card-footer text-end">
                       <small class="text-muted">תוקף המחיר עד, ${formatters.date(ticket.expiresAt)}</small>
-                      <a href="${flightHref}" target="_blank" class="btn btn-primary w-100 mt-2">צפה בטיסה</a>
+                      <a href="${flightHref}" target="_blank" class="btn btn-primary w-100 mt-2" id="websiteButton">צפה בטיסה</a>
                   </div>
               `;
           }
