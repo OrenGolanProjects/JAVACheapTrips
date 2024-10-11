@@ -97,6 +97,10 @@ public class CheapTripsApplication {
 		public String tripResults() {
 			return "trip-results";
 		}
+		@GetMapping("/settings")
+		public String userSettings() {
+			return "settings";
+		}
 
 		@GetMapping("/swagger")
 		public String swagger() {

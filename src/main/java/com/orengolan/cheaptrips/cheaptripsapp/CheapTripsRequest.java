@@ -53,7 +53,7 @@ public class CheapTripsRequest {
         this.destination_cityIATACode = destination_cityIATACode;
         this.destination_cityName = destination_cityName;
         this.radius = radius != null ? radius :10000;
-        this.limitPlaces = limitPlaces != null ? limitPlaces :2;
+        this.limitPlaces = limitPlaces != null ? limitPlaces :5;
         this.kinds = Arrays.asList("interesting_places", "amusements", "sport","tourist_facilities","accomodations","adult");
     }
 

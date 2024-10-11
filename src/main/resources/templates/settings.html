@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base :: layout(~{::title}, ~{::main}, ~{::script})}" lang="en">
+
+<head>
+    <title>CheapTrips - תוצאות חיפוש</title>
+</head>
+<body>
+    <th:block th:replace="~{base :: layout(~{::main})}">
+        <main role="main">
+            <div class="container my-4">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h2 id="settings" class="card-title text-center">User Settings</h2>
+                                <form id="settingsForm">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userName" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="userName" required>
+                                        <div id="userNameHelp" class="form-text text-danger" style="display: none;">
+                                            User name must be between 2-10 chars.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" required>
+                                        <div id="firstNameHelp" class="form-text text-danger" style="display: none;">
+                                            First name must be between 2-10 chars.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="surName" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="surName" required>
+                                        <div id="surNameHelp" class="form-text text-danger" style="display: none;">
+                                            Last name must be between 2-10 chars.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" required>
+                                        <div id="phoneHelp" class="form-text text-danger" style="display: none;">
+                                            Phone number must be in the format XXX-XXXXXXX, where X is a digit.
+                                        </div>
+                                    </div>
+                                    <div id="customAlert" class="alert" style="display: none;"></div>
+                                    <button type="submit" id="websiteButton" class="btn btn-primary w-100 mb-3">Update Account</button>
+                                </form>
+                                <button id="deleteAccount" class="btn btn-danger w-100">Delete Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </th:block>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+          // Check if userData exists in local storage
+          if (!localStorage.getItem('userData')) {
+              return window.rediretTo ='/';
+          }
+
+          fetchUserInfo();
+
+          document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateUserInfo();
+          });
+
+          document.getElementById('deleteAccount').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+              deleteUserAccount();
+            }
+          });
+        });
+
+        function fetchUserInfo() {
+          fetch('/app/userinfo/get-specific-user-info', {
+            method: 'GET',
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            document.getElementById('email').value = data.email;
+            document.getElementById('userName').value = data.userName;
+            document.getElementById('firstName').value = data.firstName;
+            document.getElementById('surName').value = data.surName;
+            document.getElementById('phone').value = data.phone;
+          })
+          .catch(error => {
+            showAlert('Failed to fetch user information. Please try again.');
+            console.error('Error:', error);
+          });
+        }
+
+        function updateUserInfo() {
+          const userData = {
+            userName: document.getElementById('userName').value,
+            firstName: document.getElementById('firstName').value,
+            surName: document.getElementById('surName').value,
+            phone: document.getElementById('phone').value
+          };
+
+          fetch('/app/userinfo/update-specific-user-info', {
+            method: 'PUT',
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('jwtToken'),
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Update localStorage with the new user data
+            const storedUserData = JSON.parse(localStorage.getItem('userData'));
+            const updatedUserData = {
+              ...storedUserData,
+              userName: userData.userName,
+              firstName: userData.firstName,
+              surName: userData.surName,
+              phone: userData.phone
+            };
+            localStorage.setItem('userData', JSON.stringify(updatedUserData));
+
+            showAlert('Account updated successfully!', 'success');
+          })
+          .catch(error => {
+            showAlert('Failed to update account. Please try again.');
+            console.error('Error:', error);
+          });
+        }
+
+
+        function deleteUserAccount() {
+          fetch('/app/userinfo/delete-specific-user-info', {
+            method: 'DELETE',
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            localStorage.clear();
+            window.location.href = '/login';
+          })
+          .catch(error => {
+            showAlert('Failed to delete account. Please try again.');
+            console.error('Error:', error);
+          });
+        }
+
+        function showAlert(message, type = 'danger') {
+          const alertElement = document.getElementById('customAlert');
+          alertElement.textContent = message;
+          alertElement.className = 'alert alert-' + type;
+          alertElement.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

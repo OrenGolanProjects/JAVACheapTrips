@@ -114,9 +114,7 @@ public class CheapTripsService {
         logger.info("CheapTripsService>>  generateNewTrip: News created successfully.");
 
         // Fetches the data of tourist place from db.
-        PlacesData placesData;
-        placesData = this.openTripMapService.getSpecificPlace(flight.getDestination().getCity().getCityName());
-
+        PlacesData placesData = this.openTripMapService.getSpecificPlace(flight.getDestination().getCity().getCityName());
 
         if (placesData == null){
             // Not found tourist data then by destination data fetches the data from API.

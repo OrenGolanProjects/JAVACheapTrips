@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Pattern;
 import java.util.logging.Logger;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -57,9 +56,9 @@ public class UserInfoController {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Internal server error")
     })
-    public UserInfo getSpecificUser(@RequestParam String userIdentifier){
+    public UserInfo getSpecificUser(HttpServletRequest request){
         logger.info("** UserController>>  getSpecificUser: Start method.");
-        return this.userService.getUserByIdentifier(userIdentifier);
+        return this.userService.getUserByIdentifier(this.retrieveUserIdentifier(request));
     }
 
 

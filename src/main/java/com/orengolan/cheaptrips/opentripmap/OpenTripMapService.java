@@ -102,7 +102,7 @@ public class OpenTripMapService {
         logger.info("OpenTripMapService  >>generatePlaces: Places generated and saved successfully.");
         logger.info("OpenTripMapService  >>generatePlaces: End method.");
         return placesData;
-}
+    }
 
     public Boolean deletePlacesDataAll(){
         logger.info("OpenTripMapService  >>deletePlacesDataAll: Start method.");
@@ -185,7 +185,6 @@ public class OpenTripMapService {
 
     public PlacesData getSpecificPlace(String cityName){
         return this.openTripMapRepository.findByCity(cityName);
-
     }
 
 }
