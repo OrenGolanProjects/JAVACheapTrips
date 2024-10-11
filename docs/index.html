@@ -274,27 +274,25 @@
             hideRetryButton();
 
             let attempts = 0;
-            const maxAttempts = 2;
-            let intervalId = null;
+            const maxAttempts = 3;
             let newTab = null;
+            let intervalId = null;
 
             function cleanup(forceClose = true) {
                 if (intervalId) {
                     clearInterval(intervalId);
                 }
-                // Only close the tab if forceClose is true and it's not the final attempt
                 if (forceClose && newTab && !newTab.closed && attempts < maxAttempts) {
                     newTab.close();
                 }
             }
 
             function attemptLoad() {
-                cleanup(attempts < maxAttempts); // Only force close if not final attempt
+                cleanup(attempts < maxAttempts);
 
                 attempts++;
                 console.log(`Attempt ${attempts} of ${maxAttempts}`);
 
-                // Open new tab
                 newTab = window.open(mainAppUrl, '_blank');
                 if (!newTab) {
                     console.log("Failed to open new tab - possibly blocked by popup blocker");
@@ -302,10 +300,8 @@
                     return;
                 }
 
-                // Start checking the tab
                 intervalId = setInterval(() => {
                     try {
-                        // Check if tab was closed
                         if (newTab.closed) {
                             console.log("Tab was closed manually");
                             cleanup(false);
@@ -313,56 +309,49 @@
                             return;
                         }
 
-                        // Try to access tab content
-                        if (newTab.document.title === "CheapTrips - חיפוש טיסות") {
-                            console.log("Success: Tab title is correct");
+                        const currentTitle = newTab.document.title;
+                        console.log(`Current tab title: "${currentTitle}"`);
+
+                        if (currentTitle === "CheapTrips - חיפוש טיסות") {
+                            console.log("Success: Tab title matches 'CheapTrips - חיפוש טיסות'");
                             cleanup(false);
                             hideLoading();
                             return;
                         }
 
-                        console.log("Current tab title:", newTab.document.title);
-                        console.log("Waiting for correct title...");
-
                     } catch (e) {
                         console.log("Cannot access tab content:", e.message);
 
-                        // If this is a cross-origin error
                         if (e.message.includes("cross-origin")) {
                             if (attempts >= maxAttempts) {
                                 console.log("Final attempt with cross-origin error - keeping tab open");
-                                cleanup(false); // Don't close the tab
+                                cleanup(false);
                                 handleError();
                                 return;
                             }
                         }
-                        // Continue waiting if not final attempt
                     }
                 }, 1000);
 
-                // Set timeout for this attempt
                 setTimeout(() => {
                     if (attempts < maxAttempts) {
                         console.log("Attempt timed out, trying again...");
                         attemptLoad();
                     } else {
                         console.log("All attempts exhausted - keeping tab open");
-                        cleanup(false); // Don't close the tab on final attempt
+                        cleanup(false);
                         handleError();
                     }
-                }, 5000); // 10 second timeout per attempt
+                }, 5000);
             }
 
             function handleError() {
                 hideLoading();
                 showRetryButton();
-                // Don't reset attempts here anymore, as we want to track the final attempt
             }
 
-            // Start the first attempt
             attemptLoad();
 
-            // Add event listener for unload to cleanup
             window.addEventListener('unload', () => cleanup(false));
         }
 
