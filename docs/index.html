@@ -276,6 +276,8 @@
         }
 
         function loadMainApp() {
+            console.log("loadMainApp function started.");
+
             showLoading();
             hideRetryButton();
 
@@ -283,14 +285,17 @@
             const maxAttempts = 3;
             let newTab = null;
 
+            console.log("Starting to load main app, attempts set to 0.");
+
             function attemptLoad() {
+                console.log(`Attempt ${attempts + 1} initiated.`);
+
                 cleanup(attempts < maxAttempts, newTab, attempts, maxAttempts);
                 attempts++;
-                console.log(`Attempt ${attempts} of ${maxAttempts}`);
 
                 newTab = window.open(mainAppUrl, '_blank');
                 if (!newTab) {
-                    console.log("Failed to open new tab - possibly blocked by popup blocker");
+                    console.log("Failed to open new tab - possibly blocked by popup blocker.");
                     handleError();
                     return;
                 }
@@ -300,63 +305,72 @@
                         console.log("Attempt timed out, trying again...");
                         attemptLoad();
                     } else {
-                        console.log("All attempts exhausted - keeping tab open");
+                        console.log("All attempts exhausted - keeping tab open.");
                         cleanup(false, newTab, attempts, maxAttempts);
                         handleError();
                     }
                 }, 5000);
 
-                newTab.onload = function() {
-                    clearTimeout(timeoutId);
-                    console.log("New tab has loaded, checking title...");
-
+                // Polling mechanism to check the content of the new tab
+                const checkTabContent = setInterval(() => {
                     try {
-                        const tabTitle = newTab.document.title;
-                        console.log(`Current tab title: "${tabTitle}"`);
+                        const tabUrl = newTab.location.href;
+                        console.log(`Current tab URL: "${tabUrl}"`);
 
-                        if (tabTitle === "CheapTrips - חיפוש טיסות") {
-                            console.log("Success: Tab title matches 'CheapTrips - חיפוש טיסות'");
-                            cleanup(false, newTab, attempts, maxAttempts);
-                            hideLoading();
-                        } else {
-                            console.log("Tab title does not match expected title");
-                            if (attempts < maxAttempts) {
-                                console.log("Trying again...");
-                                attemptLoad();
-                            } else {
-                                console.log("All attempts exhausted - keeping tab open");
-                                cleanup(false, newTab, attempts, maxAttempts);
+                        if (tabUrl === "https://cheap-trips.runmydocker-app.com/") {
+                            console.log("Success: Tab URL matches.");
+                            const tabContent = newTab.document.body.textContent || newTab.document.body.innerText;
+
+                            if (tabContent.includes("Whitelabel Error Page")) {
+                                console.log("Error: The page contains 'Whitelabel Error Page'.");
+                                clearInterval(checkTabContent); // Stop checking
                                 handleError();
+                                return;
                             }
+
+                            const tabTitle = newTab.document.title;
+                            console.log(`Current tab title: "${tabTitle}"`);
+
+                            if (tabTitle === "CheapTrips - חיפוש טיסות") {
+                                console.log("Success: Tab title matches 'CheapTrips - חיפוש טיסות'.");
+                                clearInterval(checkTabContent); // Stop checking
+                                cleanup(false, newTab, attempts, maxAttempts);
+                                hideLoading();
+                            } else {
+                                console.log("Tab title does not match expected title.");
+                            }
+                        } else {
+                            console.log("Tab URL does not match the expected URL.");
+                            clearInterval(checkTabContent); // Stop checking
+                            handleError();
                         }
                     } catch (error) {
-                        console.log("Error accessing tab title:", error.message);
+                        console.log("Error accessing tab details:", error.message);
                         if (error.name === 'SecurityError') {
                             console.log("Cross-origin error detected. Unable to access tab content.");
                         }
-                        if (attempts < maxAttempts) {
-                            console.log("Trying again...");
-                            attemptLoad();
-                        } else {
-                            console.log("All attempts exhausted - keeping tab open");
-                            cleanup(false, newTab, attempts, maxAttempts);
-                            handleError();
-                        }
                     }
-                };
+                }, 1000); // Check every 1 second
+
+                // Clear the timeout if we stop polling
+                window.addEventListener('unload', () => {
+                    console.log("Window unload event, cleaning up.");
+                    cleanup(false, newTab, attempts, maxAttempts);
+                    clearInterval(checkTabContent);
+                });
             }
 
             function handleError() {
+                console.log("Handling error, showing retry button.");
                 hideLoading();
                 showRetryButton();
             }
 
             // Start the first attempt
+            console.log("Starting first attempt to load the main app.");
             attemptLoad();
-
-            // Add event listener for unload to cleanup
-            window.addEventListener('unload', () => cleanup(false, newTab, attempts, maxAttempts));
         }
+
 
         retryButton.addEventListener('click', function() {
             console.log("Retry button clicked");
