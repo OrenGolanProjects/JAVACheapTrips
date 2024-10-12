@@ -18,7 +18,7 @@
 
 
     <!-- Tabs Navigation -->
-    <ul class="nav nav-tabs mb-4" id="resultTabs" role="tablist">
+    <ul class="nav nav-tabs mb-4" id="resultTabs" role="tablist" dir="rtl">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="flights-tab" data-bs-toggle="tab" data-bs-target="#flights" type="button">טיסות</button>
       </li>
@@ -250,11 +250,11 @@
 
           function renderFlightDetails(ticket) {
               return `
-                  <div class="flight-details">
-                      ${renderDetailItem('מחיר:', `${ticket.price} ${tripData.flight.currency}`)}
-                      ${renderDetailItem('תאריך יציאה:', formatters.date(ticket.departureAt))}
-                      ${ticket.returnAt ? renderDetailItem('תאריך חזרה:', formatters.date(ticket.returnAt)) : ''}
-                      ${renderDetailItem('מספר עצירות:', ticket.transfers)}
+                  <div class="flight-details" dir="rtl">
+                      ${renderDetailItem('מחיר:  ', `${ticket.price} ${tripData.flight.currency}`)}
+                      ${renderDetailItem('תאריך יציאה:  ', formatters.date(ticket.departureAt))}
+                      ${ticket.returnAt ? renderDetailItem('תאריך חזרה:  ', formatters.date(ticket.returnAt)) : ''}
+                      ${renderDetailItem('מספר עצירות:  ', ticket.transfers)}
                   </div>
               `;
           }
