@@ -99,7 +99,7 @@
                   const sentimentScoreElement = document.getElementById('sentimentScore');
                   sentimentScoreElement.className = 'text-end mt-2';
                   sentimentScoreElement.dir = 'rtl';
-                  sentimentScoreElement.textContent = `דירוג הכתבות מצביע האם הטקסט של הכתבות שלילי (1) עד חיובי (5)`;
+                  sentimentScoreElement.textContent = `דירוג הכתבות מצביע האם הטקסט של הכתבות (1) שלילי עד (5) חיובי`;
 
                   // Define the stars element
                   const starsElement = document.getElementById('recommendationStars');
@@ -214,8 +214,21 @@
 
           function renderFlights() {
               console.log('Rendering flights');
+
+              // Create the header HTML
+              const flightHeader = `
+                  <div class="row mb-4">
+                      <div class="col">
+                          <h5 class="text-end mt-2" dir="rtl">טיסות זמינות - לחץ על צפה בטיסה להזמנת הטיסה</h5>
+                      </div>
+                  </div>
+              `;
+
+              // Create the flight cards HTML
               const flightCards = tripData.flight.ticketKeys.map(ticket => renderFlightCard(ticket)).join('');
-              document.getElementById('flightsList').innerHTML = flightCards;
+
+              // Combine the header and flight cards
+              document.getElementById('flightsList').innerHTML = flightHeader + flightCards;
           }
 
           function renderFlightCard(ticket) {
@@ -342,6 +355,15 @@
           function renderPlaces() {
               console.log('Rendering places');
 
+              // Create the header with radius and amount information
+              const placesHeader = `
+                  <div class="row mb-4">
+                      <div class="col">
+                          <h5 class="text-end mt-2" dir="rtl">מקומות לביקור ברדיוס של ${tripData.placesData.radius} ק"מ</h5>
+                      </div>
+                  </div>
+              `;
+
               const placesAccordion = tripData.placesData.kindsCategory.categories.map((category, index) => `
                   <div class="accordion-item">
                       <h2 class="accordion-header">
@@ -401,7 +423,9 @@
                       </div>
                   </div>
               `).join('');
-              document.getElementById('placesAccordion').innerHTML = placesAccordion;
+              // Combine the header and accordion content within the places tab
+              const placesTabContent = document.getElementById('places');
+              placesTabContent.innerHTML = placesHeader + `<div id="placesAccordion" class="accordion">${placesAccordion}</div>`;
           }
 
           function initializeTabs() {
